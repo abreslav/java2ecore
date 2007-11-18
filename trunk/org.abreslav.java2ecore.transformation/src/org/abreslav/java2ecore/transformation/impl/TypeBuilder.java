@@ -1,4 +1,4 @@
-package org.abreslav.java2ecore.transformation;
+package org.abreslav.java2ecore.transformation.impl;
 
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;

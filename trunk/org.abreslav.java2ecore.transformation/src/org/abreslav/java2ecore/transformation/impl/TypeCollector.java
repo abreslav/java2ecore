@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.abreslav.java2ecore.transformation;
+package org.abreslav.java2ecore.transformation.impl;
 
 import org.abreslav.java2ecore.annotations.InstanceTypeName;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;

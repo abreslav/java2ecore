@@ -1,12 +1,9 @@
-/**
- * 
- */
-package org.abreslav.java2ecore.transformation;
+package org.abreslav.java2ecore.transformation.utils;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
 
-final class NullSet<T> extends AbstractSet<T> {
+public class NullSet<T> extends AbstractSet<T> {
 	@Override
 	public Iterator<T> iterator() {
 		return null;
