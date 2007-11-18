@@ -3,12 +3,12 @@
  */
 package org.abreslav.java2ecore.transformation;
 
-import java.util.Set;
-
 import org.abreslav.java2ecore.annotations.InstanceTypeName;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
 import org.abreslav.java2ecore.transformation.astview.TypeView;
+import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import org.abreslav.java2ecore.transformation.diagnostics.NullDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -20,12 +20,12 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 public class TypeCollector extends ASTVisitor {
 	private EPackage myEPackage;
-	private final Set<Diagnostic> myDiagnostics;
+	private final IDiagnostics myDiagnostics;
 	private final IWritableTypeResolver myTypeResolver = TypeResolverFactory.createTypeReolver();
 	
-	public TypeCollector(Set<Diagnostic> diagnostics) {
+	public TypeCollector(IDiagnostics diagnostics) {
 		super(false);
-		myDiagnostics = diagnostics != null ? diagnostics : new NullSet<Diagnostic>();
+		myDiagnostics = diagnostics != null ? diagnostics : new NullDiagnostics();
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class TypeCollector extends ASTVisitor {
 		} 
 		
 		if (myEPackage == null) {
-			myDiagnostics.add(new Diagnostic(node, "EPackage must be specified first"));
+			myDiagnostics.reportError("EPackage must be specified first", node);
 			return false;
 		}
 		
@@ -80,10 +80,6 @@ public class TypeCollector extends ASTVisitor {
 	
 	public EPackage getEPackage() {
 		return myEPackage;
-	}
-	
-	public Set<Diagnostic> getDiagnostics() {
-		return myDiagnostics;
 	}
 	
 	public IWritableTypeResolver getTypeResolver() {

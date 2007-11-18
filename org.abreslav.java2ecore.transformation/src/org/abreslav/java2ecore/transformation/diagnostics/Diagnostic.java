@@ -1,20 +1,16 @@
-package org.abreslav.java2ecore.transformation;
+package org.abreslav.java2ecore.transformation.diagnostics;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class Diagnostic {
 	private final ASTNode myNode;
 	private final String myMessage;
-	private final boolean myError;
+	private final Severity mySeverity;
 	
-	public Diagnostic(ASTNode node, String message) {
-		this(node, message, true);
-	}
-	
-	public Diagnostic(ASTNode node, String message, boolean isError) {
+	public Diagnostic(ASTNode node, String message, Severity severity) {
 		myNode = node;
 		myMessage = message;
-		myError = isError;
+		mySeverity = severity;
 	}
 	
 	public ASTNode getNode() {
@@ -25,7 +21,7 @@ public class Diagnostic {
 		return myMessage;
 	}
 	
-	public boolean isError() {
-		return myError;
+	public Severity getSeverity() {
+		return mySeverity;
 	}
 }

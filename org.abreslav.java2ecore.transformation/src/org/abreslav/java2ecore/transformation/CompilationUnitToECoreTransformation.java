@@ -1,8 +1,7 @@
 package org.abreslav.java2ecore.transformation;
 
 
-import java.util.Set;
-
+import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
@@ -12,7 +11,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public class CompilationUnitToECoreTransformation {
 
-	public static EPackage transform(ICompilationUnit compilationUnit, Set<Diagnostic> diagnostics) throws JavaModelException {
+	public static EPackage transform(ICompilationUnit compilationUnit, IDiagnostics diagnostics) throws JavaModelException {
 		ASTParser parser = ASTParser.newParser(AST.JLS3); 
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setSource(compilationUnit);

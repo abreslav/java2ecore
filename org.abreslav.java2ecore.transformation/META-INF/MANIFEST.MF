@@ -7,4 +7,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core,
  org.eclipse.emf.ecore,
  org.abreslav.java2ecore
-Export-Package: org.abreslav.java2ecore.transformation
+Export-Package: org.abreslav.java2ecore.transformation,
+ org.abreslav.java2ecore.transformation.diagnostics
