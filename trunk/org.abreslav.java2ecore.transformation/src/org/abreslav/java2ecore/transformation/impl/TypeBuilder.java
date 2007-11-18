@@ -49,7 +49,28 @@ public class TypeBuilder extends ASTVisitor {
 			}
 		}
 		
+		ITypeBinding[] supertypes = getSupertypes(binding);
+		for (ITypeBinding typeBinding : supertypes) {
+			if (typeBinding == null 
+					|| Object.class.getName().equals(typeBinding.getQualifiedName())) {
+				continue;
+			}
+			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(typeBinding, typeParameterIndex);
+			eClass.getEGenericSuperTypes().add(eSuperClass);
+		}
+		
 		node.accept(new MemberBuilder(eClass, myTypeResolver, myDiagnostics, typeParameterIndex));
 		return false;
+	}
+
+	private ITypeBinding[] getSupertypes(ITypeBinding binding) {
+		ITypeBinding superclass = binding.getSuperclass();
+		ITypeBinding[] interfaces = binding.getInterfaces();
+		ITypeBinding[] supertypes = new ITypeBinding[1 + interfaces.length];
+		supertypes[0] = superclass;
+		for (int i = 1; i < supertypes.length; i++) {
+			supertypes[i] = interfaces[i - 1];
+		}
+		return supertypes;
 	}
 }
