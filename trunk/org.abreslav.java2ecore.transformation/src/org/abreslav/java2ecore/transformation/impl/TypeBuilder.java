@@ -1,11 +1,16 @@
 package org.abreslav.java2ecore.transformation.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.abreslav.java2ecore.multinh._;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -49,10 +54,10 @@ public class TypeBuilder extends ASTVisitor {
 			}
 		}
 		
-		ITypeBinding[] supertypes = getSupertypes(binding);
+		List<ITypeBinding> supertypes = getSupertypes(binding, node);
 		for (ITypeBinding typeBinding : supertypes) {
 			if (typeBinding == null 
-					|| Object.class.getName().equals(typeBinding.getQualifiedName())) {
+					|| Object.class.getCanonicalName().equals(typeBinding.getQualifiedName())) {
 				continue;
 			}
 			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(typeBinding, typeParameterIndex);
@@ -63,14 +68,31 @@ public class TypeBuilder extends ASTVisitor {
 		return false;
 	}
 
-	private ITypeBinding[] getSupertypes(ITypeBinding binding) {
+	private List<ITypeBinding> getSupertypes(ITypeBinding binding, ASTNode node) {
+		ArrayList<ITypeBinding> result = new ArrayList<ITypeBinding>();
+		
 		ITypeBinding superclass = binding.getSuperclass();
-		ITypeBinding[] interfaces = binding.getInterfaces();
-		ITypeBinding[] supertypes = new ITypeBinding[1 + interfaces.length];
-		supertypes[0] = superclass;
-		for (int i = 1; i < supertypes.length; i++) {
-			supertypes[i] = interfaces[i - 1];
+		if (superclass != null
+				&& !Object.class.getCanonicalName().equals(superclass.getQualifiedName())) {
+			result.add(superclass);
 		}
-		return supertypes;
+		ITypeBinding[] interfaces = binding.getInterfaces();
+		for (ITypeBinding typeBinding : interfaces) {
+			unwrapToList(typeBinding, result, 0, node);
+		}
+		return result;
+	}
+
+	private void unwrapToList(ITypeBinding typeBinding, ArrayList<ITypeBinding> list, int depth, ASTNode node) {
+		if (_.class.getCanonicalName().equals(typeBinding.getErasure().getQualifiedName())) {
+			ITypeBinding[] typeArguments = typeBinding.getTypeArguments();
+			unwrapToList(typeArguments[0], list, depth + 1, node);
+			unwrapToList(typeArguments[1], list, depth + 1, node);
+		} else {
+			if (depth > 0 && typeBinding.isInterface()) {
+				myDiagnostics.reportWarning("Don't use interface-wrapper operator '_' for interfaces. It is unnecesssary", node);
+			}
+			list.add(typeBinding);
+		}
 	}
 }

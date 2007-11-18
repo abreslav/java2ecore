@@ -3,6 +3,7 @@ package org.abreslav.java2ecore.transformation.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.abreslav.java2ecore.multinh.__;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
@@ -30,6 +31,10 @@ public class TypeResolver implements IWritableTypeResolver {
 	}
 	
 	public EGenericType resolveEGenericType(ITypeBinding binding, EClassTypeParameterIndex typeParameterIndex) {
+		if (__.class.getCanonicalName().equals(binding.getErasure().getQualifiedName())) {
+			return resolveEGenericType(binding.getTypeArguments()[0], typeParameterIndex);
+		}
+		
 		EGenericType eGenericType = EcoreFactory.eINSTANCE.createEGenericType(); 
 
 		if (binding.isTypeVariable()) {
@@ -57,6 +62,7 @@ public class TypeResolver implements IWritableTypeResolver {
 	private void processActualType(ITypeBinding binding,
 			EGenericType eGenericType) {
 		String fqn = binding.getErasure().getQualifiedName();
+		
 		EClass eClass = getEClass(fqn);
 		if (eClass != null) {
 			eGenericType.setEClassifier(eClass);
