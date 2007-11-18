@@ -4,4 +4,5 @@ Bundle-Name: org.abreslav.java2ecore
 Bundle-SymbolicName: org.abreslav.java2ecore
 Bundle-Version: 1.0.0
 Export-Package: org.abreslav.java2ecore.annotations,
+ org.abreslav.java2ecore.multinh,
  org.abreslav.java2ecore.multiplicities
