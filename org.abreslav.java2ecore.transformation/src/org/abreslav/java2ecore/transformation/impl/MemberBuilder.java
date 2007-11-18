@@ -20,17 +20,34 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MemberBuilder extends ASTVisitor {
+	private static final FeatureSettings DEFAULT_FEATURE_SETTINGS = new FeatureSettings(1, true, true);
+	
+	private static final int SPECIFIED_FEATURE_SETTINGS = -2;
+
 	private static class FeatureSettings {
+		int lowerBound = 0;
 		int upperBound = 1;
 		boolean isUnique = true;
 		boolean isOrdered = true;
 		
+		public FeatureSettings(int lowerBound, int upperBound, FeatureSettings fs) {
+			this(lowerBound, upperBound, fs.isUnique, fs.isOrdered);
+		}
+		
 		public FeatureSettings(int upperBound, boolean isUnique,
 				boolean isOrdered) {
+			this(0, upperBound, isUnique, isOrdered);
+		}
+		
+		public FeatureSettings(int lowerBound, int upperBound, boolean isUnique,
+				boolean isOrdered) {
+			this.lowerBound = lowerBound;
 			this.upperBound = upperBound;
 			this.isUnique = isUnique;
 			this.isOrdered = isOrdered;
-		}		
+		}	
+		
+		
 	}
 	
 	private static final Map<String, FeatureSettings> ourFeatureSettingsMap = new HashMap<String, FeatureSettings>();
@@ -38,6 +55,9 @@ public class MemberBuilder extends ASTVisitor {
 		ourFeatureSettingsMap.put(Collection.class.getCanonicalName(), new FeatureSettings(-1, false, false));
 		ourFeatureSettingsMap.put(Set.class.getCanonicalName(), new FeatureSettings(-1, true, false));
 		ourFeatureSettingsMap.put(List.class.getCanonicalName(), new FeatureSettings(-1, false, true));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MCollection.class.getCanonicalName(), new FeatureSettings(SPECIFIED_FEATURE_SETTINGS, false, false));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MSet.class.getCanonicalName(), new FeatureSettings(SPECIFIED_FEATURE_SETTINGS, true, false));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MList.class.getCanonicalName(), new FeatureSettings(SPECIFIED_FEATURE_SETTINGS, false, true));
 	}
 
 	private final EClass myEClass;
@@ -56,21 +76,13 @@ public class MemberBuilder extends ASTVisitor {
 	@Override
 	public boolean visit(FieldDeclaration node) {
 		ITypeBinding binding = node.getType().resolveBinding();
-		String fqn = binding.getErasure().getQualifiedName();
 
-		FeatureSettings featureSettings = ourFeatureSettingsMap.get(fqn);
-		if (featureSettings != null) {
+		FeatureSettings featureSettings = getFeatureSettings(node);
+		if (featureSettings != DEFAULT_FEATURE_SETTINGS) {
 			ITypeBinding[] typeArguments = binding.getTypeArguments();
-			if (typeArguments.length > 0) {
-				binding = typeArguments[0];
-			} else {
-				featureSettings = new FeatureSettings(1, true, true);
-				myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", node.getType());
-			}
-		} else {
-			featureSettings = new FeatureSettings(1, true, true);
+			binding = typeArguments[0];
 		}
-
+		
 		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, myTypeParameterIndex);
 		boolean isFinal = (node.getModifiers() & Modifier.FINAL) != 0;
 		boolean isTransient = (node.getModifiers() & Modifier.TRANSIENT) != 0;
@@ -86,7 +98,7 @@ public class MemberBuilder extends ASTVisitor {
 			feature.setChangeable(isFinal);
 			feature.setTransient(isTransient);
 			feature.setVolatile(isVolatile);
-			feature.setLowerBound(0);
+			feature.setLowerBound(featureSettings.lowerBound);
 			feature.setUpperBound(featureSettings.upperBound);
 			feature.setUnique(featureSettings.isUnique);
 			feature.setOrdered(featureSettings.isOrdered);
@@ -96,6 +108,36 @@ public class MemberBuilder extends ASTVisitor {
 			myEClass.getEStructuralFeatures().add(feature);
 		}
 		return false;
+	}
+
+	private FeatureSettings getFeatureSettings(FieldDeclaration fieldDeclaration) {
+		ITypeBinding binding = fieldDeclaration.getType().resolveBinding();
+		String fqn = binding.getErasure().getQualifiedName();
+		FeatureSettings featureSettings = ourFeatureSettingsMap.get(fqn);
+		if (featureSettings == null) {
+			return DEFAULT_FEATURE_SETTINGS;
+		}
+		
+		ITypeBinding[] typeArguments = binding.getTypeArguments();
+		if (typeArguments.length == 0) {
+			myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", fieldDeclaration.getType());
+			return DEFAULT_FEATURE_SETTINGS;
+		}
+
+		if (featureSettings.upperBound == SPECIFIED_FEATURE_SETTINGS) {
+			try {
+				Integer lowerBound = Integer.valueOf(typeArguments[1].getName().substring(1));
+				Integer upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
+				if (lowerBound > upperBound) {
+					myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, fieldDeclaration.getType());
+				}
+				featureSettings = new FeatureSettings(lowerBound, upperBound, featureSettings);
+			} catch (NumberFormatException e) {
+				myDiagnostics.reportError("Wrong number format. " + e.getMessage(), fieldDeclaration.getType());
+			}
+		}
+		
+		return featureSettings;
 	}
 
 	private EStructuralFeature createEStructuralFeature(
