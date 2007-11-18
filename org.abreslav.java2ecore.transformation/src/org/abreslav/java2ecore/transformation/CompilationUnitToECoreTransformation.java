@@ -2,6 +2,8 @@ package org.abreslav.java2ecore.transformation;
 
 
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import org.abreslav.java2ecore.transformation.impl.TypeBuilder;
+import org.abreslav.java2ecore.transformation.impl.TypeCollector;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;

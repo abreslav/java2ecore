@@ -1,4 +1,4 @@
-package org.abreslav.java2ecore.transformation;
+package org.abreslav.java2ecore.transformation.impl;
 
 import java.util.Collection;
 import java.util.HashMap;

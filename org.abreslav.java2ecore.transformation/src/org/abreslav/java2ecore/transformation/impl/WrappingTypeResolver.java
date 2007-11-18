@@ -1,9 +1,10 @@
-package org.abreslav.java2ecore.transformation;
+package org.abreslav.java2ecore.transformation.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.abreslav.java2ecore.transformation.utils.NullSet;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EcoreFactory;
