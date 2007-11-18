@@ -7,11 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -45,12 +43,14 @@ public class MemberBuilder extends ASTVisitor {
 	private final EClass myEClass;
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
+	private final EClassTypeParameterIndex myTypeParameterIndex;
 
 	public MemberBuilder(EClass class1, ITypeResolver typeResolver,
-			IDiagnostics diagnostics, Collection<? super EDataType> wrappedTypes) {
+			IDiagnostics diagnostics, EClassTypeParameterIndex parameterIndex) {
 		myEClass = class1;
-		myTypeResolver = new WrappingTypeResolver(typeResolver, wrappedTypes);
+		myTypeResolver = typeResolver;
 		myDiagnostics = diagnostics;
+		myTypeParameterIndex = parameterIndex;
 	}
 	
 	@Override
@@ -58,7 +58,6 @@ public class MemberBuilder extends ASTVisitor {
 		ITypeBinding binding = node.getType().resolveBinding();
 		String fqn = binding.getErasure().getQualifiedName();
 
-		System.out.println(fqn);
 		FeatureSettings featureSettings = ourFeatureSettingsMap.get(fqn);
 		if (featureSettings != null) {
 			ITypeBinding[] typeArguments = binding.getTypeArguments();
@@ -72,7 +71,7 @@ public class MemberBuilder extends ASTVisitor {
 			featureSettings = new FeatureSettings(1, true, true);
 		}
 
-		EGenericType eGenericType = resolveEGenericType(binding);
+		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, myTypeParameterIndex);
 		boolean isFinal = (node.getModifiers() & Modifier.FINAL) != 0;
 		boolean isTransient = (node.getModifiers() & Modifier.TRANSIENT) != 0;
 		boolean isVolatile = (node.getModifiers() & Modifier.VOLATILE) != 0;
@@ -80,14 +79,7 @@ public class MemberBuilder extends ASTVisitor {
 		@SuppressWarnings("unchecked")
 		List<VariableDeclarationFragment> fragments = (List<VariableDeclarationFragment>) node.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
 		for (VariableDeclarationFragment fragment : fragments) {
-			EStructuralFeature feature;
-			if (eGenericType.getEClassifier() instanceof EDataType) {
-				EAttribute eAttribute = EcoreFactory.eINSTANCE.createEAttribute();
-				feature = eAttribute;
-			} else {
-				EReference eReference = EcoreFactory.eINSTANCE.createEReference();
-				feature = eReference;
-			}
+			EStructuralFeature feature = createEStructuralFeature(eGenericType);
 			
 			feature.setEGenericType(eGenericType);
 			feature.setName(fragment.getName().getIdentifier());
@@ -106,6 +98,17 @@ public class MemberBuilder extends ASTVisitor {
 		return false;
 	}
 
+	private EStructuralFeature createEStructuralFeature(
+			EGenericType eGenericType) {
+		EStructuralFeature feature;
+		if (eGenericType.getEClassifier() instanceof EDataType) {
+			feature = EcoreFactory.eINSTANCE.createEAttribute();
+		} else {
+			feature = EcoreFactory.eINSTANCE.createEReference();
+		}
+		return feature;
+	}
+
 	private void setDefaultValue(EStructuralFeature feature,
 			Expression initializer) {
 		if (initializer != null) {
@@ -118,21 +121,5 @@ public class MemberBuilder extends ASTVisitor {
 		}
 	}
 
-	private EGenericType resolveEGenericType(ITypeBinding binding) {
-		EGenericType eGenericType = EcoreFactory.eINSTANCE.createEGenericType(); 
-		String fqn = binding.getQualifiedName();
-		
-		EClass eClass = myTypeResolver.getEClass(fqn);
-		if (eClass != null) {
-			eGenericType.setEClassifier(eClass);
-		} else {
-			EDataType eDataType = myTypeResolver.getEDataType(fqn);
-			if (eDataType != null) {
-				eGenericType.setEClassifier(eDataType);
-			}
-		} 
-		
-		return eGenericType;
-	}
 
 }
