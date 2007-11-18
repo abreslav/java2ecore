@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -43,10 +44,10 @@ public class MemberBuilder extends ASTVisitor {
 
 	private final EClass myEClass;
 	private final ITypeResolver myTypeResolver;
-	private final Set<Diagnostic> myDiagnostics;
+	private final IDiagnostics myDiagnostics;
 
 	public MemberBuilder(EClass class1, ITypeResolver typeResolver,
-			Set<Diagnostic> diagnostics, Collection<? super EDataType> wrappedTypes) {
+			IDiagnostics diagnostics, Collection<? super EDataType> wrappedTypes) {
 		myEClass = class1;
 		myTypeResolver = new WrappingTypeResolver(typeResolver, wrappedTypes);
 		myDiagnostics = diagnostics;
@@ -57,6 +58,7 @@ public class MemberBuilder extends ASTVisitor {
 		ITypeBinding binding = node.getType().resolveBinding();
 		String fqn = binding.getErasure().getQualifiedName();
 
+		System.out.println(fqn);
 		FeatureSettings featureSettings = ourFeatureSettingsMap.get(fqn);
 		if (featureSettings != null) {
 			ITypeBinding[] typeArguments = binding.getTypeArguments();
@@ -64,7 +66,7 @@ public class MemberBuilder extends ASTVisitor {
 				binding = typeArguments[0];
 			} else {
 				featureSettings = new FeatureSettings(1, true, true);
-				myDiagnostics.add(new Diagnostic(node.getType(), "Raw collection type will be wrapped into a simple EDatatType", false));
+				myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", node.getType());
 			}
 		} else {
 			featureSettings = new FeatureSettings(1, true, true);
@@ -111,7 +113,7 @@ public class MemberBuilder extends ASTVisitor {
 			if (constant != null) {
 				feature.setDefaultValueLiteral(constant.toString());
 			} else {
-				myDiagnostics.add(new Diagnostic(initializer, "Non-constant values are not allowed"));
+				myDiagnostics.reportError("Non-constant values are not allowed", initializer);
 			}
 		}
 	}

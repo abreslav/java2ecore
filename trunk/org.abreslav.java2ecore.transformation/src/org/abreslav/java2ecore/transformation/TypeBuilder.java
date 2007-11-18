@@ -1,7 +1,6 @@
 package org.abreslav.java2ecore.transformation;
 
-import java.util.Set;
-
+import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -10,10 +9,10 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 public class TypeBuilder extends ASTVisitor {
 
 	private final ITypeResolver myTypeResolver;
-	private final Set<Diagnostic> myDiagnostics;
+	private final IDiagnostics myDiagnostics;
 	private final EPackage myEPackage;
 
-	public TypeBuilder(ITypeResolver typeResolver, Set<Diagnostic> diagnostics,
+	public TypeBuilder(ITypeResolver typeResolver, IDiagnostics diagnostics,
 			EPackage package1) {
 		super();
 		myTypeResolver = typeResolver;

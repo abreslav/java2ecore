@@ -34,7 +34,13 @@ public class WrappingTypeResolver implements ITypeResolver {
 		}
 		if (eDataType == null) {
 			eDataType = EcoreFactory.eINSTANCE.createEDataType();
-			eDataType.setName(fqn.substring(fqn.lastIndexOf('.') + 1));
+			String name = fqn;
+			int genericIndex = name.indexOf('<');
+			if (genericIndex >= 0) {
+				name = name.substring(0, genericIndex);
+			}
+			name = name.substring(name.lastIndexOf('.') + 1);
+			eDataType.setName(name);
 			eDataType.setInstanceTypeName(fqn);
 			myEDataTypeMap.put(fqn, eDataType);
 			myEDataTypes.add(eDataType);
