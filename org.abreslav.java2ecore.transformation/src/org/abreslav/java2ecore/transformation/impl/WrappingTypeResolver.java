@@ -7,7 +7,9 @@ import java.util.Map;
 import org.abreslav.java2ecore.transformation.utils.NullSet;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class WrappingTypeResolver implements ITypeResolver {
 
@@ -51,5 +53,10 @@ public class WrappingTypeResolver implements ITypeResolver {
 
 	public Collection<EDataType> getWrappedTypes() {
 		return myEDataTypeMap.values();
+	}
+
+	public EGenericType resolveEGenericType(ITypeBinding binding,
+			EClassTypeParameterIndex typeParameterIndex) {
+		return myResolver.resolveEGenericType(binding, typeParameterIndex);
 	}
 }
