@@ -1,6 +1,7 @@
 = What is Java2ECore? =
 
 Java2Ecore is a translator from a subset of Java language to [http://www.eclipse.org/emf EMF ECore]. 
+
 Tha main idea is that you can simply define some classes in Java and they will be transformed to an ECore model.
 
 = Example =
