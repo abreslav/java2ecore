@@ -1,8 +1,20 @@
 #summary Description of Java2Ecore syntax
 
 = File structure =
+When youdescribe some ECore model in a `*`.java file you define classes on the same level:
+one of them might be public (I think, it will be a package-specifying class) and others are package-private. All these classes will be handled by Java2ECore.
 
 = EPackage specification =
+The first thing to do when defining a ECore model is to create EPackage (and not to forget  to set up nsPrefix and nsURI attributes). In Java2ECore this is done as follows:
+{{{
+@EPackage(
+    nsPrefix="samples",   
+    nsURI="http:///example.com/samples"
+)  
+public class samples {
+}
+}}}
+Such a class is called a _package specification class_. EPackage will have the same name and nsPrefix and nsURI are specified by an annotation @EPackage.
 
 = Classifiers =
 Java2Ecore supports all three types of classifiers:
