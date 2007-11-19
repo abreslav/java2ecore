@@ -3,7 +3,6 @@ package org.abreslav.java2ecore.transformation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.abreslav.java2ecore.multinh._;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EGenericType;
@@ -78,21 +77,9 @@ public class TypeBuilder extends ASTVisitor {
 		}
 		ITypeBinding[] interfaces = binding.getInterfaces();
 		for (ITypeBinding typeBinding : interfaces) {
-			unwrapToList(typeBinding, result, 0, node);
+			result.add(typeBinding);
 		}
 		return result;
 	}
 
-	private void unwrapToList(ITypeBinding typeBinding, ArrayList<ITypeBinding> list, int depth, ASTNode node) {
-		if (_.class.getCanonicalName().equals(typeBinding.getErasure().getQualifiedName())) {
-			ITypeBinding[] typeArguments = typeBinding.getTypeArguments();
-			unwrapToList(typeArguments[0], list, depth + 1, node);
-			unwrapToList(typeArguments[1], list, depth + 1, node);
-		} else {
-			if (depth > 0 && typeBinding.isInterface()) {
-				myDiagnostics.reportWarning("Don't use interface-wrapper operator '_' for interfaces. It is unnecesssary", node);
-			}
-			list.add(typeBinding);
-		}
-	}
 }
