@@ -172,14 +172,14 @@ abstract class Abstract { // abstract modifier sets up EClass' abstract attribut
 }
 }}}
 
-But here we face a problem of multiple inheritance for lasses being supported by ECore and not supported by Java.
+But here we face a problem of multiple inheritance for classes being supported by ECore and not supported by Java.
 Java2ECore provides a workaround which we call an _interface form of class_...
 
 == Interface form of class ==
 
 There's no multiple inheritance for classes in Java. But there is one for interfaces.
 
-On the other hand you cannot declare non-final fields in interfaces and final field has to be initialized which will set up defaultValueLiteral andis impossible for most types.
+On the other hand you cannot declare non-final fields in interfaces in Java and final field has to be initialized which will set up defaultValueLiteral andis impossible for most types. And ECore support any structural features in interfaces.
 
 So we provide the following: each interface (or class, to be consistent) can declare one inner-class, which holds all the parent's contents:
 {{{
@@ -190,11 +190,11 @@ class _{
 }
 }
 }}}
-In this example we created a EClass having {{{interface}}} attribute set to true and having one integer attribute and one reference of type {{{I}}}.
+In this example we created an EClass having {{{interface}}} attribute set to true and having one integer attribute and one reference of type {{{I}}}.
 
 == Multiple inheritance for classes ==
 
-To provide multiple inheritance for classes you can define them as Java interfaces supplying a {{{@Class}}} annotation which will tell !Java2ECore not to set {{{interface}}} attribute to true.
+To provide multiple inheritance for classes you can define them as Java interfaces supplying a {{{@Class}}} annotation which will tell Java2ECore not to set {{{interface}}} attribute to true.
 {{{
 @Class interface A {
 class _{
@@ -211,9 +211,13 @@ class _{
 }}}
 
 In this sample we created three _classes_, A, B and C, and C is a descendant of both A and B.
+
 You still can specify {{{abstract}}} attribute along with {{{@Class}}} annotation to make your class abstract:
 {{{
 abstract @Class interface A {
+class _{
+   Object o;
+}
 }
 }}}
 = Handling unknown types =
