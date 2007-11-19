@@ -21,14 +21,14 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MemberBuilder extends ASTVisitor {
 	
-	private static final Map<String, FeatureSettings> ourFeatureSettingsMap = new HashMap<String, FeatureSettings>();
+	private static final Map<String, FeatureTypeSettings> ourFeatureSettingsMap = new HashMap<String, FeatureTypeSettings>();
 	static {
-		ourFeatureSettingsMap.put(Collection.class.getCanonicalName(), new FeatureSettings(0, -1, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(Set.class.getCanonicalName(), new FeatureSettings(0, -1, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(List.class.getCanonicalName(), new FeatureSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MCollection.class.getCanonicalName(), new FeatureSettings(0, FeatureSettings.BOUNDS_SPECIFIED_BY_TYPE, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MSet.class.getCanonicalName(), new FeatureSettings(0, FeatureSettings.BOUNDS_SPECIFIED_BY_TYPE, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MList.class.getCanonicalName(), new FeatureSettings(0, FeatureSettings.BOUNDS_SPECIFIED_BY_TYPE, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(Collection.class.getCanonicalName(), new FeatureTypeSettings(0, -1, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(Set.class.getCanonicalName(), new FeatureTypeSettings(0, -1, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(List.class.getCanonicalName(), new FeatureTypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MCollection.class.getCanonicalName(), new FeatureTypeSettings(0, FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MSet.class.getCanonicalName(), new FeatureTypeSettings(0, FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MList.class.getCanonicalName(), new FeatureTypeSettings(0, FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
 	}
 
 	private final EClass myEClass;
@@ -48,8 +48,8 @@ public class MemberBuilder extends ASTVisitor {
 	public boolean visit(FieldDeclaration node) {
 		ITypeBinding binding = node.getType().resolveBinding();
 
-		FeatureSettings featureSettings = getFeatureSettingsImpliedByJavaType(node);
-		binding = featureSettings.getUnwrapStrategy().unwrap(binding);
+		FeatureTypeSettings typeSettings = getFeatureSettingsImpliedByJavaType(node);
+		binding = typeSettings.getUnwrapStrategy().unwrap(binding);
 		
 		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, false, myTypeParameterIndex);
 		boolean isFinal = (node.getModifiers() & Modifier.FINAL) != 0;
@@ -69,10 +69,10 @@ public class MemberBuilder extends ASTVisitor {
 			feature.setChangeable(isFinal);
 			feature.setTransient(isTransient);
 			feature.setVolatile(isVolatile);
-			feature.setLowerBound(featureSettings.getLowerBound());
-			feature.setUpperBound(featureSettings.getUpperBound());
-			feature.setUnique(featureSettings.isUnique());
-			feature.setOrdered(featureSettings.isOrdered());
+			feature.setLowerBound(typeSettings.getLowerBound());
+			feature.setUpperBound(typeSettings.getUpperBound());
+			feature.setUnique(typeSettings.isUnique());
+			feature.setOrdered(typeSettings.isOrdered());
 			
 			setDefaultValue(feature, fragment.getInitializer());
 
@@ -81,35 +81,35 @@ public class MemberBuilder extends ASTVisitor {
 		return false;
 	}
 
-	private FeatureSettings getFeatureSettingsImpliedByJavaType(FieldDeclaration fieldDeclaration) {
+	private FeatureTypeSettings getFeatureSettingsImpliedByJavaType(FieldDeclaration fieldDeclaration) {
 		ITypeBinding binding = fieldDeclaration.getType().resolveBinding();
 		if (binding.isArray()) {
 			if (binding.getDimensions() > 1) {
 				myDiagnostics.reportError("Multidimentional arrays are not supported", fieldDeclaration.getType());
 			}
-			return new FeatureSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_ARRAY);
+			return new FeatureTypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_ARRAY);
 		}
 		
 		String fqn = binding.getErasure().getQualifiedName();
-		FeatureSettings featureSettings = ourFeatureSettingsMap.get(fqn);
+		FeatureTypeSettings featureSettings = ourFeatureSettingsMap.get(fqn);
 		if (featureSettings == null) {
-			return FeatureSettings.DEFAULT;
+			return FeatureTypeSettings.DEFAULT;
 		}
 		
 		ITypeBinding[] typeArguments = binding.getTypeArguments();
 		if (typeArguments.length == 0) {
 			myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", fieldDeclaration.getType());
-			return FeatureSettings.DEFAULT;
+			return FeatureTypeSettings.DEFAULT;
 		}
 
-		if (featureSettings.getUpperBound() == FeatureSettings.BOUNDS_SPECIFIED_BY_TYPE) {
+		if (featureSettings.getUpperBound() == FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE) {
 			try {
 				Integer lowerBound = Integer.valueOf(typeArguments[1].getName().substring(1));
 				Integer upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
 				if (lowerBound > upperBound) {
 					myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, fieldDeclaration.getType());
 				}
-				featureSettings = new FeatureSettings(lowerBound, upperBound, featureSettings);
+				featureSettings = new FeatureTypeSettings(lowerBound, upperBound, featureSettings);
 			} catch (NumberFormatException e) {
 				myDiagnostics.reportError("Wrong number format. " + e.getMessage(), fieldDeclaration.getType());
 			}
