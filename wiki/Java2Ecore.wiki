@@ -4,7 +4,7 @@ Java2Ecore is a translator from a subset of Java language to [http://www.eclipse
 Tha main idea is that you can simply define some classes in Java and they will be transformed to an ECore model.
 
 = Example =
-Let's have a look at the simplest example from Eclipse Help [http://help.eclipse.org/help32/index.jsp?topic=/org.eclipse.emf.doc/tutorials/clibmod/clibmod.html A Library]: 
+Let's have a look at the simplest example from Eclipse Help, [http://help.eclipse.org/help32/index.jsp?topic=/org.eclipse.emf.doc/tutorials/clibmod/clibmod.html A Library]: 
 
 http://help.eclipse.org/help32/topic/org.eclipse.emf.doc/tutorials/clibmod/images/model.gif 
 {{{
