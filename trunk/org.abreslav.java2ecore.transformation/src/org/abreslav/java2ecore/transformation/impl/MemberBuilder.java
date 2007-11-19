@@ -6,10 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.abreslav.java2ecore.annotations.sfeatures.Containment;
+import org.abreslav.java2ecore.annotations.sfeatures.Derived;
+import org.abreslav.java2ecore.annotations.sfeatures.ID;
+import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
+import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
+import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
+import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -46,12 +55,12 @@ public class MemberBuilder extends ASTVisitor {
 	
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		ITypeBinding binding = node.getType().resolveBinding();
-
 		FeatureTypeSettings typeSettings = getFeatureSettingsImpliedByJavaType(node);
-		binding = typeSettings.getUnwrapStrategy().unwrap(binding);
+		final ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(node.getType().resolveBinding());
 		
 		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, false, myTypeParameterIndex);
+		IFeatureFactory factory = createFeatureFactory(node, eGenericType);
+
 		boolean isFinal = (node.getModifiers() & Modifier.FINAL) != 0;
 		boolean isTransient = (node.getModifiers() & Modifier.TRANSIENT) != 0;
 		boolean isVolatile = (node.getModifiers() & Modifier.VOLATILE) != 0;
@@ -62,7 +71,7 @@ public class MemberBuilder extends ASTVisitor {
 			if (fragment.getExtraDimensions() > 0) {
 				myDiagnostics.reportError("Specify array dimensions at the field type", fragment);
 			}
-			EStructuralFeature feature = createEStructuralFeature(eGenericType);
+			EStructuralFeature feature = factory.createStructuralFeature();
 			
 			feature.setEGenericType(eGenericType);
 			feature.setName(fragment.getName().getIdentifier());
@@ -79,6 +88,36 @@ public class MemberBuilder extends ASTVisitor {
 			myEClass.getEStructuralFeatures().add(feature);
 		}
 		return false;
+	}
+
+	private IFeatureFactory createFeatureFactory(FieldDeclaration node,
+			EGenericType eGenericType) {
+		AnnotatedView annotations = ASTViewFactory.INSTANCE.createAnnotatedView(node);
+		if (eGenericType.getEClassifier() instanceof EDataType) {
+			final boolean isId = annotations.isAnnotationPresent(ID.class);
+			return new IFeatureFactory() {
+				public EStructuralFeature createStructuralFeature() {
+					EAttribute result = EcoreFactory.eINSTANCE.createEAttribute();
+					result.setID(isId);
+					return result;
+				}
+			};
+		} else {
+			final boolean isContainment = annotations.isAnnotationPresent(Containment.class);
+			final boolean isDerived = annotations.isAnnotationPresent(Derived.class);
+			final boolean isUnsettable = annotations.isAnnotationPresent(Unsettable.class);
+			final boolean isResolveProxies = annotations.isAnnotationPresent(ResolveProxies.class);
+			return new IFeatureFactory() {
+				public EStructuralFeature createStructuralFeature() {
+					EReference result = EcoreFactory.eINSTANCE.createEReference();
+					result.setContainment(isContainment);
+					result.setDerived(isDerived);
+					result.setResolveProxies(isResolveProxies);
+					result.setUnsettable(isUnsettable);
+					return result;
+				}
+			};
+		}
 	}
 
 	private FeatureTypeSettings getFeatureSettingsImpliedByJavaType(FieldDeclaration fieldDeclaration) {
@@ -117,18 +156,7 @@ public class MemberBuilder extends ASTVisitor {
 		
 		return featureSettings;
 	}
-
-	private EStructuralFeature createEStructuralFeature(
-			EGenericType eGenericType) {
-		EStructuralFeature feature;
-		if (eGenericType.getEClassifier() instanceof EDataType) {
-			feature = EcoreFactory.eINSTANCE.createEAttribute();
-		} else {
-			feature = EcoreFactory.eINSTANCE.createEReference();
-		}
-		return feature;
-	}
-
+	
 	private void setDefaultValue(EStructuralFeature feature,
 			Expression initializer) {
 		if (initializer != null) {

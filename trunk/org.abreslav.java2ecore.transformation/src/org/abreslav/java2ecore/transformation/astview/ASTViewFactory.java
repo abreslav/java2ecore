@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.core.dom.Annotation;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMemberValuePairBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -49,7 +50,7 @@ public class ASTViewFactory {
 				declaration.resolveBinding().getQualifiedName(), 
 				declaration.isInterface());
 		
-		List<?> modifiers = (List<?>) declaration.getStructuralProperty(TypeDeclaration.MODIFIERS2_PROPERTY);
+		List<?> modifiers = (List<?>) declaration.getStructuralProperty(declaration.getModifiersProperty());
 		
 		for (Object modifier : modifiers) {
 			if (modifier instanceof Annotation) {
@@ -60,6 +61,19 @@ public class ASTViewFactory {
 				if (mod.isAbstract()) {
 					view.setAbstract(true);
 				}
+			} 
+		}
+		return view;
+	}
+	
+	public AnnotatedView createAnnotatedView(BodyDeclaration declaration) {
+		AnnotatedView view = new AnnotatedView();
+		List<?> modifiers = (List<?>) declaration.getStructuralProperty(declaration.getModifiersProperty());
+		
+		for (Object modifier : modifiers) {
+			if (modifier instanceof Annotation) {
+				Annotation annotation = (Annotation) modifier;
+				view.addAnnotation(createAnnotationView(annotation));
 			} 
 		}
 		return view;
