@@ -7,9 +7,9 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public interface ITypeResolver {
 
-	EClass getEClass(String fqn);
+	EClass getEClass(ITypeBinding type);
 
-	EDataType getEDataType(String fqn);
+	EDataType getEDataType(ITypeBinding type);
 	
 	EGenericType resolveEGenericType(ITypeBinding binding, EClassTypeParameterIndex typeParameterIndex);
 

@@ -26,26 +26,24 @@ public class WrappingTypeResolver implements ITypeResolver {
 		}
 	}
 
-	public EClass getEClass(String fqn) {
-		return myResolver.getEClass(fqn);
+	public EClass getEClass(ITypeBinding type) {
+		return myResolver.getEClass(type);
 	}
 
-	public EDataType getEDataType(String fqn) {
-		EDataType eDataType = myResolver.getEDataType(fqn);
+	public EDataType getEDataType(ITypeBinding type) {
+		EDataType eDataType = myResolver.getEDataType(type);
 		if (eDataType == null) {
-			eDataType = myEDataTypeMap.get(fqn);
+			eDataType = myEDataTypeMap.get(type);
 		}
 		if (eDataType == null) {
 			eDataType = EcoreFactory.eINSTANCE.createEDataType();
-			String name = fqn;
-			int genericIndex = name.indexOf('<');
-			if (genericIndex >= 0) {
-				name = name.substring(0, genericIndex);
-			}
-			name = name.substring(name.lastIndexOf('.') + 1);
-			eDataType.setName(name);
-			eDataType.setInstanceTypeName(fqn);
-			myEDataTypeMap.put(fqn, eDataType);
+			eDataType.setName(type.getName());
+			String qualifiedName = type.getErasure().getQualifiedName();
+			eDataType.setInstanceTypeName(qualifiedName);
+
+			// TODO: Use generic arguments
+			
+			myEDataTypeMap.put(qualifiedName, eDataType);
 			myEDataTypes.add(eDataType);
 		}
 		return eDataType;

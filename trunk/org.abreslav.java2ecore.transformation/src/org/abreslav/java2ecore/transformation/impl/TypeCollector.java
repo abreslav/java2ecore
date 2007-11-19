@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 public class TypeCollector extends ASTVisitor {
 	private EPackage myEPackage;
 	private final IDiagnostics myDiagnostics;
-	private final IWritableTypeResolver myTypeResolver = TypeResolverFactory.createTypeReolver();
+	private final IWritableTypeResolver myTypeResolver = new TypeResolver();
 	
 	public TypeCollector(IDiagnostics diagnostics) {
 		super(false);
@@ -58,26 +58,26 @@ public class TypeCollector extends ASTVisitor {
 		AnnotationView eDataTypeAnnotation = type.getAnnotation(org.abreslav.java2ecore.annotations.types.EDataType.class.getCanonicalName());
 		if (eDataTypeAnnotation != null) {
 			EDataType eDataType = EcoreFactory.eINSTANCE.createEDataType();
-			myTypeResolver.addEDataType(type.getQualifiedName(), eDataType);
+			myTypeResolver.addEDataType(node.resolveBinding(), eDataType);
 			eClassifier = eDataType;
 			
 			eDataType.setInstanceTypeName((String) eDataTypeAnnotation.getAttribute("value"));
 		} else {
 			EClass eClass = EcoreFactory.eINSTANCE.createEClass();
-			myTypeResolver.addEClass(type.getQualifiedName(), eClass);
+			myTypeResolver.addEClass(node.resolveBinding(), eClass);
 			eClassifier = eClass;
 			AnnotationView instanceTypeName = type.getAnnotation(InstanceTypeName.class.getCanonicalName());
 			if (instanceTypeName != null) {
 				eClassifier.setInstanceTypeName((String) instanceTypeName.getAttribute("value"));
 			}
+
+			eClass.setAbstract(type.isAbstract());
 			
 			AnnotationView classAnnotation = type.getAnnotation(Class.class.getCanonicalName());
 			if ((classAnnotation == null) || !type.isInterface()) {
-				eClass.setAbstract(type.isAbstract());
 				eClass.setInterface(type.isInterface());
 			} else {
 				eClass.setInterface(false);
-				eClass.setAbstract((Boolean) classAnnotation.getAttribute("value"));
 			}
 		}
 		eClassifier.setName(type.getSimpleName());
