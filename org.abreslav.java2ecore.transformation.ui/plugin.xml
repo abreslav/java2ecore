@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         id="sampleBuilder"
+         name="Sample Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="org.abreslav.java2ecore.transformation.ui.builder.SampleBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="sampleNature"
+         name="Sample Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.abreslav.java2ecore.transformation.ui.builder.SampleNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.abreslav.java2ecore.transformation.ui.sampleBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="Test.contribution1"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="org.abreslav.java2ecore.transformation.ui.builder.ToggleNatureAction"
+               enablesFor="+"
+               id="Test.addRemoveNatureAction"
+               label="Add/Remove Sample Nature"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="Test.contribution1"
+            objectClass="org.eclipse.jdt.core.ICompilationUnit">
+         <action
+               class="test.popup.actions.GenerateEcoreAction"
+               enablesFor="1"
+               id="Test.newAction"
+               label="Generate ECore"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension
+         id="j2EcoreProblem"
+         name="Java to ECore Transformation Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+
+</plugin>
