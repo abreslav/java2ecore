@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.ETypeParameter;
-import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -20,40 +18,31 @@ public class TypeBuilder extends ASTVisitor {
 
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
-	private final EPackage myEPackage;
 
-	public TypeBuilder(ITypeResolver typeResolver, IDiagnostics diagnostics,
-			EPackage package1) {
-		myEPackage = package1;
+	public TypeBuilder(ITypeResolver typeResolver, IDiagnostics diagnostics) {
 		myDiagnostics = diagnostics;
-		myTypeResolver = new WrappingTypeResolver(typeResolver, myEPackage.getEClassifiers());
+		myTypeResolver = typeResolver;
 	}
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		EClass eClass = myTypeResolver.getEClass(node.resolveBinding());
-		if (eClass == null) {
+		ITypeBinding binding = node.resolveBinding();
+		if (processEDataType(binding)) {
 			return false;
 		}
 		
-		ITypeBinding binding = node.resolveBinding();
-		EClassTypeParameterIndex typeParameterIndex = new EClassTypeParameterIndex();
-		if (binding.isGenericType()) {
-			ITypeBinding[] typeParameters = binding.getTypeParameters();
-			for (ITypeBinding typeParameter : typeParameters) {
-				ETypeParameter eTypeParameter = EcoreFactory.eINSTANCE.createETypeParameter();
-				eTypeParameter.setName(typeParameter.getName());
-				typeParameterIndex.registerTypeParameter(eTypeParameter);
-				
-				ITypeBinding[] typeBounds = typeParameter.getTypeBounds();
-				for (ITypeBinding typeBound : typeBounds) {
-					EGenericType eTypeBound = myTypeResolver.resolveEGenericType(typeBound, typeParameterIndex);
-					eTypeParameter.getEBounds().add(eTypeBound);
-				}
-				
-				eClass.getETypeParameters().add(eTypeParameter);
-			}
+		processEClass(node, binding);
+		return false;
+	}
+
+	private void processEClass(TypeDeclaration node, ITypeBinding binding) {
+		EClass eClass = myTypeResolver.getEClass(binding);
+		if (eClass == null) {
+			return;
 		}
+		
+		EClassTypeParameterIndex typeParameterIndex = myTypeResolver.createTypeParameters(
+				eClass, binding);
 		
 		List<ITypeBinding> supertypes = getSupertypes(binding, node);
 		for (ITypeBinding typeBinding : supertypes) {
@@ -70,7 +59,16 @@ public class TypeBuilder extends ASTVisitor {
 			node = types[0];
 		}
 		node.accept(new MemberBuilder(eClass, myTypeResolver, myDiagnostics, typeParameterIndex));
-		return false;
+	}
+
+	private boolean processEDataType(ITypeBinding binding) {
+		EDataType eDataType = myTypeResolver.getEDataType(binding);
+		if (eDataType == null) {
+			return false;
+		}
+		
+		myTypeResolver.createTypeParameters(eDataType, binding);
+		return true;
 	}
 
 	private void markNestedThings(final TypeDeclaration node, TypeDeclaration[] types) {

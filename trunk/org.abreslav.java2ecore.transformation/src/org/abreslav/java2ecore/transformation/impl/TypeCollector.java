@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 public class TypeCollector extends ASTVisitor {
 	private EPackage myEPackage;
 	private final IDiagnostics myDiagnostics;
-	private final IWritableTypeResolver myTypeResolver = new TypeResolver();
+	private ITypeResolver myTypeResolver;
 	
 	public TypeCollector(IDiagnostics diagnostics) {
 		super(false);
@@ -38,6 +38,7 @@ public class TypeCollector extends ASTVisitor {
 			myEPackage.setName(type.getSimpleName());
 			myEPackage.setNsPrefix((String) annotation.getAttribute("nsPrefix"));
 			myEPackage.setNsURI((String) annotation.getAttribute("nsURI"));
+			myTypeResolver = new TypeResolver(myEPackage.getEClassifiers());
 			// TODO: subpackages are not processed!!!
 			return false;
 		} 
@@ -89,7 +90,7 @@ public class TypeCollector extends ASTVisitor {
 		return myEPackage;
 	}
 	
-	public IWritableTypeResolver getTypeResolver() {
+	public ITypeResolver getTypeResolver() {
 		return myTypeResolver;
 	}
 }
