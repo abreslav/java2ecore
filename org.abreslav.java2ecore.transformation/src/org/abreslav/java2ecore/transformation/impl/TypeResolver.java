@@ -1,5 +1,6 @@
 package org.abreslav.java2ecore.transformation.impl;
 
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class TypeResolver implements ITypeResolver {
 		myEDataTypes.put(type.getErasure().getQualifiedName(), eDataType);
 	}
 	
-	public EGenericType resolveEGenericType(ITypeBinding binding, EClassTypeParameterIndex typeParameterIndex) {
+	public EGenericType resolveEGenericType(ITypeBinding binding, boolean forceEClass, EClassTypeParameterIndex typeParameterIndex) {
 		EGenericType eGenericType = EcoreFactory.eINSTANCE.createEGenericType(); 
 		
 		if (binding.isTypeVariable()) {
@@ -66,7 +67,7 @@ public class TypeResolver implements ITypeResolver {
 		} if (binding.isWildcardType()) { 
 			ITypeBinding bound = binding.getBound();
 			if (bound != null) {
-				EGenericType eBound = resolveEGenericType(bound, typeParameterIndex);
+				EGenericType eBound = resolveEGenericType(bound, false, typeParameterIndex);
 				if (binding.isUpperbound()) {
 					eGenericType.setEUpperBound(eBound);
 				} else {
@@ -74,21 +75,31 @@ public class TypeResolver implements ITypeResolver {
 				}
 			}
 		} else {
-			processActualType(binding, eGenericType);
+			processActualType(binding.getTypeDeclaration(), eGenericType, forceEClass);
 		}
 		
 		ITypeBinding[] typeArguments = binding.getTypeArguments();
 		for (ITypeBinding typeArgument : typeArguments) {
-			eGenericType.getETypeArguments().add(resolveEGenericType(typeArgument, typeParameterIndex));
+			eGenericType.getETypeArguments().add(resolveEGenericType(typeArgument, false, typeParameterIndex));
 		}
 		
 		return eGenericType;
 	}
 
 	private void processActualType(ITypeBinding binding,
-			EGenericType eGenericType) {
+			EGenericType eGenericType, boolean forceEClass) {
 		
 		EClass eClass = getEClass(binding);
+		if (forceEClass && eClass == null) {
+			eClass = EcoreFactory.eINSTANCE.createEClass();
+			eClass.setName(binding.getErasure().getName());
+			eClass.setAbstract((binding.getModifiers() & Modifier.ABSTRACT) != 0);
+			eClass.setInstanceClassName(binding.getErasure().getQualifiedName());
+			eClass.setInterface(binding.isInterface());
+			createTypeParameters(eClass, binding);
+			myEClasses.put(eClass.getInstanceClassName(), eClass);
+			myWrappedEClassifiers.add(eClass);
+		}
 		if (eClass != null) {
 			eGenericType.setEClassifier(eClass);
 		} else {
@@ -115,7 +126,7 @@ public class TypeResolver implements ITypeResolver {
 					if (Object.class.getName().equals(typeBound.getQualifiedName())) {
 						continue;
 					}
-					EGenericType eTypeBound = resolveEGenericType(typeBound, typeParameterIndex);
+					EGenericType eTypeBound = resolveEGenericType(typeBound, false, typeParameterIndex);
 					eTypeParameter.getEBounds().add(eTypeBound);
 				}
 				

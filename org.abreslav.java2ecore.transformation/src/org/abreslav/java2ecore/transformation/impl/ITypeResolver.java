@@ -14,7 +14,7 @@ public interface ITypeResolver {
 	
 	EDataType resolveEDataType(ITypeBinding type);	
 	
-	EGenericType resolveEGenericType(ITypeBinding binding, EClassTypeParameterIndex typeParameterIndex);
+	EGenericType resolveEGenericType(ITypeBinding binding, boolean forceEClass, EClassTypeParameterIndex typeParameterIndex);
 
 	void addEClass(ITypeBinding type, EClass eClass);
 

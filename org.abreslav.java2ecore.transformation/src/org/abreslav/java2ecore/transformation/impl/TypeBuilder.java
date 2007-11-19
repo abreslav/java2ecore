@@ -50,7 +50,7 @@ public class TypeBuilder extends ASTVisitor {
 					|| Object.class.getCanonicalName().equals(typeBinding.getQualifiedName())) {
 				continue;
 			}
-			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(typeBinding, typeParameterIndex);
+			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(typeBinding, true, typeParameterIndex);
 			eClass.getEGenericSuperTypes().add(eSuperClass);
 		}
 		TypeDeclaration[] types = node.getTypes();

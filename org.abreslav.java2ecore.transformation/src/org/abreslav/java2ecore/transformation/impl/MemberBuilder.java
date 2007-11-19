@@ -83,7 +83,7 @@ public class MemberBuilder extends ASTVisitor {
 			binding = typeArguments[0];
 		}
 		
-		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, myTypeParameterIndex);
+		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, false, myTypeParameterIndex);
 		boolean isFinal = (node.getModifiers() & Modifier.FINAL) != 0;
 		boolean isTransient = (node.getModifiers() & Modifier.TRANSIENT) != 0;
 		boolean isVolatile = (node.getModifiers() & Modifier.VOLATILE) != 0;
