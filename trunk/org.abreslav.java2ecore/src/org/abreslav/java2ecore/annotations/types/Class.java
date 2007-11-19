@@ -5,7 +5,4 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 public @interface Class {
-	public static final boolean ABSTRACT = true;
-	
-	boolean value() default false;
 }
