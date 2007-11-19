@@ -62,7 +62,48 @@ class A {
     int[] x; // produces an Attribute with lowerBound = 0 and upperBound = -1
 }
 }}}
+Multiple feature is marked as _ordered_ and not _unique_.
 
+*Note:* only one-dimension arrays are allowed and brackets must be specified after the type, not field name.
+
+=== Java collections ===
+You can use {{{java.util.Collection}}}, {{{java.util.Set}}} and {{{java.util.List}}} to denote the same {{{0..*}}} multiplicity. 
+
+However, _ordered_ and _unique_ will differ:
+{{{
+class A {
+    Collection<A> as; // 0..*, not ordered, not unique
+    Set<String> strings; // 0..*, not ordered, unique
+    List<Integer> ints; // 0..*, ordered, not unique (same as arrays)
+
+}}}
+
+=== MCollections ===
+There are some auxilary classes defined in {{{org.abreslav.java2ecore.multiplicities}}} multiplicities package.
+
+Main three of them are:
+ * MCollection<T, L extends ILowerBound, U extends IUpperBound>
+ * MSet<T, L extends ILowerBound, U extends IUpperBound>
+ * MList<T, L extends ILowerBound, U extends IUpperBound>
+
+These classes are analogous to Java collections but they allow to specify lowe and upper bounds in their {{{L}}} and {{{U}}} parameters.
+
+Possible values are
+ * {{{Infinity}}} - for infinite upper bound (-1)
+ * {{{Unspecified}}} - for unspecified upper bound (-2)
+ * {{{_<n>}}} where {{{<n>}}} is a non-negative integer
+{{{
+class A {
+    MList<String, _1, _5> strings; // 1..5
+}
+}}}
+  * {{{_0}}} cannot be specified as an upper bound and upper bound cannot be less than lower bound
+  * Types {{{_0}}} through {{{_12}}} are defined in {{{org.abreslav.java2ecore.multiplicities}}}
+  * If you need higher values you can create your own:
+{{{
+interface _239 extends ILowerBound, IUpperBound {
+}
+}}}
 
 = Operations =
 
