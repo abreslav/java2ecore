@@ -10,7 +10,9 @@ Java2Ecore supports all three types of classifiers:
 {{{
 interface MyInterface {
 }
-class Sample implements MyInterface {
+class Sample extends Object implements MyInterface { // both extends and implements are supported
+}
+abstract class Abstract { // abstract modifier sets up EClass' abstract attribute
 }
 }}}
  * _EDataType_ which is represented by Java {{{class}}} with {{{@EDataType}}} annotation or just created automatically (see below)
@@ -105,7 +107,54 @@ interface _239 extends ILowerBound, IUpperBound {
 }
 }}}
 
+=== @Bounds ===
+{{{
+class A {
+   @Bounds({5, 8})
+   int x; // 5..8
+}
+}}}
+
+== Other attributes of structural features ==
+Some attributes are mapped from Java modifiers
+ * {{{final}}} makes changeable false
+ * {{{transient}}} makes transient true
+ * {{{volatile}}} makes volatile true
+
+You can specify default value by initializing a field:
+{{{
+class A {
+    String s = "some"; // defaultValueLiteral = "some"
+}
+}}}
+
+Other attributes are set by annotations:
+ * @Bounds
+   * mentioned above
+ * @Containment
+ * @DefaultValueLiteral
+  * used when the type does not allow to initialize a field with an appropriate literal
+ * @Derived
+ * @ID
+ * @Opposite
+  * value() attribute specifies the name of the opposite feature
+ * @Ordered
+ * @ResolveProxies
+ * @Unique
+ * @Unsettable
+ 
 = Operations =
+
+Operations are defined just as in Java.
+{{{
+class A {
+    void a(String x, int y) {
+    }
+}
+}}}
+Method body is always ignored.
+
+To avoid writing stub code for methods returning values you can use astract mathods and to avoid making your class necessary abstract you can use _interface form of class_ (see next section).
 
 = Inheritance =
 
