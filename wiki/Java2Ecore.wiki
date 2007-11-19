@@ -17,6 +17,6 @@ Tha main idea is that you can simply define some classes in Java and they will b
   * Some syntax is ugly
   
 = See also =
- * Syntax description
- * Problems, unsupported and not implemented features
- * User manual for Eclipse integration
+ * [Syntax] description
+ * [Problems], unsupported and not implemented features
+ * User manual for [Eclipse integration]
