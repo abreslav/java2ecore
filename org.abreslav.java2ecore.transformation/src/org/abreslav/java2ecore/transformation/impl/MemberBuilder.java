@@ -11,6 +11,8 @@ import org.abreslav.java2ecore.annotations.sfeatures.Derived;
 import org.abreslav.java2ecore.annotations.sfeatures.ID;
 import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
 import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
+import org.abreslav.java2ecore.multiplicities.Infinity;
+import org.abreslav.java2ecore.multiplicities.Unspecified;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
@@ -20,6 +22,7 @@ import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.ETypedElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
@@ -144,9 +147,16 @@ public class MemberBuilder extends ASTVisitor {
 		if (featureSettings.getUpperBound() == FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE) {
 			try {
 				Integer lowerBound = Integer.valueOf(typeArguments[1].getName().substring(1));
-				Integer upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
-				if (lowerBound > upperBound) {
-					myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, fieldDeclaration.getType());
+				Integer upperBound;
+				if (Infinity.class.getCanonicalName().equals(typeArguments[2].getQualifiedName())) {
+					upperBound = ETypedElement.UNBOUNDED_MULTIPLICITY;
+				} else if (Unspecified.class.getCanonicalName().equals(typeArguments[2].getQualifiedName())) {
+					upperBound = ETypedElement.UNSPECIFIED_MULTIPLICITY;
+				} else {
+					upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
+					if (lowerBound > upperBound) {
+						myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, fieldDeclaration.getType());
+					}
 				}
 				featureSettings = new FeatureTypeSettings(lowerBound, upperBound, featureSettings);
 			} catch (NumberFormatException e) {
@@ -168,6 +178,5 @@ public class MemberBuilder extends ASTVisitor {
 			}
 		}
 	}
-
 
 }

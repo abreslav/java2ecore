@@ -4,7 +4,7 @@
 package org.abreslav.java2ecore.transformation.impl;
 
 class FeatureTypeSettings {
-	public static final int BOUNDS_SPECIFIED_BY_TYPE = -2;
+	public static final int BOUNDS_SPECIFIED_BY_TYPE = -3;
 	public static final FeatureTypeSettings DEFAULT = new FeatureTypeSettings(0, 1, true, true, IUnwrapStrategy.NO_UNWRAP);
 	
 	private final int myLowerBound;
