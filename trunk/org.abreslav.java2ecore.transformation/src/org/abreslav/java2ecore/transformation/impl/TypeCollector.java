@@ -13,9 +13,11 @@ import org.abreslav.java2ecore.transformation.diagnostics.NullDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 
@@ -52,6 +54,15 @@ public class TypeCollector extends ASTVisitor {
 		return false;
 	}
 
+	@Override
+	public boolean visit(EnumDeclaration node) {
+		EEnum eEnum = EcoreFactory.eINSTANCE.createEEnum();
+		eEnum.setName(node.getName().getIdentifier());
+		myTypeResolver.addEEnum(node.resolveBinding(), eEnum);
+		myEPackage.getEClassifiers().add(eEnum);
+		return false;
+	}
+	
 	private void createEClassifier(TypeView type, TypeDeclaration node) {
 		assert myEPackage != null;
 		
