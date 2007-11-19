@@ -57,6 +57,6 @@ public class WrappingTypeResolver implements ITypeResolver {
 
 	public EGenericType resolveEGenericType(ITypeBinding binding,
 			EClassTypeParameterIndex typeParameterIndex) {
-		return myResolver.resolveEGenericType(binding, typeParameterIndex);
+		return TypeResolver.doResolveEGenericType(this, binding, typeParameterIndex);
 	}
 }

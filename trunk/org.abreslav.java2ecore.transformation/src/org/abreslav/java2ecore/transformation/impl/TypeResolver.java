@@ -30,39 +30,44 @@ public class TypeResolver implements IWritableTypeResolver {
 	}
 	
 	public EGenericType resolveEGenericType(ITypeBinding binding, EClassTypeParameterIndex typeParameterIndex) {
+		return doResolveEGenericType(this, binding, typeParameterIndex);
+	}
+
+	/*package*/ static EGenericType doResolveEGenericType(ITypeResolver resolver, ITypeBinding binding,
+			EClassTypeParameterIndex typeParameterIndex) {
 		EGenericType eGenericType = EcoreFactory.eINSTANCE.createEGenericType(); 
 
 		if (binding.isTypeVariable()) {
 			eGenericType.setETypeParameter(typeParameterIndex.getETypeParameter(binding.getName()));
 		} if (binding.isWildcardType()) { 
 			ITypeBinding bound = binding.getBound();
-			EGenericType eBound = resolveEGenericType(bound, typeParameterIndex);
+			EGenericType eBound = resolver.resolveEGenericType(bound, typeParameterIndex);
 			if (binding.isUpperbound()) {
 				eGenericType.setEUpperBound(eBound);
 			} else {
 				eGenericType.setELowerBound(eBound);
 			}
 		} else {
-			processActualType(binding, eGenericType);
+			processActualType(resolver, binding, eGenericType);
 		}
 		
 		ITypeBinding[] typeArguments = binding.getTypeArguments();
 		for (ITypeBinding typeArgument : typeArguments) {
-			eGenericType.getETypeArguments().add(resolveEGenericType(typeArgument, typeParameterIndex));
+			eGenericType.getETypeArguments().add(resolver.resolveEGenericType(typeArgument, typeParameterIndex));
 		}
 		
 		return eGenericType;
 	}
 
-	private void processActualType(ITypeBinding binding,
+	private static void processActualType(ITypeResolver resolver, ITypeBinding binding,
 			EGenericType eGenericType) {
 		String fqn = binding.getErasure().getQualifiedName();
 		
-		EClass eClass = getEClass(fqn);
+		EClass eClass = resolver.getEClass(fqn);
 		if (eClass != null) {
 			eGenericType.setEClassifier(eClass);
 		} else {
-			EDataType eDataType = getEDataType(fqn);
+			EDataType eDataType = resolver.getEDataType(fqn);
 			if (eDataType != null) {
 				eGenericType.setEClassifier(eDataType);
 			}
