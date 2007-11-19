@@ -59,7 +59,7 @@ public class ASTViewFactory {
 				Modifier mod = (Modifier) modifier;
 				if (mod.isAbstract()) {
 					view.setAbstract(true);
-				}				
+				}
 			} 
 		}
 		return view;

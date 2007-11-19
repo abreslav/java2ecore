@@ -31,7 +31,7 @@ public class TypeBuilder extends ASTVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		EClass eClass = myTypeResolver.getEClass(node.resolveBinding().getQualifiedName());
+		EClass eClass = myTypeResolver.getEClass(node.resolveBinding());
 		if (eClass == null) {
 			return false;
 		}
