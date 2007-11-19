@@ -220,6 +220,43 @@ class _{
 }
 }
 }}}
+
 = Handling unknown types =
 
+When you define a type in your EPackage and then use it, there's no doubt about what happens then.
+
+But what if you use some Java type not being declared in your package?
+By default Java2ECore creates a new EDataType with {{{instanceClassName}}} attribute set to fully-qualified name of unknown class.
+
+The only exception is for unknown supertypes: such a type has to be EClass, not EDataType.
+So, Java2ECore creates EClass for such types assigning {{{instanceClassName}}} the same way.
+
 = Generics =
+
+Almost nothing to say: generics are fully supported:
+ * Generic classes, interfaces and data types
+  * even those created automatically for unknown types
+ * Type parameters for methods
+ * Upper- and lowerbounds (T extends Some, ? super T)
+ * Severla bounds on the same variable (T extends A & B)
+ * Wildcards
+  * with no bound
+  * with upper bound (? extends T)
+  * with lower bound (? super T)
+
+Did ever know that Java itself supports all these things? :)
+
+And a big sample:
+{{{
+class A<T, Q extends Comparable<? super T>> {
+
+}
+class B<E> {
+abstract class _{
+    A<E, Comparable<E>>;
+    abstract <R, P> R doIt(Collection<? extends P> objects) {};
+}
+class C extends B<String> {
+
+}
+}}}
