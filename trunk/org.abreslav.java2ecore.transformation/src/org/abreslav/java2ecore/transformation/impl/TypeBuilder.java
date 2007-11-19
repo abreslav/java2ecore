@@ -41,7 +41,7 @@ public class TypeBuilder extends ASTVisitor {
 			return;
 		}
 		
-		EClassTypeParameterIndex typeParameterIndex = myTypeResolver.createTypeParameters(
+		TypeParameterIndex typeParameterIndex = myTypeResolver.createTypeParameters(
 				eClass, binding);
 		
 		List<ITypeBinding> supertypes = getSupertypes(binding, node);
