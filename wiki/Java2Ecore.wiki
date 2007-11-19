@@ -53,7 +53,20 @@ If you like it even a little bit, please, proceed to [Syntax] page. :)
   * Java2Ecore uses *JDT DOM* and thus can hardly work out of Eclipse
   * Some ECore notions cannot be expressed in Java
   * Some syntax is ugly
-  
+
+= Installation =
+
+Download three `*`.jar files from [http://code.google.com/p/java2ecore/downloads/list downloads page]:
+ * org.abreslav.java2ecore.jar
+ * org.abreslav.java2ecore.transformation.jar
+ * org.abreslav.java2ecore.transformation.ui.jar
+
+Copy them to your plugins directory.
+
+Restart Eclipse with {{{-clear}}} command line parameter.
+
+See [Integration] section for further instructions...
+
 = See also =
  * [Syntax] description
  * User manual for [Integration Eclipse integration]
