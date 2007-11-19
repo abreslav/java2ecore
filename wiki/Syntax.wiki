@@ -14,7 +14,7 @@ The first thing to do when defining a ECore model is to create EPackage (and not
 public class samples {
 }
 }}}
-Such a class is called a _package specification class_. EPackage will have the same name and nsPrefix and nsURI are specified by an annotation @EPackage.
+Such a class is called a _package specification class_. EPackage will have the same name as it's specification class and nsPrefix and nsURI are specified by an annotation @EPackage.
 
 = Classifiers =
 Java2Ecore supports all three types of classifiers:
