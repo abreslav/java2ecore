@@ -1,5 +1,9 @@
 #summary Description of Java2Ecore syntax
 
+= File structure =
+
+= EPackage specification =
+
 = Classifiers =
 Java2Ecore supports all three types of classifiers:
  * _EClass_ which is represented by Java {{{class}}} or {{{interface}}} (see below)
@@ -23,7 +27,42 @@ enum Enum {
 }
 }}}
 
+== Standard primitive types ==
+
+ECore defines number of EDataTypes for general purposes: {{{EInt}}}, {{{EJavaObject}}} and so on.
+To use those types in your model just use their Java analogs: {{{int}}} and {{{Object}}} for given example.
+
 = Structural features =
+
+Structural features are represented by felds. 
+{{{
+class A {
+    int x;
+    A y;
+}
+}}}
+ERerferences are distiguished from EAttributes by type: if the type is EClass (see _Handling unknown types_ section) then the feature will be a reference otherwise it will be an attribute.
+
+Above example is transformed to the following:
+
+http://content.screencast.com/media/f65373b7-9f45-481e-ab41-a17993595cfc_2d2ecdec-33f4-4541-acd2-9ed52d228863_static_0_0_image.png
+
+== Multiplicities ==
+
+There are several wyas to denote feature's multiplicity:
+ * Use Java array type
+ * Use Java collections ({{{java.util.Collection}}} and it's descendants
+ * Use MCollections (from {{{org.abreslav.java2ecore.multiplicities}}} package)
+ * Use {{{@Bounds}}} annotation
+
+=== Java arrays ===
+You can denote a {{{0..*}}} multiplicity by using array type:
+{{{
+class A {
+    int[] x; // produces an Attribute with lowerBound = 0 and upperBound = -1
+}
+}}}
+
 
 = Operations =
 
