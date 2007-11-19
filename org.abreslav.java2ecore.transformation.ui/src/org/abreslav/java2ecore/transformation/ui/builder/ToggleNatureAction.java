@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+@SuppressWarnings("unchecked")
 public class ToggleNatureAction implements IObjectActionDelegate {
 
 	private ISelection selection;
