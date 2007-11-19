@@ -1,0 +1,22 @@
+= What is Java2ECore? =
+
+Java2Ecore is a translator from a subset of Java language to [http://www.eclipse.org/emf EMF ECore]. 
+Tha main idea is that you can simply define some classes in Java and they will be transformed to an ECore model.
+
+
+= Advantages =
+
+  * *Eclipse Java editor* is used for entering your code, this gives you all of it's features: type checking, code completion, outline an so on
+  * *Full support for generics* - actually at first this was the main goal. All the generic-related things supported both in Java and EMF anre supported by Java2Ecore.
+  * *Clear syntax* - most constructs are expressed in very natural manner. But, unfortunately, there are some exceptions.
+
+= Disadvantages =
+
+  * Java2Ecore uses *JDT DOM* and thus can hardly work out of Eclipse
+  * Some ECore notions cannot be expressed in Java
+  * Some syntax is ugly
+  
+= See also =
+ * Syntax description
+ * Problems, unsupported and not implemented features
+ * User manual for Eclipse integration
