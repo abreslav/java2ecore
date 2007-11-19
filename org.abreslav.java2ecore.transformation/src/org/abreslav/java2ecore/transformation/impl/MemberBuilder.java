@@ -1,5 +1,6 @@
 package org.abreslav.java2ecore.transformation.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -20,36 +21,45 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EOperation;
+import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.ETypedElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MemberBuilder extends ASTVisitor {
 	
-	private static final Map<String, FeatureTypeSettings> ourFeatureSettingsMap = new HashMap<String, FeatureTypeSettings>();
+	private static final Map<String, TypeSettings> ourFeatureSettingsMap = new HashMap<String, TypeSettings>();
 	static {
-		ourFeatureSettingsMap.put(Collection.class.getCanonicalName(), new FeatureTypeSettings(0, -1, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(Set.class.getCanonicalName(), new FeatureTypeSettings(0, -1, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(List.class.getCanonicalName(), new FeatureTypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MCollection.class.getCanonicalName(), new FeatureTypeSettings(0, FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MSet.class.getCanonicalName(), new FeatureTypeSettings(0, FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MList.class.getCanonicalName(), new FeatureTypeSettings(0, FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(Collection.class.getCanonicalName(), new TypeSettings(0, -1, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(Set.class.getCanonicalName(), new TypeSettings(0, -1, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(List.class.getCanonicalName(), new TypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MCollection.class.getCanonicalName(), new TypeSettings(0, TypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MSet.class.getCanonicalName(), new TypeSettings(0, TypeSettings.BOUNDS_SPECIFIED_BY_TYPE, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
+		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MList.class.getCanonicalName(), new TypeSettings(0, TypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
 	}
 
 	private final EClass myEClass;
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
-	private final EClassTypeParameterIndex myTypeParameterIndex;
+	private final TypeParameterIndex myTypeParameterIndex;
 
 	public MemberBuilder(EClass class1, ITypeResolver typeResolver,
-			IDiagnostics diagnostics, EClassTypeParameterIndex parameterIndex) {
+			IDiagnostics diagnostics, TypeParameterIndex parameterIndex) {
 		myEClass = class1;
 		myTypeResolver = typeResolver;
 		myDiagnostics = diagnostics;
@@ -58,7 +68,7 @@ public class MemberBuilder extends ASTVisitor {
 	
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		FeatureTypeSettings typeSettings = getFeatureSettingsImpliedByJavaType(node);
+		TypeSettings typeSettings = getTypeSettingsImpliedByJavaType(node.getType());
 		final ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(node.getType().resolveBinding());
 		
 		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, false, myTypeParameterIndex);
@@ -81,10 +91,8 @@ public class MemberBuilder extends ASTVisitor {
 			feature.setChangeable(isFinal);
 			feature.setTransient(isTransient);
 			feature.setVolatile(isVolatile);
-			feature.setLowerBound(typeSettings.getLowerBound());
-			feature.setUpperBound(typeSettings.getUpperBound());
-			feature.setUnique(typeSettings.isUnique());
-			feature.setOrdered(typeSettings.isOrdered());
+			
+			applyTypeSettings(feature, typeSettings);
 			
 			setDefaultValue(feature, fragment.getInitializer());
 
@@ -93,7 +101,62 @@ public class MemberBuilder extends ASTVisitor {
 		return false;
 	}
 
-	private IFeatureFactory createFeatureFactory(FieldDeclaration node,
+	private void applyTypeSettings(ETypedElement eTypedElement,
+			TypeSettings typeSettings) {
+		eTypedElement.setLowerBound(typeSettings.getLowerBound());
+		eTypedElement.setUpperBound(typeSettings.getUpperBound());
+		eTypedElement.setUnique(typeSettings.isUnique());
+		eTypedElement.setOrdered(typeSettings.isOrdered());
+	}
+
+	@Override
+	public boolean visit(MethodDeclaration node) {
+		EOperation eOperation = EcoreFactory.eINSTANCE.createEOperation();
+		eOperation.setName(node.getName().getIdentifier());
+		
+		TypeParameterIndex typeParameterIndex = new TypeParameterIndex(myTypeParameterIndex);
+		
+		@SuppressWarnings("unchecked")
+		List<TypeParameter> typeParameters = (List<TypeParameter>) node.getStructuralProperty(MethodDeclaration.TYPE_PARAMETERS_PROPERTY);
+		List<ITypeBinding> parameterTypeBindings = new ArrayList<ITypeBinding>();
+		for (TypeParameter typeParameter : typeParameters) {
+			parameterTypeBindings.add(typeParameter.resolveBinding());
+		}
+		Collection<ETypeParameter> eTypeParameters = myTypeResolver.createETypeParameters(typeParameterIndex, parameterTypeBindings);
+		eOperation.getETypeParameters().addAll(eTypeParameters);
+		
+		setUpType(eOperation, node.getReturnType2(), typeParameterIndex);
+
+		@SuppressWarnings("unchecked")
+		List<SingleVariableDeclaration> parameters = (List<SingleVariableDeclaration>) node.getStructuralProperty(MethodDeclaration.PARAMETERS_PROPERTY);
+		for (SingleVariableDeclaration parameter : parameters) {
+			EParameter eParameter = EcoreFactory.eINSTANCE.createEParameter();
+			eParameter.setName(parameter.getName().getIdentifier());
+			setUpType(eParameter, parameter.getType(), typeParameterIndex);
+			eOperation.getEParameters().add(eParameter);
+		}
+		
+		@SuppressWarnings("unchecked")
+		List<Name> exceptionClassNames = (List<Name>) node.getStructuralProperty(MethodDeclaration.THROWN_EXCEPTIONS_PROPERTY);
+		for (Name name : exceptionClassNames) {
+			ITypeBinding exceptionType = name.resolveTypeBinding();
+			EGenericType genericExceptionType = myTypeResolver.resolveEGenericType(exceptionType, false, typeParameterIndex);
+			eOperation.getEGenericExceptions().add(genericExceptionType);
+		}
+		
+		myEClass.getEOperations().add(eOperation);		
+		return false;
+	}
+
+	private void setUpType(ETypedElement eTypedElement, Type type, TypeParameterIndex typeParameterIndex) {
+		TypeSettings typeSettings = getTypeSettingsImpliedByJavaType(type);
+		ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(type.resolveBinding());
+		
+		applyTypeSettings(eTypedElement, typeSettings);
+		eTypedElement.setEGenericType(myTypeResolver.resolveEGenericType(binding, false, typeParameterIndex));
+	}
+	
+	private IFeatureFactory createFeatureFactory(BodyDeclaration node,
 			EGenericType eGenericType) {
 		AnnotatedView annotations = ASTViewFactory.INSTANCE.createAnnotatedView(node);
 		if (eGenericType.getEClassifier() instanceof EDataType) {
@@ -123,28 +186,28 @@ public class MemberBuilder extends ASTVisitor {
 		}
 	}
 
-	private FeatureTypeSettings getFeatureSettingsImpliedByJavaType(FieldDeclaration fieldDeclaration) {
-		ITypeBinding binding = fieldDeclaration.getType().resolveBinding();
+	private TypeSettings getTypeSettingsImpliedByJavaType(Type type) {
+		ITypeBinding binding = type.resolveBinding();
 		if (binding.isArray()) {
 			if (binding.getDimensions() > 1) {
-				myDiagnostics.reportError("Multidimentional arrays are not supported", fieldDeclaration.getType());
+				myDiagnostics.reportError("Multidimentional arrays are not supported", type);
 			}
-			return new FeatureTypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_ARRAY);
+			return new TypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_ARRAY);
 		}
 		
 		String fqn = binding.getErasure().getQualifiedName();
-		FeatureTypeSettings featureSettings = ourFeatureSettingsMap.get(fqn);
+		TypeSettings featureSettings = ourFeatureSettingsMap.get(fqn);
 		if (featureSettings == null) {
-			return FeatureTypeSettings.DEFAULT;
+			return TypeSettings.DEFAULT;
 		}
 		
 		ITypeBinding[] typeArguments = binding.getTypeArguments();
 		if (typeArguments.length == 0) {
-			myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", fieldDeclaration.getType());
-			return FeatureTypeSettings.DEFAULT;
+			myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", type);
+			return TypeSettings.DEFAULT;
 		}
 
-		if (featureSettings.getUpperBound() == FeatureTypeSettings.BOUNDS_SPECIFIED_BY_TYPE) {
+		if (featureSettings.getUpperBound() == TypeSettings.BOUNDS_SPECIFIED_BY_TYPE) {
 			try {
 				Integer lowerBound = Integer.valueOf(typeArguments[1].getName().substring(1));
 				Integer upperBound;
@@ -155,12 +218,12 @@ public class MemberBuilder extends ASTVisitor {
 				} else {
 					upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
 					if (lowerBound > upperBound) {
-						myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, fieldDeclaration.getType());
+						myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, type);
 					}
 				}
-				featureSettings = new FeatureTypeSettings(lowerBound, upperBound, featureSettings);
+				featureSettings = new TypeSettings(lowerBound, upperBound, featureSettings);
 			} catch (NumberFormatException e) {
-				myDiagnostics.reportError("Wrong number format. " + e.getMessage(), fieldDeclaration.getType());
+				myDiagnostics.reportError("Wrong number format. " + e.getMessage(), type);
 			}
 		}
 		
