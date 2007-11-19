@@ -1,1 +1,34 @@
-Not yet...
+#Description of Java2Ecore syntax
+
+= Classifiers =
+Java2Ecore supports all three types of classifiers:
+ * _EClass_ which is represented by Java {{{class}}} or {{{interface}}} (see below)
+{{{
+interface MyInterface {
+}
+class Sample implements MyInterface {
+}
+}}}
+ * _EDataType_ which is represented by Java {{{class}}} with {{{@EDataType}}} annotation or just created automatically (see below)
+{{{
+@EDataType("java.awt.Point")
+class Point {}
+}}}
+ * _EEnum_ which is represented by Java {{{enum}}}
+{{{
+enum Enum {
+  A,
+  B,
+  C;
+}
+}}}
+
+= Structural features =
+
+= Operations =
+
+= Inheritance =
+
+= Handling unknown types =
+
+= Generics =
