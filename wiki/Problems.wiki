@@ -1,13 +1,31 @@
-#summary One-sentence summary of this page.
+#summary A list of problems, unsupported things and not implemented features
 
-= Introduction =
+= Not yet implemented =
+ * ECore annotations
+ * Nested packages
+ * Import of existing ECore models (ECore itself, for example)
+ * ECore2Java transformations
 
-Add your content here.
+= Problems and known issues =
+ * Fields in generic classes represented by interfaces
+{{{
+@Class interface A<T> {
+class _{
+    T field; // an error here: type parameter T is not visible from static inner class
+}
+}
+}}} 
+  * Workaround (ugly, but working):
+{{{
+@Class interface A<T> {
+class _<T> { // Define the same type parametes as enclosing type does
+    T field; 
+}
+}
+}}}
+ * No opportunity to place two models (`*`.java files) containing classes with same names in the same package (two Java classes with same names cannot appear in one package)
+  * _Solution_ (not implemented): allow to declare model types inside package type
 
 
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+= Unsupported things =
+ * Generic exceptions are not supported in Java, so !Java2ECore does not support them
