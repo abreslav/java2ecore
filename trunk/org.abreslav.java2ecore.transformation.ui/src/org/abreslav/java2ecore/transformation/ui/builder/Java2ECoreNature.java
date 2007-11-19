@@ -6,12 +6,12 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
-public class SampleNature implements IProjectNature {
+public class Java2ECoreNature implements IProjectNature {
 
 	/**
 	 * ID of this project nature
 	 */
-	public static final String NATURE_ID = "org.abreslav.java2ecore.transformation.ui.sampleNature";
+	public static final String NATURE_ID = "org.abreslav.java2ecore.transformation.ui.nature";
 
 	private IProject project;
 
@@ -25,7 +25,7 @@ public class SampleNature implements IProjectNature {
 		ICommand[] commands = desc.getBuildSpec();
 
 		for (int i = 0; i < commands.length; ++i) {
-			if (commands[i].getBuilderName().equals(SampleBuilder.BUILDER_ID)) {
+			if (commands[i].getBuilderName().equals(Java2ECoreBuilder.BUILDER_ID)) {
 				return;
 			}
 		}
@@ -33,7 +33,7 @@ public class SampleNature implements IProjectNature {
 		ICommand[] newCommands = new ICommand[commands.length + 1];
 		System.arraycopy(commands, 0, newCommands, 0, commands.length);
 		ICommand command = desc.newCommand();
-		command.setBuilderName(SampleBuilder.BUILDER_ID);
+		command.setBuilderName(Java2ECoreBuilder.BUILDER_ID);
 		newCommands[newCommands.length - 1] = command;
 		desc.setBuildSpec(newCommands);
 		
@@ -49,7 +49,7 @@ public class SampleNature implements IProjectNature {
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();
 		for (int i = 0; i < commands.length; ++i) {
-			if (commands[i].getBuilderName().equals(SampleBuilder.BUILDER_ID)) {
+			if (commands[i].getBuilderName().equals(Java2ECoreBuilder.BUILDER_ID)) {
 				ICommand[] newCommands = new ICommand[commands.length - 1];
 				System.arraycopy(commands, 0, newCommands, 0, i);
 				System.arraycopy(commands, i + 1, newCommands, i,
