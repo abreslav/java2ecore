@@ -21,7 +21,7 @@ public class CompilationUnitToECoreTransformation {
 		CompilationUnit unitAST = (CompilationUnit) parser.createAST(null);
 		TypeCollector typeCollector = new TypeCollector(diagnostics);
 		unitAST.accept(typeCollector);
-		unitAST.accept(new TypeBuilder(typeCollector.getTypeResolver(), diagnostics, typeCollector.getEPackage()));
+		unitAST.accept(new TypeBuilder(typeCollector.getTypeResolver(), diagnostics));
 		return typeCollector.getEPackage();
 	}
 
