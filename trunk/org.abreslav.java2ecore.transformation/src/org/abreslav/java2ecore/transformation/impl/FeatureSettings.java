@@ -24,9 +24,6 @@ class FeatureSettings {
 		this.myIsUnique = isUnique;
 		this.myIsOrdered = isOrdered;
 		this.myUnwrapStrategy = unwrapStrategy;
-		if (myUnwrapStrategy == null) {
-			new Exception().printStackTrace();
-		}
 	}
 
 	public int getLowerBound() {
