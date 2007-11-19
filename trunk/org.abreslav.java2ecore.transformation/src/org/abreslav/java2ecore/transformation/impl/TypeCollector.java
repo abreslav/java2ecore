@@ -3,7 +3,8 @@
  */
 package org.abreslav.java2ecore.transformation.impl;
 
-import org.abreslav.java2ecore.annotations.InstanceTypeName;
+import org.abreslav.java2ecore.annotations.types.Class;
+import org.abreslav.java2ecore.annotations.types.InstanceTypeName;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
 import org.abreslav.java2ecore.transformation.astview.TypeView;
@@ -54,7 +55,7 @@ public class TypeCollector extends ASTVisitor {
 		assert myEPackage != null;
 		
 		EClassifier eClassifier;
-		AnnotationView eDataTypeAnnotation = type.getAnnotation(org.abreslav.java2ecore.annotations.EDataType.class.getCanonicalName());
+		AnnotationView eDataTypeAnnotation = type.getAnnotation(org.abreslav.java2ecore.annotations.types.EDataType.class.getCanonicalName());
 		if (eDataTypeAnnotation != null) {
 			EDataType eDataType = EcoreFactory.eINSTANCE.createEDataType();
 			myTypeResolver.addEDataType(type.getQualifiedName(), eDataType);
@@ -70,8 +71,14 @@ public class TypeCollector extends ASTVisitor {
 				eClassifier.setInstanceTypeName((String) instanceTypeName.getAttribute("value"));
 			}
 			
-			eClass.setAbstract(type.isAbstract());
-			eClass.setInterface(type.isInterface());
+			AnnotationView classAnnotation = type.getAnnotation(Class.class.getCanonicalName());
+			if ((classAnnotation == null) || !type.isInterface()) {
+				eClass.setAbstract(type.isAbstract());
+				eClass.setInterface(type.isInterface());
+			} else {
+				eClass.setInterface(false);
+				eClass.setAbstract((Boolean) classAnnotation.getAttribute("value"));
+			}
 		}
 		eClassifier.setName(type.getSimpleName());
 		
