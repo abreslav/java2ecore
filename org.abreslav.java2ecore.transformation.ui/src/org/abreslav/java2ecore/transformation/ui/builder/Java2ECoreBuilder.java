@@ -17,9 +17,9 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 
-public class SampleBuilder extends IncrementalProjectBuilder {
+public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 
-	class SampleDeltaVisitor implements IResourceDeltaVisitor {
+	class DeltaVisitor implements IResourceDeltaVisitor {
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
 			IJavaElement element = JavaCore.create(resource);
@@ -49,14 +49,25 @@ public class SampleBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-	class SampleResourceVisitor implements IResourceVisitor {
+	class ResourceVisitor implements IResourceVisitor {
 		public boolean visit(IResource resource) {
-			//return true to continue visiting children.
+			IJavaElement element = JavaCore.create(resource);
+			if (element == null) {
+				return false;
+			}
+			if (element instanceof IPackageFragmentRoot) {
+				IPackageFragmentRoot srcFolder = (IPackageFragmentRoot) element;
+				return "ecores".equals(srcFolder.getElementName());
+			}
+			if (element instanceof ICompilationUnit) {
+				ICompilationUnit compilationUnit = (ICompilationUnit) element;
+				perform(compilationUnit);
+			}
 			return true;
 		}
 	}
 
-	public static final String BUILDER_ID = "org.abreslav.java2ecore.transformation.ui.sampleBuilder";
+	public static final String BUILDER_ID = "org.abreslav.java2ecore.transformation.ui.builder";
 
 	@SuppressWarnings("unchecked")
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor)
@@ -77,14 +88,14 @@ public class SampleBuilder extends IncrementalProjectBuilder {
 	protected void fullBuild(final IProgressMonitor monitor)
 			throws CoreException {
 		try {
-			getProject().accept(new SampleResourceVisitor());
+			getProject().accept(new ResourceVisitor());
 		} catch (CoreException e) {
 		}
 	}
 
 	protected void incrementalBuild(IResourceDelta delta,
 			IProgressMonitor monitor) throws CoreException {
-		delta.accept(new SampleDeltaVisitor());
+		delta.accept(new DeltaVisitor());
 	}
 
 	private void perform(ICompilationUnit compilationUnit) {
