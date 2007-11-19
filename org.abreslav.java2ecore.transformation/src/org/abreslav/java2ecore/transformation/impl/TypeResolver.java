@@ -91,14 +91,7 @@ public class TypeResolver implements ITypeResolver {
 		
 		EClass eClass = getEClass(binding);
 		if (forceEClass && eClass == null) {
-			eClass = EcoreFactory.eINSTANCE.createEClass();
-			eClass.setName(binding.getErasure().getName());
-			eClass.setAbstract((binding.getModifiers() & Modifier.ABSTRACT) != 0);
-			eClass.setInstanceClassName(binding.getErasure().getQualifiedName());
-			eClass.setInterface(binding.isInterface());
-			createTypeParameters(eClass, binding);
-			myEClasses.put(eClass.getInstanceClassName(), eClass);
-			myWrappedEClassifiers.add(eClass);
+			eClass = wrapUnknownClass(binding);
 		}
 		if (eClass != null) {
 			eGenericType.setEClassifier(eClass);
@@ -108,6 +101,19 @@ public class TypeResolver implements ITypeResolver {
 				eGenericType.setEClassifier(eDataType);
 			}
 		}
+	}
+
+	private EClass wrapUnknownClass(ITypeBinding binding) {
+		EClass eClass;
+		eClass = EcoreFactory.eINSTANCE.createEClass();
+		eClass.setName(binding.getErasure().getName());
+		eClass.setAbstract((binding.getModifiers() & Modifier.ABSTRACT) != 0);
+		eClass.setInstanceClassName(binding.getErasure().getQualifiedName());
+		eClass.setInterface(binding.isInterface());
+		createTypeParameters(eClass, binding);
+		myEClasses.put(eClass.getInstanceClassName(), eClass);
+		myWrappedEClassifiers.add(eClass);
+		return eClass;
 	}
 	
 	public EClassTypeParameterIndex createTypeParameters(EClassifier eClassifier,
