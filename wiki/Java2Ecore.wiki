@@ -56,5 +56,5 @@ If you like it even a little bit, please, proceed to [Syntax] page. :)
   
 = See also =
  * [Syntax] description
- * [Problems], unsupported and not implemented features
  * User manual for [Integration Eclipse integration]
+ * [Problems], unsupported and not implemented features
