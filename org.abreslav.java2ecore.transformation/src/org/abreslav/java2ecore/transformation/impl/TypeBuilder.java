@@ -11,7 +11,9 @@ import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 public class TypeBuilder extends ASTVisitor {
@@ -62,9 +64,38 @@ public class TypeBuilder extends ASTVisitor {
 			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(typeBinding, typeParameterIndex);
 			eClass.getEGenericSuperTypes().add(eSuperClass);
 		}
-		
+		TypeDeclaration[] types = node.getTypes();
+		if (types.length > 0) {
+			markNestedThings(node, types);
+			node = types[0];
+		}
 		node.accept(new MemberBuilder(eClass, myTypeResolver, myDiagnostics, typeParameterIndex));
 		return false;
+	}
+
+	private void markNestedThings(final TypeDeclaration node, TypeDeclaration[] types) {
+		for (int i = 1; i < types.length; i++) {
+			myDiagnostics.reportError("Only one nested type is allowed", types[i]);
+		}
+		
+		node.accept(new ASTVisitor() {
+			@Override
+			public boolean visit(FieldDeclaration node) {
+				myDiagnostics.reportError("If nested type is present, all the features must be specified in this type", node);
+				return true;
+			}
+			
+			@Override
+			public boolean visit(MethodDeclaration node) {
+				myDiagnostics.reportError("If nested type is present, all the features must be specified in this type", node);
+				return true;
+			}
+			
+			@Override
+			public boolean visit(TypeDeclaration type) {
+				return type == node;
+			}
+		});
 	}
 
 	private List<ITypeBinding> getSupertypes(ITypeBinding binding, ASTNode node) {
