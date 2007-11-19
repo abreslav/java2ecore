@@ -6,12 +6,19 @@ import java.util.List;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EEnumLiteral;
 import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 public class TypeBuilder extends ASTVisitor {
@@ -35,6 +42,45 @@ public class TypeBuilder extends ASTVisitor {
 		return false;
 	}
 
+	@Override
+	public boolean visit(final EnumDeclaration enumNode) {
+		final EEnum eEnum = myTypeResolver.getEEnum(enumNode.resolveBinding());
+		if (eEnum == null) {
+			throw new IllegalStateException("An enum is present but not collected");
+		}
+		
+		@SuppressWarnings("unchecked")
+		List<Type> superInterfaces = (List<Type>) enumNode.getStructuralProperty(EnumDeclaration.SUPER_INTERFACE_TYPES_PROPERTY);
+		for (Type type : superInterfaces) {
+			myDiagnostics.reportError("ECore enums do not implement interfaces", type);
+		}
+		enumNode.accept(new ASTVisitor() {
+			private int myIndex = 0;
+			
+			@Override
+			public boolean visit(EnumConstantDeclaration node) {
+				EEnumLiteral eEnumLiteral = EcoreFactory.eINSTANCE.createEEnumLiteral();
+				eEnumLiteral.setLiteral(node.getName().getIdentifier());
+				eEnumLiteral.setName(node.getName().getIdentifier());
+				eEnumLiteral.setValue(myIndex++);
+				eEnum.getELiterals().add(eEnumLiteral);
+				return false;
+			}
+			
+			@Override
+			public void preVisit(ASTNode node) {
+				if (node.getParent() == enumNode) {
+					if (node instanceof BodyDeclaration 
+							&& false == node instanceof EnumConstantDeclaration) {
+						myDiagnostics.reportError("Nothing but literals is allowed in Enums", node);
+					}
+				}
+			}
+		});
+		
+		return false;
+	}
+	
 	private void processEClass(TypeDeclaration node, ITypeBinding binding) {
 		EClass eClass = myTypeResolver.getEClass(binding);
 		if (eClass == null) {

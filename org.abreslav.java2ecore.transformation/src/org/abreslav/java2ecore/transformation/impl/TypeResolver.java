@@ -13,6 +13,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
+import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
@@ -22,6 +23,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 public class TypeResolver implements ITypeResolver {
 	private final Map<String, EClass> myEClasses = new HashMap<String, EClass>();
 	private final Map<String, EDataType> myEDataTypes = new HashMap<String, EDataType>();
+	private final Map<String, EEnum> myEEnums = new HashMap<String, EEnum>();
 	private Collection<? super EClassifier> myWrappedEClassifiers;
 	
 	public TypeResolver() {
@@ -51,7 +53,11 @@ public class TypeResolver implements ITypeResolver {
 	}
 
 	public EDataType getEDataType(ITypeBinding type) {
-		return myEDataTypes.get(type.getErasure().getQualifiedName());
+		EDataType eDataType = myEDataTypes.get(type.getErasure().getQualifiedName());
+		if (eDataType != null) {
+			return eDataType;
+		}
+		return getEEnum(type);
 	}
 
 	public void addEClass(ITypeBinding type, EClass eClass) {
@@ -173,5 +179,13 @@ public class TypeResolver implements ITypeResolver {
 			myWrappedEClassifiers.add(eDataType);
 		}
 		return eDataType;
+	}
+
+	public void addEEnum(ITypeBinding type, EEnum eEnum) {
+		myEEnums.put(type.getErasure().getQualifiedName(), eEnum);
+	}
+
+	public EEnum getEEnum(ITypeBinding type) {
+		return myEEnums.get(type.getErasure().getQualifiedName());
 	}
 }
