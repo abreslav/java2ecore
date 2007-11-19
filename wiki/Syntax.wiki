@@ -1,4 +1,4 @@
-#Description of Java2Ecore syntax
+#summary Description of Java2Ecore syntax
 
 = Classifiers =
 Java2Ecore supports all three types of classifiers:
