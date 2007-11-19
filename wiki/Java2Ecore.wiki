@@ -3,6 +3,42 @@
 Java2Ecore is a translator from a subset of Java language to [http://www.eclipse.org/emf EMF ECore]. 
 Tha main idea is that you can simply define some classes in Java and they will be transformed to an ECore model.
 
+= Example =
+Let's have a look at the simplest example from Eclipse Help [http://help.eclipse.org/help32/index.jsp?topic=/org.eclipse.emf.doc/tutorials/clibmod/clibmod.html A Library]: 
+
+http://help.eclipse.org/help32/topic/org.eclipse.emf.doc/tutorials/clibmod/images/model.gif 
+{{{
+@EPackage(
+	nsPrefix = "library", 
+	nsURI = "http:///example.com/library"
+)
+public class library {}
+
+class Library {
+	String name;
+	List<Writer> writers;
+	List<Book> books;
+}
+
+class Writer {
+	String name;
+	List<Book> books;
+}
+
+class Book {
+	String title;
+	Writer author;
+	int pages = 100;
+	BookCategory category;
+}
+
+enum BookCategory {
+	Mystery,
+	ScienceFiction,
+	Biography
+}
+}}}
+If you like it even a little bit, please, proceed to [Syntax] page. :)
 
 = Advantages =
 
