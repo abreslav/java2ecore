@@ -3,9 +3,9 @@
  */
 package org.abreslav.java2ecore.transformation.impl;
 
-class FeatureSettings {
+class FeatureTypeSettings {
 	public static final int BOUNDS_SPECIFIED_BY_TYPE = -2;
-	public static final FeatureSettings DEFAULT = new FeatureSettings(0, 1, true, true, IUnwrapStrategy.NO_UNWRAP);
+	public static final FeatureTypeSettings DEFAULT = new FeatureTypeSettings(0, 1, true, true, IUnwrapStrategy.NO_UNWRAP);
 	
 	private final int myLowerBound;
 	private final int myUpperBound;
@@ -13,11 +13,11 @@ class FeatureSettings {
 	private final boolean myIsOrdered;
 	private final IUnwrapStrategy myUnwrapStrategy;
 	
-	public FeatureSettings(int lowerBound, int upperBound, FeatureSettings fs) {
-		this(lowerBound, upperBound, fs.myIsUnique, fs.myIsOrdered, fs.myUnwrapStrategy);
+	public FeatureTypeSettings(int lowerBound, int upperBound, FeatureTypeSettings fts) {
+		this(lowerBound, upperBound, fts.myIsUnique, fts.myIsOrdered, fts.myUnwrapStrategy);
 	}
 	
-	public FeatureSettings(int lowerBound, int upperBound, boolean isUnique, boolean isOrdered,
+	public FeatureTypeSettings(int lowerBound, int upperBound, boolean isUnique, boolean isOrdered,
 			IUnwrapStrategy unwrapStrategy) {
 		this.myLowerBound = lowerBound;
 		this.myUpperBound = upperBound;
