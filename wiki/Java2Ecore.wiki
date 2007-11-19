@@ -56,12 +56,14 @@ If you like it even a little bit, please, proceed to [Syntax] page. :)
 
 = Installation =
 
+For Eclipse usere only.
+
 Download three `*`.jar files from [http://code.google.com/p/java2ecore/downloads/list downloads page]:
  * org.abreslav.java2ecore.jar
  * org.abreslav.java2ecore.transformation.jar
  * org.abreslav.java2ecore.transformation.ui.jar
 
-Copy them to your plugins directory.
+Copy them to Eclipse plugins directory.
 
 Restart Eclipse with {{{-clear}}} command line parameter.
 
