@@ -233,14 +233,14 @@ So, Java2ECore creates EClass for such types assigning {{{instanceClassName}}} t
 
 = Generics =
 
-Almost nothing to say: generics are fully supported:
+Almost nothing to say: generics are fully supported :)...
  * Generic classes, interfaces and data types
   * even those created automatically for unknown types
  * Type parameters for methods
  * Upper- and lowerbounds (T extends Some, ? super T)
- * Severla bounds on the same variable (T extends A & B)
+ * Several bounds on the same variable (T extends A & B)
  * Wildcards
-  * with no bound
+  * with no bound (?)
   * with upper bound (? extends T)
   * with lower bound (? super T)
 
@@ -254,7 +254,8 @@ class A<T, Q extends Comparable<? super T>> {
 class B<E> {
 abstract class _{
     A<E, Comparable<E>>;
-    abstract <R, P> R doIt(Collection<? extends P> objects) {};
+    abstract <R, P> R doIt(Collection<? extends P & Serializable> objects) {};
+}
 }
 class C extends B<String> {
 
