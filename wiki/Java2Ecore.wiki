@@ -8,7 +8,7 @@ The main idea is that you can simply define some classes in Java and they will b
 = Advantages =
 
   * *Eclipse Java editor* is used for entering your code, this gives you all of it's features: type checking, code completion, outline an so on
-  * *Full support for generics* - actually at first this was the main goal. All the generic-related things supported both in Java and EMF anre supported by Java2Ecore.
+  * *Full support for generics* - actually at first this was the main goal. All the generic-related things supported both in Java and EMF are supported by !Java2Ecore.
   * *Clear syntax* - most constructs are expressed in very natural manner. 
    * Unfortunately, there are some [Problems exceptions].
 
