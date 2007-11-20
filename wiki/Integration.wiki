@@ -3,7 +3,7 @@
 = Installation =
 
 Developed and tested under Eclipse 3.3.1.1.
-Requires JDT, EMF 2.2.3 and Java 5 or higher.
+Requires JDT, EMF 2.3 and Java 5 or higher.
 
 Download three `*`.jar files from [http://code.google.com/p/java2ecore/downloads/list downloads page]:
  * org.abreslav.java2ecore.jar
