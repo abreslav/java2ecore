@@ -18,7 +18,7 @@ class _{
   * Workaround (ugly, but working):
 {{{
 @Class interface A<T> {
-class _<T> { // Define the same type parametes as enclosing type does
+class _<T> { // Define the same type parameters as enclosing type does
     T field; 
 }
 }
