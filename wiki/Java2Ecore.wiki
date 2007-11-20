@@ -1,5 +1,5 @@
 #summary Introduction to the project
-= What is Java2Ecore? =
+= What is !Java2Ecore? =
 
 Java2Ecore is a translator from a subset of Java language to [http://www.eclipse.org/emf EMF Ecore]. 
 
