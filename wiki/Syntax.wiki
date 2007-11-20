@@ -1,7 +1,7 @@
 #summary Description of Java2Ecore syntax
 
 = File structure =
-When youdescribe some Ecore model in a `*`.java file you define classes on the same level:
+When you describe some Ecore model in a `*`.java file you define classes on the same level:
 one of them might be public (I think, it will be a package-specifying class) and others are package-private. All these classes will be handled by Java2Ecore.
 
 = EPackage specification =
@@ -50,14 +50,14 @@ To use those types in your model just use their Java analogs: {{{int}}} and {{{O
 
 = Structural features =
 
-Structural features are represented by felds. 
+Structural features are represented by fields. 
 {{{
 class A {
     int x;
     A y;
 }
 }}}
-ERerferences are distiguished from EAttributes by type: if the type is EClass (see _Handling unknown types_ section) then the feature will be a reference otherwise it will be an attribute.
+ERerferences are distinguished from EAttributes by type: if the type is EClass (see _Handling unknown types_ section) then the feature will be a reference otherwise it will be an attribute.
 
 Above example is transformed to the following:
 
@@ -95,14 +95,14 @@ class A {
 }}}
 
 === MCollections ===
-There are some auxilary classes defined in {{{org.abreslav.java2ecore.multiplicities}}} multiplicities package.
+There are some auxiliary classes defined in {{{org.abreslav.java2ecore.multiplicities}}} multiplicities package.
 
 Main three of them are:
  * MCollection<T, L extends ILowerBound, U extends IUpperBound>
  * MSet<T, L extends ILowerBound, U extends IUpperBound>
  * MList<T, L extends ILowerBound, U extends IUpperBound>
 
-These classes are analogous to Java collections but they allow to specify lowe and upper bounds in their {{{L}}} and {{{U}}} parameters.
+These classes are analogous to Java collections but they allow to specify lower and upper bounds in their {{{L}}} and {{{U}}} parameters.
 
 Possible values are
  * {{{Infinity}}} - for infinite upper bound (-1)
@@ -168,7 +168,7 @@ class A {
 }}}
 Method body is always ignored.
 
-To avoid writing stub code for methods returning values you can use astract mathods and to avoid making your class necessary abstract you can use _interface form of class_ (see next section).
+To avoid writing stub code for methods returning values you can use abstract methods and to avoid making your class necessary abstract you can use _interface form of class_ (see next section).
 
 = Inheritance =
 
@@ -191,7 +191,7 @@ Java2Ecore provides a workaround which we call an _interface form of class_...
 
 There's no multiple inheritance for classes in Java. But there is one for interfaces.
 
-On the other hand you cannot declare non-final fields in interfaces in Java and final field has to be initialized which will set up defaultValueLiteral andis impossible for most types. And Ecore supports any structural features in interfaces.
+On the other hand you cannot declare non-final fields in interfaces in Java and final field has to be initialized which will set up defaultValueLiteral and is impossible for most types. And Ecore supports any structural features in interfaces.
 
 So we provide the following: each interface (or class, to be consistent) can declare one inner-class, which holds all the parent's contents:
 {{{
@@ -249,14 +249,14 @@ Almost nothing to say: generics are fully supported :)...
  * Generic classes, interfaces and data types
   * even those created automatically for unknown types
  * Type parameters for methods
- * Upper- and lowerbounds (T extends Some, ? super T)
+ * Upper and lower bounds (T extends Some, ? super T)
  * Several bounds on the same variable (T extends A & B)
  * Wildcards
   * with no bound (?)
   * with upper bound (? extends T)
   * with lower bound (? super T)
 
-Did ever know that Java itself supports all these things? :)
+Did you ever know that Java itself supports all these things? :)
 
 And a big sample:
 {{{
