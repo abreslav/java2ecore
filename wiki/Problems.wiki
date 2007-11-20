@@ -1,10 +1,10 @@
 #summary A list of problems, unsupported things and not implemented features
 
 = Not yet implemented =
- * ECore annotations
+ * Ecore annotations
  * Nested packages
- * Import of existing ECore models (ECore itself, for example)
- * ECore2Java transformations
+ * Import of existing Ecore models (Ecore itself, for example)
+ * Ecore2Java transformations
 
 = Problems and known issues =
  * Fields in generic classes represented by interfaces
@@ -28,4 +28,4 @@ class _<T> { // Define the same type parametes as enclosing type does
 
 
 = Unsupported things =
- * Generic exceptions are not supported in Java, so !Java2ECore does not support them
+ * Generic exceptions are not supported in Java, so !Java2Ecore does not support them
