@@ -1,9 +1,9 @@
 #summary Introduction to the project
-= What is Java2ECore? =
+= What is Java2Ecore? =
 
-Java2Ecore is a translator from a subset of Java language to [http://www.eclipse.org/emf EMF ECore]. 
+Java2Ecore is a translator from a subset of Java language to [http://www.eclipse.org/emf EMF Ecore]. 
 
-Tha main idea is that you can simply define some classes in Java and they will be transformed to an ECore model.
+Tha main idea is that you can simply define some classes in Java and they will be transformed to an Ecore model.
 
 = Example =
 Let's have a look at the simplest example from Eclipse Help, [http://help.eclipse.org/help32/index.jsp?topic=/org.eclipse.emf.doc/tutorials/clibmod/clibmod.html A Library]: 
@@ -51,7 +51,7 @@ If you like it even a little bit, please, proceed to [Syntax] page. :)
 = Disadvantages =
 
   * Java2Ecore uses *JDT DOM* and thus can hardly work out of Eclipse
-  * Some ECore notions cannot be expressed in Java
+  * Some Ecore notions cannot be expressed in Java
   * Some syntax is ugly
 
 = See also =
