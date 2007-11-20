@@ -7,7 +7,7 @@
  * Ecore2Java transformations
 
 = Problems and known issues =
- * Fields in generic classes represented by interfaces
+ * Fields in generic classes represented by interfaces (see [Syntax] section)
 {{{
 @Class interface A<T> {
 class _{
