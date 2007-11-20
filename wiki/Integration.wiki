@@ -27,7 +27,7 @@ http://content.screencast.com/media/0dc63ae8-799c-4f68-9420-a2baeefdb29a_2d2ecde
   * Click Add External JARs...
   * Select org.abreslav.java2ecore.jar from Eclipse plugins directory
   * Click OK
- * You will use some special annotations and classes from this JAR
+ * You will use some special annotations and classes from this JAR (see [Syntax] section)
 http://content.screencast.com/media/75b51434-fb23-44d5-be2a-5ec248810e83_2d2ecdec-33f4-4541-acd2-9ed52d228863_static_0_0_image.png
  * Right-click your project and choose "Toggle Java2Ecore nature"
   * This will enable Java2Ecore builder on your project
