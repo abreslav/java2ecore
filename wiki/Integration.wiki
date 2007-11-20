@@ -13,7 +13,7 @@ Copy them to Eclipse plugins directory.
 
 Restart Eclipse with {{{-clear}}} command-line parameter.
 
-= How does Java2Ecore integrate with Eclipse =
+= How does !Java2Ecore integrate with Eclipse =
 
 It just uses standard Java editor for entering text. 
 
