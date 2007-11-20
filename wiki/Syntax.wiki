@@ -1,11 +1,11 @@
 #summary Description of Java2Ecore syntax
 
 = File structure =
-When youdescribe some ECore model in a `*`.java file you define classes on the same level:
-one of them might be public (I think, it will be a package-specifying class) and others are package-private. All these classes will be handled by Java2ECore.
+When youdescribe some Ecore model in a `*`.java file you define classes on the same level:
+one of them might be public (I think, it will be a package-specifying class) and others are package-private. All these classes will be handled by Java2Ecore.
 
 = EPackage specification =
-The first thing to do when defining a ECore model is to create EPackage (and not to forget  to set up nsPrefix and nsURI attributes). In Java2ECore this is done as follows:
+The first thing to do when defining a Ecore model is to create EPackage (and not to forget  to set up nsPrefix and nsURI attributes). In Java2Ecore this is done as follows:
 {{{
 @EPackage(
     nsPrefix="samples",   
@@ -45,7 +45,7 @@ enum Enum {
 
 == Standard primitive types ==
 
-ECore defines number of EDataTypes for general purposes: {{{EInt}}}, {{{EJavaObject}}} and so on.
+Ecore defines number of EDataTypes for general purposes: {{{EInt}}}, {{{EJavaObject}}} and so on.
 To use those types in your model just use their Java analogs: {{{int}}} and {{{Object}}} for given example.
 
 = Structural features =
@@ -184,14 +184,14 @@ abstract class Abstract { // abstract modifier sets up EClass' abstract attribut
 }
 }}}
 
-But here we face a problem of multiple inheritance for classes being supported by ECore and not supported by Java.
-Java2ECore provides a workaround which we call an _interface form of class_...
+But here we face a problem of multiple inheritance for classes being supported by Ecore and not supported by Java.
+Java2Ecore provides a workaround which we call an _interface form of class_...
 
 == Interface form of class ==
 
 There's no multiple inheritance for classes in Java. But there is one for interfaces.
 
-On the other hand you cannot declare non-final fields in interfaces in Java and final field has to be initialized which will set up defaultValueLiteral andis impossible for most types. And ECore support any structural features in interfaces.
+On the other hand you cannot declare non-final fields in interfaces in Java and final field has to be initialized which will set up defaultValueLiteral andis impossible for most types. And Ecore supports any structural features in interfaces.
 
 So we provide the following: each interface (or class, to be consistent) can declare one inner-class, which holds all the parent's contents:
 {{{
@@ -206,7 +206,7 @@ In this example we created an EClass having {{{interface}}} attribute set to tru
 
 == Multiple inheritance for classes ==
 
-To provide multiple inheritance for classes you can define them as Java interfaces supplying a {{{@Class}}} annotation which will tell Java2ECore not to set {{{interface}}} attribute to true.
+To provide multiple inheritance for classes you can define them as Java interfaces supplying a {{{@Class}}} annotation which will tell Java2Ecore not to set {{{interface}}} attribute to true.
 {{{
 @Class interface A {
 class _{
@@ -238,10 +238,10 @@ class _{
 When you define a type in your EPackage and then use it, there's no doubt about what happens then.
 
 But what if you use some Java type not being declared in your package?
-By default Java2ECore creates a new EDataType with {{{instanceClassName}}} attribute set to fully-qualified name of unknown class.
+By default Java2Ecore creates a new EDataType with {{{instanceClassName}}} attribute set to fully-qualified name of unknown class.
 
 The only exception is for unknown supertypes: such a type has to be EClass, not EDataType.
-So, Java2ECore creates EClass for such types assigning {{{instanceClassName}}} the same way.
+So, Java2Ecore creates EClass for such types assigning {{{instanceClassName}}} the same way.
 
 = Generics =
 
