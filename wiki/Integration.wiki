@@ -2,7 +2,8 @@
 
 = Installation =
 
-Developed and tested under Eclipse 3.3.1.1
+Developed and tested under Eclipse 3.3.1.1.
+Requires JDT, EMF 2.2.3 and Java 5 or higher.
 
 Download three `*`.jar files from [http://code.google.com/p/java2ecore/downloads/list downloads page]:
  * org.abreslav.java2ecore.jar
@@ -20,12 +21,12 @@ It just uses standard Java editor for entering text.
 In addition it defines a project builder and a nature. 
 
 To start using Java2Ecore on some files in your project you have to perform the following steps:
- * Your project must be a Java project (eighther plug-in project or not)
+ * Your project must be a Java project (either plug-in project or not)
 http://content.screencast.com/media/0dc63ae8-799c-4f68-9420-a2baeefdb29a_2d2ecdec-33f4-4541-acd2-9ed52d228863_static_0_0_image.png
  * Go to project properties Java Build Path page
   * Select Libraries tab
   * Click Add External JARs...
-  * Select org.abreslav.java2ecore.jar from Eclipse plugins directory
+  * Select org.abreslav.java2ecore.jar from Eclipse plug-ins directory
   * Click OK
  * You will use some special annotations and classes from this JAR (see [Syntax] section)
 http://content.screencast.com/media/75b51434-fb23-44d5-be2a-5ec248810e83_2d2ecdec-33f4-4541-acd2-9ed52d228863_static_0_0_image.png
