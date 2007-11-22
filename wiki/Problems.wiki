@@ -1,5 +1,8 @@
 #summary A list of problems, unsupported things and not implemented features
 
+*See also*
+ * Our [http://code.google.com/p/java2ecore/issues/list bug-tracker]
+
 = Not yet implemented =
  * Ecore annotations
  * Nested packages
