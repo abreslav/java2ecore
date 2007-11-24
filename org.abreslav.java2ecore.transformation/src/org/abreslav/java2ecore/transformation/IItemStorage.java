@@ -6,7 +6,7 @@ import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
-public interface IItemCollector {
+public interface IItemStorage {
 	EClass getEClass(ITypeBinding type);
 	EEnum getEEnum(ITypeBinding type);	
 	EDataType getEDataType(ITypeBinding type);

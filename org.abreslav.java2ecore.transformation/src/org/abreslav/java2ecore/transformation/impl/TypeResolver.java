@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.abreslav.java2ecore.transformation.IItemCollector;
+import org.abreslav.java2ecore.transformation.IItemStorage;
 import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -19,21 +19,21 @@ import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class TypeResolver implements ITypeResolver {
-	private IItemCollector myItemCollector;
+	private IItemStorage myItemStorage;
 	private Collection<? super EClassifier> myWrappedEClassifiers;
 	
-	public TypeResolver(IItemCollector itemCollector,
+	public TypeResolver(IItemStorage itemStorage,
 			Collection<? super EClassifier> wrappedEClassifiers) {
-		myItemCollector = itemCollector;
+		myItemStorage = itemStorage;
 		myWrappedEClassifiers = wrappedEClassifiers;
 	}
 
 	public EClass getEClass(ITypeBinding type) {
-		return myItemCollector.getEClass(type);
+		return myItemStorage.getEClass(type);
 	}
 
 	public EDataType getEDataType(ITypeBinding type) {
-		EDataType eDataType = myItemCollector.getEDataType(type);
+		EDataType eDataType = myItemStorage.getEDataType(type);
 		if (eDataType != null) {
 			return eDataType;
 		}
@@ -41,11 +41,11 @@ public class TypeResolver implements ITypeResolver {
 	}
 
 	public EEnum getEEnum(ITypeBinding type) {
-		return myItemCollector.getEEnum(type);
+		return myItemStorage.getEEnum(type);
 	}
 	
 	public EPackage getEPackage(ITypeBinding type) {
-		return myItemCollector.getEPackage(type);
+		return myItemStorage.getEPackage(type);
 	}
 
 	public EGenericType resolveEGenericType(ITypeBinding binding, boolean forceEClass, TypeParameterIndex typeParameterIndex) {
@@ -103,7 +103,7 @@ public class TypeResolver implements ITypeResolver {
 		eClass.setInstanceClassName(binding.getErasure().getQualifiedName());
 		eClass.setInterface(binding.isInterface());
 		createTypeParameters(eClass, binding);
-		myItemCollector.addEClass(binding, eClass);
+		myItemStorage.addEClass(binding, eClass);
 		myWrappedEClassifiers.add(eClass);
 		return eClass;
 	}
@@ -155,7 +155,7 @@ public class TypeResolver implements ITypeResolver {
 
 			createTypeParameters(eDataType, type.getTypeDeclaration());
 			
-			myItemCollector.addEDataType(type, eDataType);
+			myItemStorage.addEDataType(type, eDataType);
 			myWrappedEClassifiers.add(eDataType);
 		}
 		return eDataType;
