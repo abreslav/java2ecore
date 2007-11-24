@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
-public class Diagnostics implements IDiagnostics {
+public class Diagnostics implements IDiagnostics, Iterable<Diagnostic> {
 	
 	private final Collection<Diagnostic> myDiagnostics = new ArrayList<Diagnostic>(); 
 	private boolean myHasErrors = false;

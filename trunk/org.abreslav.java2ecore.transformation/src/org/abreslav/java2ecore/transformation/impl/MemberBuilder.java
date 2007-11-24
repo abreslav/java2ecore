@@ -14,6 +14,7 @@ import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
 import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
 import org.abreslav.java2ecore.multiplicities.Infinity;
 import org.abreslav.java2ecore.multiplicities.Unspecified;
+import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
@@ -42,6 +43,9 @@ import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MemberBuilder extends ASTVisitor {
+	private interface IFeatureFactory {
+		EStructuralFeature createStructuralFeature();
+	}
 	
 	private static final Map<String, TypeSettings> ourFeatureSettingsMap = new HashMap<String, TypeSettings>();
 	static {
@@ -58,9 +62,9 @@ public class MemberBuilder extends ASTVisitor {
 	private final IDiagnostics myDiagnostics;
 	private final TypeParameterIndex myTypeParameterIndex;
 
-	public MemberBuilder(EClass class1, ITypeResolver typeResolver,
+	public MemberBuilder(EClass eClass, ITypeResolver typeResolver,
 			IDiagnostics diagnostics, TypeParameterIndex parameterIndex) {
-		myEClass = class1;
+		myEClass = eClass;
 		myTypeResolver = typeResolver;
 		myDiagnostics = diagnostics;
 		myTypeParameterIndex = parameterIndex;

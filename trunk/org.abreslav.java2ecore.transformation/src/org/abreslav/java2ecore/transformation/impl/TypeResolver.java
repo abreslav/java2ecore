@@ -4,70 +4,50 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.abreslav.java2ecore.transformation.utils.NullSet;
-import org.eclipse.emf.common.util.EList;
+import org.abreslav.java2ecore.transformation.IItemCollector;
+import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
-import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class TypeResolver implements ITypeResolver {
-	private final Map<String, EClass> myEClasses = new HashMap<String, EClass>();
-	private final Map<String, EDataType> myEDataTypes = new HashMap<String, EDataType>();
-	private final Map<String, EEnum> myEEnums = new HashMap<String, EEnum>();
+	private IItemCollector myItemCollector;
 	private Collection<? super EClassifier> myWrappedEClassifiers;
 	
-	public TypeResolver() {
-		this(null);
-	}
-	
-	public TypeResolver(Collection<? super EClassifier> wrappedClassifiers) {
-		initWrappedClasssfiers(wrappedClassifiers);
-		EList<EClassifier> classifiers = EcorePackage.eINSTANCE.getEClassifiers();
-		for (EClassifier classifier : classifiers) {
-			if (classifier instanceof EDataType) {
-				myEDataTypes.put(classifier.getInstanceClassName(), (EDataType) classifier);
-			}
-		}
-	}
-
-	private void initWrappedClasssfiers(
-			Collection<? super EClassifier> wrappedClassifiers) {
-		myWrappedEClassifiers = wrappedClassifiers;
-		if (myWrappedEClassifiers == null) {
-			myWrappedEClassifiers = new NullSet<EClassifier>();
-		}
+	public TypeResolver(IItemCollector itemCollector,
+			Collection<? super EClassifier> wrappedEClassifiers) {
+		myItemCollector = itemCollector;
+		myWrappedEClassifiers = wrappedEClassifiers;
 	}
 
 	public EClass getEClass(ITypeBinding type) {
-		return myEClasses.get(type.getErasure().getQualifiedName());
+		return myItemCollector.getEClass(type);
 	}
 
 	public EDataType getEDataType(ITypeBinding type) {
-		EDataType eDataType = myEDataTypes.get(type.getErasure().getQualifiedName());
+		EDataType eDataType = myItemCollector.getEDataType(type);
 		if (eDataType != null) {
 			return eDataType;
 		}
 		return getEEnum(type);
 	}
 
-	public void addEClass(ITypeBinding type, EClass eClass) {
-		myEClasses.put(type.getErasure().getQualifiedName(), eClass);
-	}
-
-	public void addEDataType(ITypeBinding type, EDataType eDataType) {
-		myEDataTypes.put(type.getErasure().getQualifiedName(), eDataType);
+	public EEnum getEEnum(ITypeBinding type) {
+		return myItemCollector.getEEnum(type);
 	}
 	
+	public EPackage getEPackage(ITypeBinding type) {
+		return myItemCollector.getEPackage(type);
+	}
+
 	public EGenericType resolveEGenericType(ITypeBinding binding, boolean forceEClass, TypeParameterIndex typeParameterIndex) {
 		EGenericType eGenericType = EcoreFactory.eINSTANCE.createEGenericType(); 
 		
@@ -123,7 +103,7 @@ public class TypeResolver implements ITypeResolver {
 		eClass.setInstanceClassName(binding.getErasure().getQualifiedName());
 		eClass.setInterface(binding.isInterface());
 		createTypeParameters(eClass, binding);
-		myEClasses.put(eClass.getInstanceClassName(), eClass);
+		myItemCollector.addEClass(binding, eClass);
 		myWrappedEClassifiers.add(eClass);
 		return eClass;
 	}
@@ -175,17 +155,9 @@ public class TypeResolver implements ITypeResolver {
 
 			createTypeParameters(eDataType, type.getTypeDeclaration());
 			
-			myEDataTypes.put(qualifiedName, eDataType);
+			myItemCollector.addEDataType(type, eDataType);
 			myWrappedEClassifiers.add(eDataType);
 		}
 		return eDataType;
-	}
-
-	public void addEEnum(ITypeBinding type, EEnum eEnum) {
-		myEEnums.put(type.getErasure().getQualifiedName(), eEnum);
-	}
-
-	public EEnum getEEnum(ITypeBinding type) {
-		return myEEnums.get(type.getErasure().getQualifiedName());
 	}
 }
