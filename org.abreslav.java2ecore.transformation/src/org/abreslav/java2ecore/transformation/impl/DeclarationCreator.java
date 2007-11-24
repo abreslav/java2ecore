@@ -16,12 +16,12 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  * @author abreslav
  *
  */
-public class ObjectCreator extends ASTVisitor {
+public class DeclarationCreator extends ASTVisitor {
 	private final IDiagnostics myDiagnostics;
 	private final IDeclarationCollector myDeclarationCollector;
 	private final ITypeBinding myPackageSpecifier;
 	
-	public ObjectCreator(ITypeBinding packageSpecifier, IDeclarationCollector declarationCollector, IDiagnostics diagnostics) {
+	public DeclarationCreator(ITypeBinding packageSpecifier, IDeclarationCollector declarationCollector, IDiagnostics diagnostics) {
 		super(false);
 		myPackageSpecifier = packageSpecifier;
 		myDeclarationCollector = declarationCollector;
@@ -43,7 +43,7 @@ public class ObjectCreator extends ASTVisitor {
 		
 		// Subpackage
 		if (annotatedView.isAnnotationPresent(org.abreslav.java2ecore.annotations.EPackage.class)) {
-			node.accept(new ObjectCreator(type, myDeclarationCollector, myDiagnostics));
+			node.accept(new DeclarationCreator(type, myDeclarationCollector, myDiagnostics));
 			return false;
 		} 
 

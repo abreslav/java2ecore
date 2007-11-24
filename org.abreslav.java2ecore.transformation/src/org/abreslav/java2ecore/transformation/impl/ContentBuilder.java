@@ -31,12 +31,12 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-public class TypeBuilder {
+public class ContentBuilder {
 
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
 
-	public TypeBuilder(ITypeResolver typeResolver, IDiagnostics diagnostics) {
+	public ContentBuilder(ITypeResolver typeResolver, IDiagnostics diagnostics) {
 		myDiagnostics = diagnostics;
 		myTypeResolver = typeResolver;
 	}
