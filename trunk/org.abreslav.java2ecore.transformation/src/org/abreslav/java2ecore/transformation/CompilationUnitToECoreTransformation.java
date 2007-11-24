@@ -62,8 +62,8 @@ public class CompilationUnitToECoreTransformation {
 		}
 
 		Collection<EClassifier> unknownTypes = new ArrayList<EClassifier>();
-		IItemCollector itemCollector = new ItemStorage(declarationStorage);
-		ITypeResolver typeResolver = new TypeResolver(itemCollector, unknownTypes);
+		IItemStorage itemStorage = new ItemStorage(declarationStorage);
+		ITypeResolver typeResolver = new TypeResolver(itemStorage, unknownTypes);
 		rootEPackage = buildCollectedItems(diagnostics, typeResolver, declarationStorage);
 
 		rootEPackage.getEClassifiers().addAll(unknownTypes);

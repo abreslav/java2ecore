@@ -3,7 +3,7 @@ package org.abreslav.java2ecore.transformation.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.abreslav.java2ecore.transformation.IItemCollector;
+import org.abreslav.java2ecore.transformation.IItemStorage;
 import org.abreslav.java2ecore.transformation.declarations.EClassDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EDataTypeDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EEnumDeclaration;
@@ -20,7 +20,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
-public class ItemStorage implements IItemCollector {
+public class ItemStorage implements IItemStorage {
 	private final Map<String, EClass> myEClasses = new HashMap<String, EClass>();
 	private final Map<String, EDataType> myEDataTypes = new HashMap<String, EDataType>();
 	private final Map<String, EEnum> myEEnums = new HashMap<String, EEnum>();
