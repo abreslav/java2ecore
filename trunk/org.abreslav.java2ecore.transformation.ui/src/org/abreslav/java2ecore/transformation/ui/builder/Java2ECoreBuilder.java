@@ -12,6 +12,8 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -50,7 +52,8 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 	}
 
 	class ResourceVisitor implements IResourceVisitor {
-		public boolean visit(IResource resource) {
+
+		public boolean visit(IResource resource) throws CoreException {
 			IJavaElement element = JavaCore.create(resource);
 			if (element == null) {
 				return false;
@@ -65,9 +68,11 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 			}
 			return true;
 		}
+
 	}
 
 	public static final String BUILDER_ID = "org.abreslav.java2ecore.transformation.ui.builder";
+	private static final String PLUGIN_ID = "org.abreslav.java2ecore.transformation.ui";
 
 	@SuppressWarnings("unchecked")
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor)
@@ -98,13 +103,11 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 		delta.accept(new DeltaVisitor());
 	}
 
-	private void perform(ICompilationUnit compilationUnit) {
+	private void perform(ICompilationUnit compilationUnit) throws CoreException {
 		try {
 			TransformationPerformer.performTransformation(compilationUnit);
-		} catch (CoreException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		}		
+			throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
+		}
 	}
 }
