@@ -1,6 +1,5 @@
 package org.abreslav.java2ecore.transformation.impl;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -80,10 +79,10 @@ public class TypeResolver implements ITypeResolver {
 
 	private void processActualType(ITypeBinding binding,
 			EGenericType eGenericType, boolean forceEClass) {
-		
 		EClass eClass = getEClass(binding);
 		if (forceEClass && eClass == null) {
-			eClass = wrapUnknownClass(binding);
+//			eClass = wrapUnknownClass(binding);
+			return;
 		}
 		if (eClass != null) {
 			eGenericType.setEClassifier(eClass);
@@ -95,19 +94,6 @@ public class TypeResolver implements ITypeResolver {
 		}
 	}
 
-	private EClass wrapUnknownClass(ITypeBinding binding) {
-		EClass eClass;
-		eClass = EcoreFactory.eINSTANCE.createEClass();
-		eClass.setName(binding.getErasure().getName());
-		eClass.setAbstract((binding.getModifiers() & Modifier.ABSTRACT) != 0);
-		eClass.setInstanceClassName(binding.getErasure().getQualifiedName());
-		eClass.setInterface(binding.isInterface());
-		createTypeParameters(eClass, binding);
-		myItemStorage.addEClass(binding, eClass);
-		myWrappedEClassifiers.add(eClass);
-		return eClass;
-	}
-	
 	public TypeParameterIndex createTypeParameters(EClassifier eClassifier,
 			ITypeBinding binding) {
 		TypeParameterIndex typeParameterIndex = new TypeParameterIndex(null);
@@ -142,7 +128,7 @@ public class TypeResolver implements ITypeResolver {
 		return eTypeParameters;
 	}
 
-	public EDataType resolveEDataType(ITypeBinding type) {
+	private EDataType resolveEDataType(ITypeBinding type) {
 		EDataType eDataType = getEDataType(type);
 		if (void.class.getCanonicalName().equals(type.getQualifiedName())) {
 			return null;

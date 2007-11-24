@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.abreslav.java2ecore.annotations.types.NonModel;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.declarations.DeclarationStorage;
@@ -44,7 +45,7 @@ public class CompilationUnitToECoreTransformation {
 
 		AbstractTypeDeclaration firstType = types.get(0);
 		if (types.size() > 1) {
-			List<AbstractTypeDeclaration> otherTypes = types.subList(1, types.size() - 1);
+			List<AbstractTypeDeclaration> otherTypes = types.subList(1, types.size());
 			for (AbstractTypeDeclaration abstractTypeDeclaration : otherTypes) {
 				diagnostics.reportError("All the types must be contained in a package. Only one top-level package might be declared in a compilation unit.", abstractTypeDeclaration);
 			}
@@ -55,6 +56,9 @@ public class CompilationUnitToECoreTransformation {
 		
 		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(firstType);
 		if (annotatedView.isAnnotationPresent(org.abreslav.java2ecore.annotations.EPackage.class)) {
+			if (annotatedView.isAnnotationPresent(NonModel.class)) {
+				diagnostics.reportError("Root package type cannot be non-model", annotatedView.getAnnotation(NonModel.class).getAnnotation());
+			}
 			firstType.accept(new DeclarationCollector(firstType.resolveBinding(), declarationStorage, diagnostics));
 		} else {
 			diagnostics.reportError("This type must declare @EPackage annotation", firstType.getName());

@@ -1,5 +1,6 @@
 package org.abreslav.java2ecore.transformation.impl;
 
+import org.abreslav.java2ecore.annotations.types.NonModel;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationStorage;
@@ -33,14 +34,19 @@ public class DeclarationCollector extends ASTVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
+		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(node);
+		
+		// @Ignore
+		if (annotatedView.isAnnotationPresent(NonModel.class)) {
+			return false;
+		}
+
 		ITypeBinding type = node.resolveBinding();
 		if (type == myPackageSpecifier) {
 			myDeclarationStorage.addEPackage(node, EcoreFactory.eINSTANCE.createEPackage());
 			return true;
 		}
-		
-		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(node);
-		
+				
 		// Subpackage
 		if (annotatedView.isAnnotationPresent(org.abreslav.java2ecore.annotations.EPackage.class)) {
 			node.accept(new DeclarationCollector(type, myDeclarationStorage, myDiagnostics));
