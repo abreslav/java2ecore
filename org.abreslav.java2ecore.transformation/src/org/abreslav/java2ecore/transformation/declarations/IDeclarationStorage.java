@@ -9,7 +9,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-public interface IDeclarationCollector {
+public interface IDeclarationStorage {
 	void addEClass(TypeDeclaration type, EClass eClass);
 	void addEEnum(EnumDeclaration type, EEnum eEnum);
 	void addEDataType(TypeDeclaration type, EDataType eDataType);

@@ -9,7 +9,7 @@ import org.abreslav.java2ecore.transformation.declarations.EDataTypeDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EEnumDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EPackageDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.IDeclaration;
-import org.abreslav.java2ecore.transformation.declarations.IDeclarationCollector;
+import org.abreslav.java2ecore.transformation.declarations.IDeclarationStorage;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationVisitor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
@@ -20,13 +20,13 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
-public class ItemCollector implements IItemCollector {
+public class ItemStorage implements IItemCollector {
 	private final Map<String, EClass> myEClasses = new HashMap<String, EClass>();
 	private final Map<String, EDataType> myEDataTypes = new HashMap<String, EDataType>();
 	private final Map<String, EEnum> myEEnums = new HashMap<String, EEnum>();
 	private final Map<String, EPackage> myEPackages = new HashMap<String, EPackage>();
 	
-	public ItemCollector(IDeclarationCollector declarationCollector) {
+	public ItemStorage(IDeclarationStorage declarationStorage) {
 		EList<EClassifier> classifiers = EcorePackage.eINSTANCE.getEClassifiers();
 		for (EClassifier classifier : classifiers) {
 			if (classifier.getInstanceClassName() != null) {
@@ -38,7 +38,7 @@ public class ItemCollector implements IItemCollector {
 			}
 		}
 
-		for (final IDeclaration declaration : declarationCollector.getDeclarations()) {
+		for (final IDeclaration declaration : declarationStorage.getDeclarations()) {
 			declaration.accept(new IDeclarationVisitor(){
 				public void visit(EClassDeclaration declaration) {
 					addEClass(declaration.getDeclaration().resolveBinding(), declaration.getDeclaredElement());

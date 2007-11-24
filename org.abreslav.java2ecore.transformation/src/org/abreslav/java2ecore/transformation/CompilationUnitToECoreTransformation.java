@@ -7,17 +7,17 @@ import java.util.List;
 
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
-import org.abreslav.java2ecore.transformation.declarations.DeclarationCollector;
+import org.abreslav.java2ecore.transformation.declarations.DeclarationStorage;
 import org.abreslav.java2ecore.transformation.declarations.EClassDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EDataTypeDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EEnumDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EPackageDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.IDeclaration;
-import org.abreslav.java2ecore.transformation.declarations.IDeclarationCollector;
+import org.abreslav.java2ecore.transformation.declarations.IDeclarationStorage;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationVisitor;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
-import org.abreslav.java2ecore.transformation.impl.ItemCollector;
-import org.abreslav.java2ecore.transformation.impl.DeclarationCreator;
+import org.abreslav.java2ecore.transformation.impl.ItemStorage;
+import org.abreslav.java2ecore.transformation.impl.DeclarationCollector;
 import org.abreslav.java2ecore.transformation.impl.ContentBuilder;
 import org.abreslav.java2ecore.transformation.impl.TypeResolver;
 import org.eclipse.emf.ecore.EClassifier;
@@ -50,32 +50,32 @@ public class CompilationUnitToECoreTransformation {
 			}
 		}
 		
-		IDeclarationCollector declarationCollector = new DeclarationCollector();
+		IDeclarationStorage declarationStorage = new DeclarationStorage();
 		EPackage rootEPackage = null;
 		
 		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(firstType);
 		if (annotatedView.isAnnotationPresent(org.abreslav.java2ecore.annotations.EPackage.class)) {
-			firstType.accept(new DeclarationCreator(firstType.resolveBinding(), declarationCollector, diagnostics));
+			firstType.accept(new DeclarationCollector(firstType.resolveBinding(), declarationStorage, diagnostics));
 		} else {
 			diagnostics.reportError("This type must declare @EPackage annotation", firstType.getName());
 			return null;
 		}
 
 		Collection<EClassifier> unknownTypes = new ArrayList<EClassifier>();
-		IItemCollector itemCollector = new ItemCollector(declarationCollector);
+		IItemCollector itemCollector = new ItemStorage(declarationStorage);
 		ITypeResolver typeResolver = new TypeResolver(itemCollector, unknownTypes);
-		rootEPackage = buildCollectedItems(diagnostics, typeResolver, declarationCollector);
+		rootEPackage = buildCollectedItems(diagnostics, typeResolver, declarationStorage);
 
 		rootEPackage.getEClassifiers().addAll(unknownTypes);
 		return rootEPackage;
 	}
 
 	private static EPackage buildCollectedItems(IDiagnostics diagnostics,
-			ITypeResolver typeResolver, IDeclarationCollector declarationCollector) {
+			ITypeResolver typeResolver, IDeclarationStorage declarationStorage) {
 		final EPackage[] rootEPackage = new EPackage[1];
 		final ContentBuilder typeBuilder = new ContentBuilder(typeResolver, diagnostics);
 
-		for (final IDeclaration declaration : declarationCollector.getDeclarations()) {
+		for (final IDeclaration declaration : declarationStorage.getDeclarations()) {
 			declaration.accept(new IDeclarationVisitor() {
 				public void visit(EClassDeclaration declaration) {
 					typeBuilder.buildEClass(declaration.getDeclaration(), declaration.getDeclaredElement());
