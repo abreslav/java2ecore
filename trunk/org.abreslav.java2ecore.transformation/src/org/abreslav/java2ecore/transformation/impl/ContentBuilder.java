@@ -9,6 +9,7 @@ import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
+import org.abreslav.java2ecore.transformation.deferred.IDeferredActions;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -35,10 +36,13 @@ public class ContentBuilder {
 
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
+	private final IDeferredActions myDeferredActions;
 
-	public ContentBuilder(ITypeResolver typeResolver, IDiagnostics diagnostics) {
-		myDiagnostics = diagnostics;
+	public ContentBuilder(ITypeResolver typeResolver, IDiagnostics diagnostics,
+			IDeferredActions deferredActions) {
 		myTypeResolver = typeResolver;
+		myDiagnostics = diagnostics;
+		myDeferredActions = deferredActions;
 	}
 
 	public void buildEPackage(TypeDeclaration type, EPackage ePackage) {
@@ -139,7 +143,7 @@ public class ContentBuilder {
 		for (TypeDeclaration nested : type.getTypes()) {
 			myDiagnostics.reportError("Nested types are not supported by Ecore", nested);
 		}
-		type.accept(new MemberBuilder(eClass, myTypeResolver, myDiagnostics, typeParameterIndex));
+		type.accept(new MemberBuilder(eClass, myTypeResolver, myDiagnostics, typeParameterIndex, myDeferredActions));
 	}
 	
 	private void markNestedThings(final TypeDeclaration node, TypeDeclaration[] types) {
