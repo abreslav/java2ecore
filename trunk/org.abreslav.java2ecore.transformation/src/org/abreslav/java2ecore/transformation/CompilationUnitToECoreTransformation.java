@@ -17,8 +17,8 @@ import org.abreslav.java2ecore.transformation.declarations.IDeclarationCollector
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationVisitor;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.abreslav.java2ecore.transformation.impl.ItemCollector;
-import org.abreslav.java2ecore.transformation.impl.ObjectCreator;
-import org.abreslav.java2ecore.transformation.impl.TypeBuilder;
+import org.abreslav.java2ecore.transformation.impl.DeclarationCreator;
+import org.abreslav.java2ecore.transformation.impl.ContentBuilder;
 import org.abreslav.java2ecore.transformation.impl.TypeResolver;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EPackage;
@@ -55,7 +55,7 @@ public class CompilationUnitToECoreTransformation {
 		
 		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(firstType);
 		if (annotatedView.isAnnotationPresent(org.abreslav.java2ecore.annotations.EPackage.class)) {
-			firstType.accept(new ObjectCreator(firstType.resolveBinding(), declarationCollector, diagnostics));
+			firstType.accept(new DeclarationCreator(firstType.resolveBinding(), declarationCollector, diagnostics));
 		}
 
 		Collection<EClassifier> unknownTypes = new ArrayList<EClassifier>();
@@ -70,7 +70,7 @@ public class CompilationUnitToECoreTransformation {
 	private static EPackage buildCollectedItems(IDiagnostics diagnostics,
 			ITypeResolver typeResolver, IDeclarationCollector declarationCollector) {
 		final EPackage[] rootEPackage = new EPackage[1];
-		final TypeBuilder typeBuilder = new TypeBuilder(typeResolver, diagnostics);
+		final ContentBuilder typeBuilder = new ContentBuilder(typeResolver, diagnostics);
 
 		for (final IDeclaration declaration : declarationCollector.getDeclarations()) {
 			declaration.accept(new IDeclarationVisitor() {
