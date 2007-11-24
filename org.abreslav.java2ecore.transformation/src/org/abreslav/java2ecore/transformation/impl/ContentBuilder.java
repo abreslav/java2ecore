@@ -122,19 +122,22 @@ public class ContentBuilder {
 		TypeParameterIndex typeParameterIndex = myTypeResolver.createTypeParameters(
 				eClass, binding);
 		
-		List<ITypeBinding> supertypes = getSupertypes(binding, type);
-		for (ITypeBinding typeBinding : supertypes) {
-			if (typeBinding == null 
-					|| Object.class.getCanonicalName().equals(typeBinding.getQualifiedName())) {
-				continue;
+		List<Type> supertypes = getSupertypes(type);
+		for (Type supertype : supertypes) {
+			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(supertype.resolveBinding(), true, typeParameterIndex);
+			if (eSuperClass != null) {
+				eClass.getEGenericSuperTypes().add(eSuperClass);
+			} else {
+				myDiagnostics.reportError("Only EClass might be a supertype", supertype);
 			}
-			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(typeBinding, true, typeParameterIndex);
-			eClass.getEGenericSuperTypes().add(eSuperClass);
 		}
 		TypeDeclaration[] types = type.getTypes();
 		if (types.length > 0) {
 			markNestedThings(type, types);
 			type = types[0];
+		}
+		for (TypeDeclaration nested : type.getTypes()) {
+			myDiagnostics.reportError("Nested types are not supported by Ecore", nested);
 		}
 		type.accept(new MemberBuilder(eClass, myTypeResolver, myDiagnostics, typeParameterIndex));
 	}
@@ -164,21 +167,19 @@ public class ContentBuilder {
 		});
 	}
 
-	private List<ITypeBinding> getSupertypes(ITypeBinding binding, ASTNode node) {
-		ArrayList<ITypeBinding> result = new ArrayList<ITypeBinding>();
-		
-		ITypeBinding superclass = binding.getSuperclass();
-		if (superclass != null
-				&& !Object.class.getCanonicalName().equals(superclass.getQualifiedName())) {
+	private List<Type> getSupertypes(TypeDeclaration type) {
+		List<Type> result = new ArrayList<Type>();
+		Type superclass = (Type) type.getStructuralProperty(TypeDeclaration.SUPERCLASS_TYPE_PROPERTY);
+		if (superclass != null) {
 			result.add(superclass);
 		}
-		ITypeBinding[] interfaces = binding.getInterfaces();
-		for (ITypeBinding typeBinding : interfaces) {
-			result.add(typeBinding);
-		}
+		
+		@SuppressWarnings("unchecked")
+		List<Type> superinterfaces = (List<Type>) type.getStructuralProperty(TypeDeclaration.SUPER_INTERFACE_TYPES_PROPERTY);
+		result.addAll(superinterfaces);
 		return result;
 	}
-
+	
 	private void setUpEClassifier(final AbstractTypeDeclaration type, final EClassifier eClassifier) {
 		eClassifier.setName(type.getName().getIdentifier());
 		ITypeBinding declaringClass = type.resolveBinding().getDeclaringClass();

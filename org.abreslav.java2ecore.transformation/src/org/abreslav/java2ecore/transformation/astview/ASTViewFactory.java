@@ -17,7 +17,7 @@ public class ASTViewFactory {
 	
 	public AnnotationView createAnnotationView(Annotation annotation) {
 		IAnnotationBinding binding = annotation.resolveAnnotationBinding();
-		AnnotationView view = new AnnotationView(binding.getAnnotationType().getQualifiedName());
+		AnnotationView view = new AnnotationView(annotation);
 		IMemberValuePairBinding[] allMemberValuePairs = binding.getAllMemberValuePairs();
 		for (IMemberValuePairBinding pair : allMemberValuePairs) {
 			view.getAttributes().put(pair.getName(), pair.getValue());

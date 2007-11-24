@@ -20,7 +20,6 @@ public interface ITypeResolver {
 	EEnum getEEnum(ITypeBinding type);
 	EDataType getEDataType(ITypeBinding type);
 
-	EDataType resolveEDataType(ITypeBinding type);	
 	EGenericType resolveEGenericType(ITypeBinding binding, boolean forceEClass, TypeParameterIndex typeParameterIndex);
 	
 	TypeParameterIndex createTypeParameters(EClassifier eClassifier,
