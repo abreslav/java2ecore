@@ -10,7 +10,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-public class DeclarationCollector implements IDeclarationCollector {
+public class DeclarationStorage implements IDeclarationStorage {
 
 	private List<IDeclaration> myDeclarations = new ArrayList<IDeclaration>();
 	
