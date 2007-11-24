@@ -16,6 +16,8 @@ import org.abreslav.java2ecore.transformation.declarations.EPackageDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.IDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationStorage;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationVisitor;
+import org.abreslav.java2ecore.transformation.deferred.DeferredActions;
+import org.abreslav.java2ecore.transformation.deferred.IDeferredActions;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.abreslav.java2ecore.transformation.impl.ItemStorage;
 import org.abreslav.java2ecore.transformation.impl.DeclarationCollector;
@@ -77,7 +79,8 @@ public class CompilationUnitToECoreTransformation {
 	private static EPackage buildCollectedItems(IDiagnostics diagnostics,
 			ITypeResolver typeResolver, IDeclarationStorage declarationStorage) {
 		final EPackage[] rootEPackage = new EPackage[1];
-		final ContentBuilder typeBuilder = new ContentBuilder(typeResolver, diagnostics);
+		IDeferredActions deferredActions = new DeferredActions();
+		final ContentBuilder typeBuilder = new ContentBuilder(typeResolver, diagnostics, deferredActions);
 
 		for (final IDeclaration declaration : declarationStorage.getDeclarations()) {
 			declaration.accept(new IDeclarationVisitor() {
@@ -101,6 +104,7 @@ public class CompilationUnitToECoreTransformation {
 				}
 			});
 		}
+		deferredActions.performActions(diagnostics);
 		return rootEPackage[0];
 	}
 

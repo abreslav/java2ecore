@@ -10,6 +10,7 @@ import java.util.Set;
 import org.abreslav.java2ecore.annotations.sfeatures.Containment;
 import org.abreslav.java2ecore.annotations.sfeatures.Derived;
 import org.abreslav.java2ecore.annotations.sfeatures.ID;
+import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
 import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
 import org.abreslav.java2ecore.multiplicities.Infinity;
@@ -17,6 +18,9 @@ import org.abreslav.java2ecore.multiplicities.Unspecified;
 import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
+import org.abreslav.java2ecore.transformation.astview.AnnotationView;
+import org.abreslav.java2ecore.transformation.deferred.IDeferredActions;
+import org.abreslav.java2ecore.transformation.deferred.SetOppositeAction;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -61,15 +65,18 @@ public class MemberBuilder extends ASTVisitor {
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
 	private final TypeParameterIndex myTypeParameterIndex;
-
+	private final IDeferredActions myDeferredActions;
+	
 	public MemberBuilder(EClass eClass, ITypeResolver typeResolver,
-			IDiagnostics diagnostics, TypeParameterIndex parameterIndex) {
+			IDiagnostics diagnostics, TypeParameterIndex typeParameterIndex,
+			IDeferredActions deferredActions) {
 		myEClass = eClass;
 		myTypeResolver = typeResolver;
 		myDiagnostics = diagnostics;
-		myTypeParameterIndex = parameterIndex;
+		myTypeParameterIndex = typeParameterIndex;
+		myDeferredActions = deferredActions;
 	}
-	
+
 	@Override
 	public boolean visit(FieldDeclaration node) {
 		TypeSettings typeSettings = getTypeSettingsImpliedByJavaType(node.getType());
@@ -160,8 +167,8 @@ public class MemberBuilder extends ASTVisitor {
 		eTypedElement.setEGenericType(myTypeResolver.resolveEGenericType(binding, false, typeParameterIndex));
 	}
 	
-	private IFeatureFactory createFeatureFactory(BodyDeclaration node,
-			EGenericType eGenericType) {
+	private IFeatureFactory createFeatureFactory(final BodyDeclaration node,
+			final EGenericType eGenericType) {
 		AnnotatedView annotations = ASTViewFactory.INSTANCE.createAnnotatedView(node);
 		if (eGenericType.getEClassifier() instanceof EDataType) {
 			final boolean isId = annotations.isAnnotationPresent(ID.class);
@@ -177,6 +184,8 @@ public class MemberBuilder extends ASTVisitor {
 			final boolean isDerived = annotations.isAnnotationPresent(Derived.class);
 			final boolean isUnsettable = annotations.isAnnotationPresent(Unsettable.class);
 			final boolean isResolveProxies = annotations.isAnnotationPresent(ResolveProxies.class);
+
+			final AnnotationView oppositeAnnotation = annotations.getAnnotation(Opposite.class);
 			return new IFeatureFactory() {
 				public EStructuralFeature createStructuralFeature() {
 					EReference result = EcoreFactory.eINSTANCE.createEReference();
@@ -184,6 +193,15 @@ public class MemberBuilder extends ASTVisitor {
 					result.setDerived(isDerived);
 					result.setResolveProxies(isResolveProxies);
 					result.setUnsettable(isUnsettable);
+					if (oppositeAnnotation != null) {
+						myDeferredActions.addAction(
+								new SetOppositeAction(
+										result, oppositeAnnotation.getAnnotation(), 
+										(EClass) eGenericType.getEClassifier(), 
+										(String) oppositeAnnotation.getAttribute("value"),
+										true
+								));
+					}
 					return result;
 				}
 			};
