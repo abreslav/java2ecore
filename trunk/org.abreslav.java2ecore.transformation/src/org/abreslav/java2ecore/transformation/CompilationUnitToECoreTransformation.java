@@ -56,6 +56,8 @@ public class CompilationUnitToECoreTransformation {
 		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(firstType);
 		if (annotatedView.isAnnotationPresent(org.abreslav.java2ecore.annotations.EPackage.class)) {
 			firstType.accept(new DeclarationCreator(firstType.resolveBinding(), declarationCollector, diagnostics));
+		} else {
+			diagnostics.reportError("This type must declare @EPackage annotation", firstType.getName());
 		}
 
 		Collection<EClassifier> unknownTypes = new ArrayList<EClassifier>();
