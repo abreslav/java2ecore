@@ -58,6 +58,7 @@ public class CompilationUnitToECoreTransformation {
 			firstType.accept(new DeclarationCreator(firstType.resolveBinding(), declarationCollector, diagnostics));
 		} else {
 			diagnostics.reportError("This type must declare @EPackage annotation", firstType.getName());
+			return null;
 		}
 
 		Collection<EClassifier> unknownTypes = new ArrayList<EClassifier>();
