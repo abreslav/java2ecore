@@ -23,6 +23,10 @@ public class AnnotationView {
 		return myAttributes.get(name);
 	}
 	
+	public Object getDefaultAttribute() {
+		return getAttribute("value");
+	}
+	
 	/*package*/ Map<String, Object> getAttributes() {
 		return myAttributes;
 	}

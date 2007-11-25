@@ -3,7 +3,6 @@ package org.abreslav.java2ecore.transformation.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.abreslav.java2ecore.annotations.types.Class;
 import org.abreslav.java2ecore.annotations.types.InstanceTypeName;
 import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
@@ -100,7 +99,7 @@ public class ContentBuilder {
 		
 		AnnotatedView view = ASTViewFactory.INSTANCE.createAnnotatedView(type);
 		AnnotationView eDataTypeAnnotation = view.getAnnotation(org.abreslav.java2ecore.annotations.types.EDataType.class);
-		eDataType.setInstanceTypeName((String) eDataTypeAnnotation.getAttribute("value"));
+		eDataType.setInstanceTypeName((String) eDataTypeAnnotation.getDefaultAttribute());
 		myTypeResolver.createTypeParameters(eDataType, type.resolveBinding());
 	}
 	
@@ -110,12 +109,12 @@ public class ContentBuilder {
 		AnnotatedView view = ASTViewFactory.INSTANCE.createAnnotatedView(type);
 		AnnotationView instanceTypeName = view.getAnnotation(InstanceTypeName.class);
 		if (instanceTypeName != null) {
-			eClass.setInstanceTypeName((String) instanceTypeName.getAttribute("value"));
+			eClass.setInstanceTypeName((String) instanceTypeName.getDefaultAttribute());
 		}
 		
 		eClass.setAbstract((type.getModifiers() & Modifier.ABSTRACT) != 0);
 
-		AnnotationView classAnnotation = view.getAnnotation(Class.class);
+		AnnotationView classAnnotation = view.getAnnotation(org.abreslav.java2ecore.annotations.types.EClass.class);
 		if ((classAnnotation == null) || !type.isInterface()) {
 			eClass.setInterface(type.isInterface());
 		} else {
