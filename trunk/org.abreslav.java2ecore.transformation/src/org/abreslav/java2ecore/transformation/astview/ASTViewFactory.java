@@ -26,7 +26,7 @@ public class ASTViewFactory {
 	}
 	
 	public AnnotatedView createAnnotatedView(BodyDeclaration declaration) {
-		AnnotatedView view = new AnnotatedView();
+		AnnotatedView view = new AnnotatedView(declaration);
 		List<?> modifiers = (List<?>) declaration.getStructuralProperty(declaration.getModifiersProperty());
 		
 		for (Object modifier : modifiers) {

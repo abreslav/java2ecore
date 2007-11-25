@@ -2,10 +2,7 @@ package org.abreslav.java2ecore.transformation.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.abreslav.java2ecore.annotations.sfeatures.Containment;
 import org.abreslav.java2ecore.annotations.sfeatures.Derived;
@@ -13,8 +10,6 @@ import org.abreslav.java2ecore.annotations.sfeatures.ID;
 import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
 import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
-import org.abreslav.java2ecore.multiplicities.Infinity;
-import org.abreslav.java2ecore.multiplicities.Unspecified;
 import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
@@ -34,7 +29,6 @@ import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.ETypedElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -51,21 +45,12 @@ public class MemberBuilder extends ASTVisitor {
 		EStructuralFeature createStructuralFeature();
 	}
 	
-	private static final Map<String, TypeSettings> ourFeatureSettingsMap = new HashMap<String, TypeSettings>();
-	static {
-		ourFeatureSettingsMap.put(Collection.class.getCanonicalName(), new TypeSettings(0, -1, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(Set.class.getCanonicalName(), new TypeSettings(0, -1, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(List.class.getCanonicalName(), new TypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MCollection.class.getCanonicalName(), new TypeSettings(0, TypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MSet.class.getCanonicalName(), new TypeSettings(0, TypeSettings.BOUNDS_SPECIFIED_BY_TYPE, true, false, IUnwrapStrategy.UNWRAP_GENERIC));
-		ourFeatureSettingsMap.put(org.abreslav.java2ecore.multiplicities.MList.class.getCanonicalName(), new TypeSettings(0, TypeSettings.BOUNDS_SPECIFIED_BY_TYPE, false, true, IUnwrapStrategy.UNWRAP_GENERIC));
-	}
-
 	private final EClass myEClass;
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
 	private final TypeParameterIndex myTypeParameterIndex;
 	private final IDeferredActions myDeferredActions;
+	private final TypeSettingsCalculator myTypeSettingsCalculator;
 	
 	public MemberBuilder(EClass eClass, ITypeResolver typeResolver,
 			IDiagnostics diagnostics, TypeParameterIndex typeParameterIndex,
@@ -75,15 +60,17 @@ public class MemberBuilder extends ASTVisitor {
 		myDiagnostics = diagnostics;
 		myTypeParameterIndex = typeParameterIndex;
 		myDeferredActions = deferredActions;
+		myTypeSettingsCalculator = new TypeSettingsCalculator(myDiagnostics);
 	}
 
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		TypeSettings typeSettings = getTypeSettingsImpliedByJavaType(node.getType());
+		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(node);
+		TypeSettings typeSettings = myTypeSettingsCalculator.calculateTypeSettings(node.getType(), annotatedView);
 		final ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(node.getType().resolveBinding());
 		
 		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, false, myTypeParameterIndex);
-		IFeatureFactory factory = createFeatureFactory(node, eGenericType);
+		IFeatureFactory factory = createFeatureFactory(annotatedView, eGenericType);
 
 		boolean isFinal = (node.getModifiers() & Modifier.FINAL) != 0;
 		boolean isTransient = (node.getModifiers() & Modifier.TRANSIENT) != 0;
@@ -91,33 +78,28 @@ public class MemberBuilder extends ASTVisitor {
 
 		@SuppressWarnings("unchecked")
 		List<VariableDeclarationFragment> fragments = (List<VariableDeclarationFragment>) node.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
-		for (VariableDeclarationFragment fragment : fragments) {
-			if (fragment.getExtraDimensions() > 0) {
-				myDiagnostics.reportError("Specify array dimensions at the field type", fragment);
-			}
-			EStructuralFeature feature = factory.createStructuralFeature();
-			
-			feature.setEGenericType(eGenericType);
-			feature.setName(fragment.getName().getIdentifier());
-			feature.setChangeable(isFinal);
-			feature.setTransient(isTransient);
-			feature.setVolatile(isVolatile);
-			
-			applyTypeSettings(feature, typeSettings);
-			
-			setDefaultValue(feature, fragment.getInitializer());
-
-			myEClass.getEStructuralFeatures().add(feature);
+		for (VariableDeclarationFragment fragment : fragments.subList(1, fragments.size())) {
+			myDiagnostics.reportError("Only one feature per declaration is allowed", fragment);
 		}
-		return false;
-	}
+		
+		VariableDeclarationFragment fragment = fragments.get(0);
+		if (fragment.getExtraDimensions() > 0) {
+			myDiagnostics.reportError("Specify array dimensions at the field type", fragment);
+		}
+		EStructuralFeature feature = factory.createStructuralFeature();
+		
+		feature.setEGenericType(eGenericType);
+		feature.setName(fragment.getName().getIdentifier());
+		feature.setChangeable(isFinal);
+		feature.setTransient(isTransient);
+		feature.setVolatile(isVolatile);
+		
+		applyTypeSettings(feature, typeSettings);
+		
+		setDefaultValue(feature, fragment.getInitializer());
 
-	private void applyTypeSettings(ETypedElement eTypedElement,
-			TypeSettings typeSettings) {
-		eTypedElement.setLowerBound(typeSettings.getLowerBound());
-		eTypedElement.setUpperBound(typeSettings.getUpperBound());
-		eTypedElement.setUnique(typeSettings.isUnique());
-		eTypedElement.setOrdered(typeSettings.isOrdered());
+		myEClass.getEStructuralFeatures().add(feature);
+		return false;
 	}
 
 	@Override
@@ -136,14 +118,23 @@ public class MemberBuilder extends ASTVisitor {
 		Collection<ETypeParameter> eTypeParameters = myTypeResolver.createETypeParameters(typeParameterIndex, parameterTypeBindings);
 		eOperation.getETypeParameters().addAll(eTypeParameters);
 		
-		setUpType(eOperation, node.getReturnType2(), typeParameterIndex);
+		Type type = node.getReturnType2();
+		TypeSettings returnTypeSettings = myTypeSettingsCalculator.calculateTypeSettings(type, ASTViewFactory.INSTANCE.createAnnotatedView(node));
+		ITypeBinding returnTypeBinding = returnTypeSettings.getUnwrapStrategy().unwrap(type.resolveBinding());
+		applyTypeSettings(eOperation, returnTypeSettings);
+		eOperation.setEGenericType(myTypeResolver.resolveEGenericType(returnTypeBinding, false, typeParameterIndex));
 
 		@SuppressWarnings("unchecked")
 		List<SingleVariableDeclaration> parameters = (List<SingleVariableDeclaration>) node.getStructuralProperty(MethodDeclaration.PARAMETERS_PROPERTY);
 		for (SingleVariableDeclaration parameter : parameters) {
 			EParameter eParameter = EcoreFactory.eINSTANCE.createEParameter();
 			eParameter.setName(parameter.getName().getIdentifier());
-			setUpType(eParameter, parameter.getType(), typeParameterIndex);
+			Type type1 = parameter.getType();
+			TypeSettings typeSettings = myTypeSettingsCalculator.calculateTypeSettings(type1, null);
+			ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(type1.resolveBinding());
+			
+			applyTypeSettings(eParameter, typeSettings);
+			eParameter.setEGenericType(myTypeResolver.resolveEGenericType(binding, false, typeParameterIndex));
 			eOperation.getEParameters().add(eParameter);
 		}
 		
@@ -159,17 +150,8 @@ public class MemberBuilder extends ASTVisitor {
 		return false;
 	}
 
-	private void setUpType(ETypedElement eTypedElement, Type type, TypeParameterIndex typeParameterIndex) {
-		TypeSettings typeSettings = getTypeSettingsImpliedByJavaType(type);
-		ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(type.resolveBinding());
-		
-		applyTypeSettings(eTypedElement, typeSettings);
-		eTypedElement.setEGenericType(myTypeResolver.resolveEGenericType(binding, false, typeParameterIndex));
-	}
-	
-	private IFeatureFactory createFeatureFactory(final BodyDeclaration node,
+	private IFeatureFactory createFeatureFactory(final AnnotatedView annotations,
 			final EGenericType eGenericType) {
-		AnnotatedView annotations = ASTViewFactory.INSTANCE.createAnnotatedView(node);
 		if (eGenericType.getEClassifier() instanceof EDataType) {
 			final boolean isId = annotations.isAnnotationPresent(ID.class);
 			return new IFeatureFactory() {
@@ -198,7 +180,7 @@ public class MemberBuilder extends ASTVisitor {
 								new SetOppositeAction(
 										result, oppositeAnnotation.getAnnotation(), 
 										(EClass) eGenericType.getEClassifier(), 
-										(String) oppositeAnnotation.getAttribute("value"),
+										(String) oppositeAnnotation.getDefaultAttribute(),
 										true
 								));
 					}
@@ -208,50 +190,14 @@ public class MemberBuilder extends ASTVisitor {
 		}
 	}
 
-	private TypeSettings getTypeSettingsImpliedByJavaType(Type type) {
-		ITypeBinding binding = type.resolveBinding();
-		if (binding.isArray()) {
-			if (binding.getDimensions() > 1) {
-				myDiagnostics.reportError("Multidimentional arrays are not supported", type);
-			}
-			return new TypeSettings(0, -1, false, true, IUnwrapStrategy.UNWRAP_ARRAY);
-		}
-		
-		String fqn = binding.getErasure().getQualifiedName();
-		TypeSettings featureSettings = ourFeatureSettingsMap.get(fqn);
-		if (featureSettings == null) {
-			return TypeSettings.DEFAULT;
-		}
-		
-		ITypeBinding[] typeArguments = binding.getTypeArguments();
-		if (typeArguments.length == 0) {
-			myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", type);
-			return TypeSettings.DEFAULT;
-		}
-
-		if (featureSettings.getUpperBound() == TypeSettings.BOUNDS_SPECIFIED_BY_TYPE) {
-			try {
-				Integer lowerBound = Integer.valueOf(typeArguments[1].getName().substring(1));
-				Integer upperBound;
-				if (Infinity.class.getCanonicalName().equals(typeArguments[2].getQualifiedName())) {
-					upperBound = ETypedElement.UNBOUNDED_MULTIPLICITY;
-				} else if (Unspecified.class.getCanonicalName().equals(typeArguments[2].getQualifiedName())) {
-					upperBound = ETypedElement.UNSPECIFIED_MULTIPLICITY;
-				} else {
-					upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
-					if (lowerBound > upperBound) {
-						myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, type);
-					}
-				}
-				featureSettings = new TypeSettings(lowerBound, upperBound, featureSettings);
-			} catch (NumberFormatException e) {
-				myDiagnostics.reportError("Wrong number format. " + e.getMessage(), type);
-			}
-		}
-		
-		return featureSettings;
+	private void applyTypeSettings(ETypedElement eTypedElement,
+			TypeSettings typeSettings) {
+		eTypedElement.setLowerBound(typeSettings.getLowerBound());
+		eTypedElement.setUpperBound(typeSettings.getUpperBound());
+		eTypedElement.setUnique(typeSettings.isUnique());
+		eTypedElement.setOrdered(typeSettings.isOrdered());
 	}
-	
+
 	private void setDefaultValue(EStructuralFeature feature,
 			Expression initializer) {
 		if (initializer != null) {
