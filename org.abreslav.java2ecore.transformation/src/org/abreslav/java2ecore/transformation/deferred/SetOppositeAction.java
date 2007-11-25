@@ -36,6 +36,9 @@ public class SetOppositeAction implements IAction {
 		EReference oppositeReference = (EReference) oppositeFeature;
 		myEReference.setEOpposite(oppositeReference);
 		if (myAuto) {
+			if (oppositeReference.getEOpposite() != myEReference && oppositeReference.getEOpposite() != null) {
+				diagnostics.reportError("Opposite reference already has another opposite", myNode);
+			}
 			oppositeReference.setEOpposite(myEReference);
 		}
 	}
