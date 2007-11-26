@@ -28,6 +28,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.ETypedElement;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -41,10 +42,6 @@ import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class MemberBuilder extends ASTVisitor {
-	private interface IFeatureFactory {
-		EStructuralFeature createStructuralFeature();
-	}
-	
 	private final EClass myEClass;
 	private final ITypeResolver myTypeResolver;
 	private final IDiagnostics myDiagnostics;
@@ -65,17 +62,6 @@ public class MemberBuilder extends ASTVisitor {
 
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(node);
-		TypeSettings typeSettings = myTypeSettingsCalculator.calculateTypeSettings(node.getType(), annotatedView);
-		final ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(node.getType().resolveBinding());
-		
-		EGenericType eGenericType = myTypeResolver.resolveEGenericType(binding, false, myTypeParameterIndex);
-		IFeatureFactory factory = createFeatureFactory(annotatedView, eGenericType);
-
-		boolean isFinal = (node.getModifiers() & Modifier.FINAL) != 0;
-		boolean isTransient = (node.getModifiers() & Modifier.TRANSIENT) != 0;
-		boolean isVolatile = (node.getModifiers() & Modifier.VOLATILE) != 0;
-
 		@SuppressWarnings("unchecked")
 		List<VariableDeclarationFragment> fragments = (List<VariableDeclarationFragment>) node.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
 		for (VariableDeclarationFragment fragment : fragments.subList(1, fragments.size())) {
@@ -86,15 +72,26 @@ public class MemberBuilder extends ASTVisitor {
 		if (fragment.getExtraDimensions() > 0) {
 			myDiagnostics.reportError("Specify array dimensions at the field type", fragment);
 		}
-		EStructuralFeature feature = factory.createStructuralFeature();
+
+		ETypedElement temporaryTypedElement = new MyTypedElement();
+		setUpTypedElement(temporaryTypedElement, node.getType(), node, myTypeParameterIndex);
+
+		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(node);
+		EGenericType eGenericType = temporaryTypedElement.getEGenericType();
 		
-		feature.setEGenericType(eGenericType);
+		EStructuralFeature feature = createFeature(annotatedView, eGenericType);;
+		
+		feature.setEGenericType(temporaryTypedElement.getEGenericType());
+		feature.setLowerBound(temporaryTypedElement.getLowerBound());
+		feature.setOrdered(temporaryTypedElement.isOrdered());
+		feature.setUnique(temporaryTypedElement.isUnique());
+		feature.setUpperBound(temporaryTypedElement.getUpperBound());
+		
 		feature.setName(fragment.getName().getIdentifier());
-		feature.setChangeable(isFinal);
-		feature.setTransient(isTransient);
-		feature.setVolatile(isVolatile);
-		
-		applyTypeSettings(feature, typeSettings);
+
+		feature.setChangeable((node.getModifiers() & Modifier.FINAL) != 0);
+		feature.setTransient((node.getModifiers() & Modifier.TRANSIENT) != 0);
+		feature.setVolatile((node.getModifiers() & Modifier.VOLATILE) != 0);
 		
 		setDefaultValue(feature, fragment.getInitializer());
 
@@ -118,23 +115,16 @@ public class MemberBuilder extends ASTVisitor {
 		Collection<ETypeParameter> eTypeParameters = myTypeResolver.createETypeParameters(typeParameterIndex, parameterTypeBindings);
 		eOperation.getETypeParameters().addAll(eTypeParameters);
 		
-		Type type = node.getReturnType2();
-		TypeSettings returnTypeSettings = myTypeSettingsCalculator.calculateTypeSettings(type, ASTViewFactory.INSTANCE.createAnnotatedView(node));
-		ITypeBinding returnTypeBinding = returnTypeSettings.getUnwrapStrategy().unwrap(type.resolveBinding());
-		applyTypeSettings(eOperation, returnTypeSettings);
-		eOperation.setEGenericType(myTypeResolver.resolveEGenericType(returnTypeBinding, false, typeParameterIndex));
+		setUpTypedElement(eOperation, node.getReturnType2(), node, typeParameterIndex);
 
 		@SuppressWarnings("unchecked")
 		List<SingleVariableDeclaration> parameters = (List<SingleVariableDeclaration>) node.getStructuralProperty(MethodDeclaration.PARAMETERS_PROPERTY);
 		for (SingleVariableDeclaration parameter : parameters) {
 			EParameter eParameter = EcoreFactory.eINSTANCE.createEParameter();
 			eParameter.setName(parameter.getName().getIdentifier());
-			Type type1 = parameter.getType();
-			TypeSettings typeSettings = myTypeSettingsCalculator.calculateTypeSettings(type1, null);
-			ITypeBinding binding = typeSettings.getUnwrapStrategy().unwrap(type1.resolveBinding());
 			
-			applyTypeSettings(eParameter, typeSettings);
-			eParameter.setEGenericType(myTypeResolver.resolveEGenericType(binding, false, typeParameterIndex));
+			setUpTypedElement(eParameter, parameter.getType(), parameter, typeParameterIndex);
+			
 			eOperation.getEParameters().add(eParameter);
 		}
 		
@@ -150,54 +140,53 @@ public class MemberBuilder extends ASTVisitor {
 		return false;
 	}
 
-	private IFeatureFactory createFeatureFactory(final AnnotatedView annotations,
-			final EGenericType eGenericType) {
+	private EStructuralFeature createFeature(AnnotatedView annotations,
+			EGenericType eGenericType) {
 		if (eGenericType.getEClassifier() instanceof EDataType) {
-			final boolean isId = annotations.isAnnotationPresent(ID.class);
-			return new IFeatureFactory() {
-				public EStructuralFeature createStructuralFeature() {
-					EAttribute result = EcoreFactory.eINSTANCE.createEAttribute();
-					result.setID(isId);
-					return result;
-				}
-			};
+			boolean isId = annotations.isAnnotationPresent(ID.class);
+			EAttribute result = EcoreFactory.eINSTANCE.createEAttribute();
+			result.setID(isId);
+			return result;
 		} else {
-			final boolean isContainment = annotations.isAnnotationPresent(Containment.class);
-			final boolean isDerived = annotations.isAnnotationPresent(Derived.class);
-			final boolean isUnsettable = annotations.isAnnotationPresent(Unsettable.class);
-			final boolean isResolveProxies = annotations.isAnnotationPresent(ResolveProxies.class);
+			boolean isContainment = annotations.isAnnotationPresent(Containment.class);
+			boolean isDerived = annotations.isAnnotationPresent(Derived.class);
+			boolean isUnsettable = annotations.isAnnotationPresent(Unsettable.class);
+			boolean isResolveProxies = annotations.isAnnotationPresent(ResolveProxies.class);
 
-			final AnnotationView oppositeAnnotation = annotations.getAnnotation(Opposite.class);
-			return new IFeatureFactory() {
-				public EStructuralFeature createStructuralFeature() {
-					EReference result = EcoreFactory.eINSTANCE.createEReference();
-					result.setContainment(isContainment);
-					result.setDerived(isDerived);
-					result.setResolveProxies(isResolveProxies);
-					result.setUnsettable(isUnsettable);
-					if (oppositeAnnotation != null) {
-						myDeferredActions.addAction(
-								new SetOppositeAction(
-										result, oppositeAnnotation.getAnnotation(), 
-										(EClass) eGenericType.getEClassifier(), 
-										(String) oppositeAnnotation.getDefaultAttribute(),
-										true
-								));
-					}
-					return result;
-				}
-			};
+			AnnotationView oppositeAnnotation = annotations.getAnnotation(Opposite.class);
+			EReference result = EcoreFactory.eINSTANCE.createEReference();
+			result.setContainment(isContainment);
+			result.setDerived(isDerived);
+			result.setResolveProxies(isResolveProxies);
+			result.setUnsettable(isUnsettable);
+			if (oppositeAnnotation != null) {
+				myDeferredActions.addAction(
+						new SetOppositeAction(
+								result, oppositeAnnotation.getAnnotation(), 
+								(EClass) eGenericType.getEClassifier(), 
+								(String) oppositeAnnotation.getDefaultAttribute(),
+								true
+						));
+			}
+			return result;
 		}
 	}
 
-	private void applyTypeSettings(ETypedElement eTypedElement,
-			TypeSettings typeSettings) {
+	private void setUpTypedElement(ETypedElement eTypedElement, Type type, ASTNode declaration, TypeParameterIndex typeParameterIndex) {
+		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(declaration);
+		ITypeSettings typeSettings = myTypeSettingsCalculator.calculateTypeSettings(type, annotatedView);
+		
 		eTypedElement.setLowerBound(typeSettings.getLowerBound());
 		eTypedElement.setUpperBound(typeSettings.getUpperBound());
 		eTypedElement.setUnique(typeSettings.isUnique());
 		eTypedElement.setOrdered(typeSettings.isOrdered());
+		
+		ITypeBinding typeBinding = type.resolveBinding();
+		typeBinding = typeSettings.getUnwrapStrategy().unwrap(typeBinding);
+		EGenericType eGenericType = myTypeResolver.resolveEGenericType(typeBinding, false, typeParameterIndex);
+		eTypedElement.setEGenericType(eGenericType);
 	}
-
+	
 	private void setDefaultValue(EStructuralFeature feature,
 			Expression initializer) {
 		if (initializer != null) {

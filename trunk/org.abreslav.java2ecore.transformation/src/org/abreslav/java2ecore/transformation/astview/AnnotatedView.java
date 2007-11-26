@@ -4,14 +4,14 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jdt.core.dom.BodyDeclaration;
+import org.eclipse.jdt.core.dom.ASTNode;
 
 public class AnnotatedView {
 
 	private final Map<String, AnnotationView> myAnnotations = new HashMap<String, AnnotationView>();
-	private final BodyDeclaration myDeclaration;
+	private final ASTNode myDeclaration;
 	
-	public AnnotatedView(BodyDeclaration declaration) {
+	public AnnotatedView(ASTNode declaration) {
 		super();
 		myDeclaration = declaration;
 	}
@@ -28,7 +28,7 @@ public class AnnotatedView {
 		myAnnotations.put(view.getQualifiedName(), view);
 	}
 	
-	public BodyDeclaration getDeclaration() {
+	public ASTNode getDeclaration() {
 		return myDeclaration;
 	}
 }
