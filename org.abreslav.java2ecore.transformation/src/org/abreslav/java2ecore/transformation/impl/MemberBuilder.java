@@ -89,9 +89,12 @@ public class MemberBuilder extends ASTVisitor {
 		
 		feature.setName(fragment.getName().getIdentifier());
 
-		feature.setChangeable((node.getModifiers() & Modifier.FINAL) != 0);
+		feature.setChangeable((node.getModifiers() & Modifier.FINAL) == 0);
 		feature.setTransient((node.getModifiers() & Modifier.TRANSIENT) != 0);
 		feature.setVolatile((node.getModifiers() & Modifier.VOLATILE) != 0);
+		
+		feature.setDerived(annotatedView.isAnnotationPresent(Derived.class));
+		feature.setUnsettable(annotatedView.isAnnotationPresent(Unsettable.class));
 		
 		setDefaultValue(feature, fragment.getInitializer());
 
@@ -143,22 +146,23 @@ public class MemberBuilder extends ASTVisitor {
 	private EStructuralFeature createFeature(AnnotatedView annotations,
 			EGenericType eGenericType) {
 		if (eGenericType.getEClassifier() instanceof EDataType) {
+			AnnotationValidator.checkEAttributeAnnotations(annotations, myDiagnostics);
 			boolean isId = annotations.isAnnotationPresent(ID.class);
 			EAttribute result = EcoreFactory.eINSTANCE.createEAttribute();
 			result.setID(isId);
 			return result;
 		} else {
+			AnnotationValidator.checkEReferenceAnnotations(annotations, myDiagnostics);
 			boolean isContainment = annotations.isAnnotationPresent(Containment.class);
-			boolean isDerived = annotations.isAnnotationPresent(Derived.class);
-			boolean isUnsettable = annotations.isAnnotationPresent(Unsettable.class);
-			boolean isResolveProxies = annotations.isAnnotationPresent(ResolveProxies.class);
-
+			AnnotationView resolveProxies = annotations.getAnnotation(ResolveProxies.class);
+			boolean isResolveProxies = 
+				(resolveProxies == null) 
+					? true
+					: (Boolean) resolveProxies.getDefaultAttribute();
 			AnnotationView oppositeAnnotation = annotations.getAnnotation(Opposite.class);
 			EReference result = EcoreFactory.eINSTANCE.createEReference();
 			result.setContainment(isContainment);
-			result.setDerived(isDerived);
 			result.setResolveProxies(isResolveProxies);
-			result.setUnsettable(isUnsettable);
 			if (oppositeAnnotation != null) {
 				myDeferredActions.addAction(
 						new SetOppositeAction(
