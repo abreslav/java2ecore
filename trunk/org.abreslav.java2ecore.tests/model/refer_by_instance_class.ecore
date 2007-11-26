@@ -4,7 +4,7 @@
     <eTypeParameters name="T">
       <eBounds eClassifier="//Reader"/>
     </eTypeParameters>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="w" eType="//Writer" changeable="false"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="w" eType="//Writer"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="X" instanceClassName="java.io.Reader"/>
   <eClassifiers xsi:type="ecore:EDataType" name="Y" instanceClassName="java.io.Writer"/>
