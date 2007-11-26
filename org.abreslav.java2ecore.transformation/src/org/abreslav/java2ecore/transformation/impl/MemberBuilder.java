@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.abreslav.java2ecore.annotations.sfeatures.Containment;
+import org.abreslav.java2ecore.annotations.sfeatures.DefaultValueLiteral;
 import org.abreslav.java2ecore.annotations.sfeatures.Derived;
 import org.abreslav.java2ecore.annotations.sfeatures.ID;
+import org.abreslav.java2ecore.annotations.sfeatures.NoDefaultValue;
 import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
 import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
@@ -36,6 +38,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeParameter;
@@ -96,7 +99,7 @@ public class MemberBuilder extends ASTVisitor {
 		feature.setDerived(annotatedView.isAnnotationPresent(Derived.class));
 		feature.setUnsettable(annotatedView.isAnnotationPresent(Unsettable.class));
 		
-		setDefaultValue(feature, fragment.getInitializer());
+		setDefaultValue(feature, annotatedView, fragment.getInitializer());
 
 		myEClass.getEStructuralFeatures().add(feature);
 		return false;
@@ -192,12 +195,25 @@ public class MemberBuilder extends ASTVisitor {
 	}
 	
 	private void setDefaultValue(EStructuralFeature feature,
-			Expression initializer) {
-		if (initializer != null) {
+			AnnotatedView annotatedView, Expression initializer) {
+		boolean noDefaultValue = annotatedView.isAnnotationPresent(NoDefaultValue.class);
+		AnnotationView annotation = annotatedView.getAnnotation(DefaultValueLiteral.class);
+		if (annotation != null) {
+			if (noDefaultValue) {
+				myDiagnostics.reportError("This conflicts with @NoDefaultValue", annotation.getAnnotation());
+			} else if (initializer != null 
+					&& false == initializer instanceof NullLiteral) {
+				myDiagnostics.reportError("Default value is specified by an initializer", annotation.getAnnotation());
+			} else {
+				feature.setDefaultValueLiteral((String) annotation.getDefaultAttribute());
+				return;
+			}
+		}
+		if (initializer != null && !noDefaultValue) {
 			Object constant = initializer.resolveConstantExpressionValue();
 			if (constant != null) {
-				feature.setDefaultValueLiteral(constant.toString());
-			} else {
+				feature.setDefaultValue(constant);
+			} else if (false == initializer instanceof NullLiteral) {
 				myDiagnostics.reportError("Non-constant values are not allowed", initializer);
 			}
 		}
