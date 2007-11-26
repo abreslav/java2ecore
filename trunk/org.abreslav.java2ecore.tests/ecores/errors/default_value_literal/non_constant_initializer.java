@@ -1,4 +1,4 @@
-package errors;
+package errors.default_value_literal;
 import org.abreslav.java2ecore.annotations.EPackage;
 
 @EPackage( 
