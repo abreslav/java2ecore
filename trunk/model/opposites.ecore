@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="opposites" nsURI="opposites" nsPrefix="opp">
+  <eClassifiers xsi:type="ecore:EClass" name="A">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="b" unique="false" upperBound="-1" eType="//B" changeable="false" resolveProxies="false" eOpposite="//B/a"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="B">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="a" eType="//A" changeable="false" resolveProxies="false" eOpposite="//A/b"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="c" eType="//C" changeable="false" resolveProxies="false" eOpposite="//C/b"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="C">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="b" eType="//B" changeable="false" resolveProxies="false" eOpposite="//B/c"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="d" eType="//D" changeable="false" resolveProxies="false" eOpposite="//D/c"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="D">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="c" eType="//C" changeable="false" resolveProxies="false" eOpposite="//C/d"/>
+  </eClassifiers>
+</ecore:EPackage>
