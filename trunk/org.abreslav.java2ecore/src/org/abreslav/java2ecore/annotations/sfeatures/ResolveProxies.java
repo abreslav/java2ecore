@@ -5,5 +5,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 public @interface ResolveProxies {
-
+	boolean value() default true;
 }
