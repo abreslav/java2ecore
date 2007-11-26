@@ -5,5 +5,5 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Unique {
-
+	boolean value() default true;
 }
