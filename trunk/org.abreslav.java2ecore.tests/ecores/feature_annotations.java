@@ -12,23 +12,26 @@ public class feature_annotations {
 
 	class A {
 	abstract class _{
-		int x;
+		int adef;
+		A fdef;
 		
 		@Derived
-		int y; 
+		int ader; 
 		
-		@ID int z;
+		@Derived
+		A fder; 
+		
+		@ID int aid;
 		 
 		@ResolveProxies(true)
-		A a;
-		
+		A fres;
 		@ResolveProxies(false)
-		A c;
-		
-		A d;
+		A fnres;
 		
 		@Unsettable
-		A b;
+		A funs;
+		@Unsettable
+		int auns;
 	}
 	}
 		 

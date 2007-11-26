@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="ASCII"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="feature_annotations" nsURI="http://sdfsad.com" nsPrefix="some">
   <eClassifiers xsi:type="ecore:EClass" name="A">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="x">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="adef">
       <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="y" derived="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fdef" eType="//A"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ader" derived="true">
       <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="z" iD="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fder" eType="//A" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="aid" iD="true">
       <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="a" eType="//A"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="c" eType="//A" resolveProxies="false"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="d" eType="//A"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="b" eType="//A" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fres" eType="//A"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fnres" eType="//A" resolveProxies="false"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="funs" eType="//A" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="auns" unsettable="true">
+      <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
   </eClassifiers>
 </ecore:EPackage>
