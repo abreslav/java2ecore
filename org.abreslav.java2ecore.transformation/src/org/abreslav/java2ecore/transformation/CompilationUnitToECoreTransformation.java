@@ -72,7 +72,9 @@ public class CompilationUnitToECoreTransformation {
 		ITypeResolver typeResolver = new TypeResolver(itemStorage, unknownTypes);
 		rootEPackage = buildCollectedItems(diagnostics, typeResolver, declarationStorage);
 
-		rootEPackage.getEClassifiers().addAll(unknownTypes);
+		if (rootEPackage != null) {
+			rootEPackage.getEClassifiers().addAll(unknownTypes);
+		}
 		return rootEPackage;
 	}
 

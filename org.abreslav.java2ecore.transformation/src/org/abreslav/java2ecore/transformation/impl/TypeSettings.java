@@ -3,22 +3,24 @@
  */
 package org.abreslav.java2ecore.transformation.impl;
 
-class TypeSettings {
+class TypeSettings implements IOverridableTypeSettings {
 	public static final int BOUNDS_SPECIFIED_BY_TYPE = -3;
-	public static final TypeSettings DEFAULT = new TypeSettings(0, 1, true, true, IUnwrapStrategy.NO_UNWRAP);
+	public static final ITypeSettings DEFAULT = new TypeSettings(true, true, true, 0, 1, true, true, IUnwrapStrategy.NO_UNWRAP);
 	
-	private final int myLowerBound;
-	private final int myUpperBound;
-	private final boolean myIsUnique;
-	private final boolean myIsOrdered;
+	private int myLowerBound;
+	private int myUpperBound;
+	private boolean myIsUnique;
+	private boolean myIsOrdered;
+	private final boolean myBoundsOverridable;
+	private final boolean myOrderedOverridable;
+	private final boolean myUniqueOverridable;
 	private final IUnwrapStrategy myUnwrapStrategy;
 	
-	public TypeSettings(int lowerBound, int upperBound, TypeSettings fts) {
-		this(lowerBound, upperBound, fts.myIsUnique, fts.myIsOrdered, fts.myUnwrapStrategy);
-	}
-	
-	public TypeSettings(int lowerBound, int upperBound, boolean isUnique, boolean isOrdered,
+	public TypeSettings(boolean boundsOverridable, boolean orderedOverridable, boolean uniqueOverridable, int lowerBound, int upperBound, boolean isUnique, boolean isOrdered,
 			IUnwrapStrategy unwrapStrategy) {
+		this.myBoundsOverridable = boundsOverridable;
+		this.myOrderedOverridable = orderedOverridable;
+		this.myUniqueOverridable = uniqueOverridable;
 		this.myLowerBound = lowerBound;
 		this.myUpperBound = upperBound;
 		this.myIsUnique = isUnique;
@@ -45,4 +47,36 @@ class TypeSettings {
 	public IUnwrapStrategy getUnwrapStrategy() {
 		return myUnwrapStrategy;
 	}	
+	
+	public boolean isBoundsOverridable() {
+		return myBoundsOverridable;
+	}
+	
+	public boolean isOrderedOverridable() {
+		return myOrderedOverridable;
+	}
+	
+	public boolean isUniqueOverridable() {
+		return myUniqueOverridable;
+	}
+	
+	public void setLowerBound(int lowerBound) {
+		myLowerBound = lowerBound;
+	}
+	
+	public void setUpperBound(int upperBound) {
+		myUpperBound = upperBound;
+	}
+	
+	public void setUnique(boolean isUnique) {
+		myIsUnique = isUnique;
+	}
+	
+	public void setOrdered(boolean isOrdered) {
+		myIsOrdered = isOrdered;
+	}
+	
+	public TypeSettings getWorkingCopy() {
+		return new TypeSettings(myBoundsOverridable, myOrderedOverridable, myUniqueOverridable, myLowerBound, myUpperBound, myIsUnique, myIsOrdered, myUnwrapStrategy);
+	}
 }

@@ -2,10 +2,12 @@ package org.abreslav.java2ecore.transformation.astview;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMemberValuePairBinding;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
 public class ASTViewFactory {
 
@@ -25,9 +27,16 @@ public class ASTViewFactory {
 		return view;
 	}
 	
-	public AnnotatedView createAnnotatedView(BodyDeclaration declaration) {
+	public AnnotatedView createAnnotatedView(ASTNode declaration) {
 		AnnotatedView view = new AnnotatedView(declaration);
-		List<?> modifiers = (List<?>) declaration.getStructuralProperty(declaration.getModifiersProperty());
+		List<?> modifiers;
+		if (declaration instanceof BodyDeclaration) {
+			BodyDeclaration bodyDecl = (BodyDeclaration) declaration;
+			modifiers = (List<?>) bodyDecl.getStructuralProperty(bodyDecl.getModifiersProperty());
+		} else {
+			SingleVariableDeclaration varDecl = (SingleVariableDeclaration) declaration;
+			modifiers = (List<?>) varDecl.getStructuralProperty(SingleVariableDeclaration.MODIFIERS2_PROPERTY);
+		}
 		
 		for (Object modifier : modifiers) {
 			if (modifier instanceof Annotation) {
