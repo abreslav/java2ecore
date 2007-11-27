@@ -159,17 +159,24 @@ public class ContentBuilder {
 			myDiagnostics.reportError("Only one nested type is allowed", types[i]);
 		}
 		
+		final String lostFeatureMessage = "If nested type is present, all the features must be specified in this type";
 		node.accept(new ASTVisitor() {
 			@Override
 			public boolean visit(FieldDeclaration node) {
-				myDiagnostics.reportError("If nested type is present, all the features must be specified in this type", node);
+				myDiagnostics.reportError(lostFeatureMessage, node);
 				return true;
 			}
 			
 			@Override
 			public boolean visit(MethodDeclaration node) {
-				myDiagnostics.reportError("If nested type is present, all the features must be specified in this type", node);
+				myDiagnostics.reportError(lostFeatureMessage, node);
 				return true;
+			}
+			
+			@Override
+			public boolean visit(EnumDeclaration node) {
+				myDiagnostics.reportError("Nested enums are not allowed", node);
+				return false;
 			}
 			
 			@Override
