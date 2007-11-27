@@ -1,17 +1,16 @@
-package errors;
+package errors.enums;
 import org.abreslav.java2ecore.annotations.EPackage;
 
 @EPackage( 
 		nsPrefix="sdf",
 		nsURI="..."
 )
-public class several_nested_classes {
+public class enum_outside_body_class {
 	
-	class A {
-		class a {
-			
+	static class A {
+		static class a {   
 		}
-		class b {
+		enum E {
 			
 		}
 	}

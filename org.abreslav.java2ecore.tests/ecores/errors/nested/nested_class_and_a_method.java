@@ -1,15 +1,16 @@
-package errors;
+package errors.nested;
 import org.abreslav.java2ecore.annotations.EPackage;
 
 @EPackage( 
 		nsPrefix="sdf",
 		nsURI="..."
 )
-public class non_literals_in_enum {
+public class nested_class_and_a_method {
 	
-	enum A {
-		A;
-		public int x;
+	class A {
+		class _ {
+		}
+		void x() {}
 	}
 	
 }

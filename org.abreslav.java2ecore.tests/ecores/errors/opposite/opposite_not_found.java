@@ -1,4 +1,4 @@
-package errors;
+package errors.opposite;
 import org.abreslav.java2ecore.annotations.EPackage;
 import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 
@@ -6,13 +6,13 @@ import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 		nsPrefix="sdf",
 		nsURI="a"
 )
-public class opposite_has_wrong_type {
+public class opposite_not_found {
 	class A {
 		@Opposite("a")
 		B b;
 	}
 	
 	class B {
-		int a; 
+		
 	}
 }

@@ -1,16 +1,19 @@
-package errors;
+package errors.nested;
 import org.abreslav.java2ecore.annotations.EPackage;
 
 @EPackage( 
 		nsPrefix="sdf",
 		nsURI="..."
 )
-public class nested_class_and_a_field {
+public class several_nested_classes {
 	
 	class A {
-		class _ {
+		class a {
+			
 		}
-		int x;
+		class b {
+			
+		}
 	}
 	
 }

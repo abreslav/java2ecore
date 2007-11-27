@@ -1,4 +1,4 @@
-package errors;
+package errors.field_declarations;
 import org.abreslav.java2ecore.annotations.EPackage;
 
 @EPackage( 
