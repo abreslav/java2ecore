@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.abreslav.java2ecore.transformation.diagnostics.IDiagnosticMessage;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -35,13 +36,24 @@ public class TransformationPerformer {
 				IResource.DEPTH_ZERO);
 		final boolean[] hasErrors = new boolean[1];
 		IDiagnostics diagnostics = new IDiagnostics() {
-			public void reportError(String message, ASTNode node) {
-				createMarker(compilationUnit, IMarker.SEVERITY_ERROR, message, node);
+			public void reportError(ASTNode node, IDiagnosticMessage message) {
+				createMarker(compilationUnit, IMarker.SEVERITY_ERROR, message.toString(), node);
 				hasErrors[0] = true;
 			}
 
-			public void reportWarning(String message, ASTNode node) {
-				createMarker(compilationUnit, IMarker.SEVERITY_WARNING, message, node);
+			public void reportErrorFormatted(ASTNode node,
+					IDiagnosticMessage message, Object... args) {
+				createMarker(compilationUnit, IMarker.SEVERITY_ERROR, message.format(args), node);
+				hasErrors[0] = true;
+			}
+
+			public void reportWarning(ASTNode node, IDiagnosticMessage message) {
+				createMarker(compilationUnit, IMarker.SEVERITY_WARNING, message.toString(), node);
+			}
+
+			public void reportWarningFormatted(ASTNode node,
+					IDiagnosticMessage message, Object... args) {
+				createMarker(compilationUnit, IMarker.SEVERITY_WARNING, message.format(args), node);
 			}
 		};
 		try {
