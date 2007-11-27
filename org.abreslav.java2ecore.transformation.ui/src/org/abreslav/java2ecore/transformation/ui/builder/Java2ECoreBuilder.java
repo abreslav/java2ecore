@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.abreslav.java2ecore.transformation.TransformationPerformer;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -16,6 +17,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -105,6 +107,10 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 
 	private void perform(ICompilationUnit compilationUnit) throws CoreException {
 		try {
+			IMarker[] markers = compilationUnit.getResource().findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_ONE);
+			if (markers.length > 0) {
+				return;
+			}
 			TransformationPerformer.performTransformation(compilationUnit);
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
