@@ -95,6 +95,12 @@ public class ContentBuilder {
 	}
 
 	public void buildEDataType(TypeDeclaration type, EDataType eDataType) {
+		@SuppressWarnings("unchecked")
+		List<BodyDeclaration> bodyDeclarations = (List<BodyDeclaration>) type.getStructuralProperty(TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
+		for (BodyDeclaration bodyDeclaration : bodyDeclarations) {
+			myDiagnostics.reportError("No content is allowed for EDataTypes", bodyDeclaration);
+		}
+
 		setUpEClassifier(type, eDataType);
 		
 		AnnotatedView view = ASTViewFactory.INSTANCE.createAnnotatedView(type);
