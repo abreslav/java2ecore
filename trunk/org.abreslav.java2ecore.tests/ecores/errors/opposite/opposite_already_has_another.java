@@ -1,4 +1,4 @@
-package errors;
+package errors.opposite;
 import org.abreslav.java2ecore.annotations.EPackage;
 import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 

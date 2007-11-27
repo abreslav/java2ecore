@@ -1,4 +1,4 @@
-package errors;
+package errors.enums;
 import java.io.Serializable;
 
 import org.abreslav.java2ecore.annotations.EPackage;

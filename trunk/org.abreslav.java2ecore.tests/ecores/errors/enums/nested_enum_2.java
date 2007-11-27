@@ -1,4 +1,4 @@
-package errors;
+package errors.enums;
 import org.abreslav.java2ecore.annotations.EPackage;
 
 @EPackage( 
@@ -9,7 +9,7 @@ public class nested_enum_2 {
 	
 	static class A {
 		enum b {
-			 
+			  
 		}
 	}
 	

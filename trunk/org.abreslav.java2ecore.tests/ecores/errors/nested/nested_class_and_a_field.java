@@ -1,18 +1,16 @@
-package errors;
+package errors.nested;
 import org.abreslav.java2ecore.annotations.EPackage;
 
 @EPackage( 
 		nsPrefix="sdf",
 		nsURI="..."
 )
-public class nested_enum_1 {
+public class nested_class_and_a_field {
 	
-	static class A {
-		static class a {  
-			enum b {
-				
-			}
+	class A {
+		class _ {
 		}
+		int x;
 	}
 	
 }
