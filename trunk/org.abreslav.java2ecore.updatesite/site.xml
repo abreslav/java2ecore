@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <description>
+      Java2Ecore Update Site
+   </description>
+   <feature url="features/org.abreslav.java2ecore.feature_0.2.0.jar" id="org.abreslav.java2ecore.feature" version="0.2"/>
+</site>
