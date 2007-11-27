@@ -67,6 +67,10 @@ public class ordered_annotation {
 		abstract A orda();
 		@Ordered(false)
 		abstract A norda();
+
+		abstract A ap(int x);
+		abstract A apord(@Ordered int x);
+		abstract A apnord(@Ordered(false) int x);
 	}
 	}
 		

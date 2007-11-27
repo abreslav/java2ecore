@@ -2,6 +2,15 @@
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="bounds_annotation" nsURI="http://sdfsad.com" nsPrefix="some">
   <eClassifiers xsi:type="ecore:EClass" name="A">
     <eOperations name="a" lowerBound="1" upperBound="-1" eType="//A"/>
+    <eOperations name="a" lowerBound="1" upperBound="5">
+      <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eParameters name="a" lowerBound="1" upperBound="5">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EFloat"/>
+      </eParameters>
+      <eParameters name="b" lowerBound="1" upperBound="5">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EChar"/>
+      </eParameters>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="x" lowerBound="1" upperBound="5">
       <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>
