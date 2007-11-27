@@ -42,6 +42,14 @@ public class bounds_annotation {
 		
 		@Bounds({1, -1})
 		abstract A a();
+		
+		@Bounds({1, 5})
+		abstract int a(
+				@Bounds({1, 5})
+				float a,
+				@Bounds({1, 5})
+				char b
+		);
 	}
 	}
 		

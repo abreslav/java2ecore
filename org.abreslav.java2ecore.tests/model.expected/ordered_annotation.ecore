@@ -4,6 +4,21 @@
     <eOperations name="a" eType="//A"/>
     <eOperations name="orda" eType="//A"/>
     <eOperations name="norda" ordered="false" eType="//A"/>
+    <eOperations name="ap" eType="//A">
+      <eParameters name="x">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eParameters>
+    </eOperations>
+    <eOperations name="apord" eType="//A">
+      <eParameters name="x">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eParameters>
+    </eOperations>
+    <eOperations name="apnord" eType="//A">
+      <eParameters name="x" ordered="false">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eParameters>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="x">
       <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>

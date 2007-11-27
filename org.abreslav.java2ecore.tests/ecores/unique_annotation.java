@@ -67,6 +67,10 @@ public class unique_annotation {
 		abstract A una();
 		@Unique(false)
 		abstract A nuna();
+
+		abstract A ap(int x);
+		abstract A apun(@Unique int x);
+		abstract A apnun(@Unique(false) int x);
 	}
 	}
 		

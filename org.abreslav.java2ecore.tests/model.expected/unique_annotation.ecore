@@ -4,6 +4,21 @@
     <eOperations name="a" eType="//A"/>
     <eOperations name="una" eType="//A"/>
     <eOperations name="nuna" unique="false" eType="//A"/>
+    <eOperations name="ap" eType="//A">
+      <eParameters name="x">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eParameters>
+    </eOperations>
+    <eOperations name="apun" eType="//A">
+      <eParameters name="x">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eParameters>
+    </eOperations>
+    <eOperations name="apnun" eType="//A">
+      <eParameters name="x" unique="false">
+        <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      </eParameters>
+    </eOperations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="x">
       <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>
