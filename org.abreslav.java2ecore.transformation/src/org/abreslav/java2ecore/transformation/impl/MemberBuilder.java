@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.ETypedElement;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -63,6 +64,12 @@ public class MemberBuilder extends ASTVisitor {
 		myTypeSettingsCalculator = new TypeSettingsCalculator(myDiagnostics);
 	}
 
+	@Override
+	public boolean visit(EnumDeclaration node) {
+		myDiagnostics.reportError("Nested enums are not allowed", node);
+		return false;
+	}
+	
 	@Override
 	public boolean visit(FieldDeclaration node) {
 		@SuppressWarnings("unchecked")
