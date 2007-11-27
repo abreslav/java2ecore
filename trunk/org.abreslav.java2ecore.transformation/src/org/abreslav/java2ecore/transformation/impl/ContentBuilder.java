@@ -140,6 +140,7 @@ public class ContentBuilder {
 				myDiagnostics.reportError("Only EClass might be a supertype", supertype);
 			}
 		}
+		
 		TypeDeclaration[] types = type.getTypes();
 		if (types.length > 0) {
 			markNestedThings(type, types);
@@ -148,6 +149,8 @@ public class ContentBuilder {
 		for (TypeDeclaration nested : type.getTypes()) {
 			myDiagnostics.reportError("Nested types are not supported by Ecore", nested);
 		}
+		
+		
 		type.accept(new MemberBuilder(eClass, myTypeResolver, myDiagnostics, typeParameterIndex, myDeferredActions));
 	}
 	
