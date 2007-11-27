@@ -11,12 +11,23 @@ public class Diagnostics implements IDiagnostics, Iterable<Diagnostic> {
 	private final Collection<Diagnostic> myDiagnostics = new ArrayList<Diagnostic>(); 
 	private boolean myHasErrors = false;
 	
-	public void reportWarning(String message, ASTNode node) {
-		myDiagnostics.add(new Diagnostic(node, message, Severity.WARNING));
+	public void reportWarning(ASTNode node, IDiagnosticMessage message) {
+		myDiagnostics.add(new Diagnostic(node, message.toString(), Severity.WARNING));
 	}
 	
-	public void reportError(String message, ASTNode node) {
-		myDiagnostics.add(new Diagnostic(node, message, Severity.ERROR));
+	public void reportWarningFormatted(ASTNode node,
+			IDiagnosticMessage message, Object... args) {
+		myDiagnostics.add(new Diagnostic(node, message.format(args), Severity.WARNING));
+	}	
+	
+	public void reportError(ASTNode node, IDiagnosticMessage message) {
+		myDiagnostics.add(new Diagnostic(node, message.toString(), Severity.ERROR));
+		myHasErrors = true;
+	}
+	
+	public void reportErrorFormatted(ASTNode node, IDiagnosticMessage message,
+			Object... args) {
+		myDiagnostics.add(new Diagnostic(node, message.format(args), Severity.ERROR));
 		myHasErrors = true;
 	}
 	
@@ -26,5 +37,5 @@ public class Diagnostics implements IDiagnostics, Iterable<Diagnostic> {
 
 	public Iterator<Diagnostic> iterator() {
 		return myDiagnostics.iterator();
-	}	
+	}
 }

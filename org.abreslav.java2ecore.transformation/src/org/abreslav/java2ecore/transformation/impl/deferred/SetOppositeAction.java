@@ -1,10 +1,12 @@
-package org.abreslav.java2ecore.transformation.deferred;
+package org.abreslav.java2ecore.transformation.impl.deferred;
 
+import org.abreslav.java2ecore.transformation.deferred.IAction;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.jdt.core.dom.ASTNode;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class SetOppositeAction implements IAction {
 
@@ -26,18 +28,18 @@ public class SetOppositeAction implements IAction {
 	public void perform(IDiagnostics diagnostics) {
 		EStructuralFeature oppositeFeature = myFeatureType.getEStructuralFeature(myOppositeFeatureName);
 		if (oppositeFeature == null) {
-			diagnostics.reportError("Opposite feature not found", myNode);
+			diagnostics.reportError(myNode, OPPOSITE_FEATURE_NOT_FOUND);
 			return;
 		}
 		if (!oppositeFeature.getEType().equals(myEReference.getEContainingClass())) {
-			diagnostics.reportError("Opposite feature has wrong type", myNode);
+			diagnostics.reportError(myNode, OPPOSITE_FEATURE_HAS_WRONG_TYPE);
 			return;
 		}
 		EReference oppositeReference = (EReference) oppositeFeature;
 		myEReference.setEOpposite(oppositeReference);
 		if (myAuto) {
 			if (oppositeReference.getEOpposite() != myEReference && oppositeReference.getEOpposite() != null) {
-				diagnostics.reportError("Opposite reference already has another opposite", myNode);
+				diagnostics.reportError(myNode, OPPOSITE_ALREADY_HAS_ANOTHER_OPPOSITE);
 			}
 			oppositeReference.setEOpposite(myEReference);
 		}

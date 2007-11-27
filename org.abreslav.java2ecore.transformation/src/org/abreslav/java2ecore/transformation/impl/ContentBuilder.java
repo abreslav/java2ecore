@@ -30,6 +30,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class ContentBuilder {
 
@@ -67,7 +68,7 @@ public class ContentBuilder {
 		@SuppressWarnings("unchecked")
 		List<Type> superInterfaces = (List<Type>) type.getStructuralProperty(EnumDeclaration.SUPER_INTERFACE_TYPES_PROPERTY);
 		for (Type superInterface : superInterfaces) {
-			myDiagnostics.reportError("Ecore enums do not implement interfaces", superInterface);
+			myDiagnostics.reportError(superInterface, ENUMS_DO_NOT_IMPLEMENT_INTERFACES);
 		}
 		type.accept(new ASTVisitor() {
 			private int myIndex = 0;
@@ -87,7 +88,7 @@ public class ContentBuilder {
 				if (node.getParent() == type) {
 					if (node instanceof BodyDeclaration 
 							&& false == node instanceof EnumConstantDeclaration) {
-						myDiagnostics.reportError("Nothing but literals is allowed in Enums", node);
+						myDiagnostics.reportError(node, NOTHING_BUT_LITERALS_ALLOWED_IN_ENUMS);
 					}
 				}
 			}
@@ -98,7 +99,7 @@ public class ContentBuilder {
 		@SuppressWarnings("unchecked")
 		List<BodyDeclaration> bodyDeclarations = (List<BodyDeclaration>) type.getStructuralProperty(TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
 		for (BodyDeclaration bodyDeclaration : bodyDeclarations) {
-			myDiagnostics.reportError("No content is allowed for EDataTypes", bodyDeclaration);
+			myDiagnostics.reportError(bodyDeclaration, NO_CONTENT_ALLOWED_FOR_EDATATYPES);
 		}
 
 		setUpEClassifier(type, eDataType);
@@ -137,7 +138,7 @@ public class ContentBuilder {
 			if (eSuperClass != null) {
 				eClass.getEGenericSuperTypes().add(eSuperClass);
 			} else {
-				myDiagnostics.reportError("Only EClass might be a supertype", supertype);
+				myDiagnostics.reportError(supertype, ONLY_ECLASS_MIGHT_BE_A_SUPERTYPE);
 			}
 		}
 		
@@ -147,7 +148,7 @@ public class ContentBuilder {
 			type = types[0];
 		}
 		for (TypeDeclaration nested : type.getTypes()) {
-			myDiagnostics.reportError("Nested types are not supported by Ecore", nested);
+			myDiagnostics.reportError(nested, NESTED_TYPES_ARE_NOT_SUPPORTED_BY_ECORE);
 		}
 		
 		
@@ -156,26 +157,25 @@ public class ContentBuilder {
 	
 	private void markNestedThings(final TypeDeclaration node, TypeDeclaration[] types) {
 		for (int i = 1; i < types.length; i++) {
-			myDiagnostics.reportError("Only one nested type is allowed", types[i]);
+			myDiagnostics.reportError(types[i], ONLY_ONE_BODY_CLASS_IS_ALLOWED);
 		}
 		
-		final String lostFeatureMessage = "If nested type is present, all the features must be specified in this type";
 		node.accept(new ASTVisitor() {
 			@Override
 			public boolean visit(FieldDeclaration node) {
-				myDiagnostics.reportError(lostFeatureMessage, node);
+				myDiagnostics.reportError(node, ALL_THE_FEATURES_MUST_BE_SPECIFIED_IN_A_BODY_CLASS);
 				return true;
 			}
 			
 			@Override
 			public boolean visit(MethodDeclaration node) {
-				myDiagnostics.reportError(lostFeatureMessage, node);
+				myDiagnostics.reportError(node, ALL_THE_FEATURES_MUST_BE_SPECIFIED_IN_A_BODY_CLASS);
 				return true;
 			}
 			
 			@Override
 			public boolean visit(EnumDeclaration node) {
-				myDiagnostics.reportError("Nested enums are not allowed", node);
+				myDiagnostics.reportError(node, NESTED_TYPES_ARE_NOT_SUPPORTED_BY_ECORE);
 				return false;
 			}
 			

@@ -20,6 +20,7 @@ import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.ETypedElement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Type;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class TypeSettingsCalculator {
 	
@@ -59,12 +60,12 @@ public class TypeSettingsCalculator {
 		IOverridableTypeSettings typeSettings = getTypeSettingsImpliedByJavaType(type);
 		if (unique != null && !typeSettings.isUniqueOverridable()) {
 			if (!unique.getDefaultAttribute().equals(typeSettings.isUnique())) {
-				myDiagnostics.reportError("eUnique is specified by feature type", unique.getAnnotation());
+				myDiagnostics.reportErrorFormatted(unique.getAnnotation(), ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE, "eUnique");
 			}
 		}
 		if (ordered != null && !typeSettings.isOrderedOverridable()) {
 			if (!ordered.getDefaultAttribute().equals(typeSettings.isOrdered())) {
-				myDiagnostics.reportError("eOrdered is specified by feature type", ordered.getAnnotation());
+				myDiagnostics.reportErrorFormatted(ordered.getAnnotation(), ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE, "eOrdered");
 			}
 		}
 		
@@ -79,20 +80,20 @@ public class TypeSettingsCalculator {
 		if (bounds != null) {
 			Object[] boundsValue = (Object[]) bounds.getDefaultAttribute();
 			if (boundsValue.length != 2) {
-				myDiagnostics.reportError("Bounds array must contain two integer values", bounds.getAnnotation());
+				myDiagnostics.reportError(bounds.getAnnotation(), WRONG_BOUNDS_ARRAY_CONTENT);
 			} else {
 				int lowerBound = (Integer) boundsValue[0];
 				int upperBound = (Integer) boundsValue[1];
 				if ((lowerBound != typeSettings.getLowerBound() 
 						|| upperBound != typeSettings.getUpperBound()) 
 						&& !typeSettings.isBoundsOverridable()) {
-					myDiagnostics.reportError("Bounds are specified by MCollection type", bounds.getAnnotation());
+					myDiagnostics.reportErrorFormatted(bounds.getAnnotation(), ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE, "Bounds");
 				}
 				if (lowerBound < 0) {
-					myDiagnostics.reportError("Lower bound cannot be infinite or unspecified", bounds.getAnnotation());
+					myDiagnostics.reportError(bounds.getAnnotation(), LOWERBOUND_CANNOT_BE_INFINITE);
 				}
 				if (lowerBound > upperBound && upperBound > 0) {
-					myDiagnostics.reportError("Lower bound is greater than upper bound", bounds.getAnnotation());
+					myDiagnostics.reportErrorFormatted(bounds.getAnnotation(), LOWERBOUND_GREATER_THAN_UPPERBOUND, lowerBound, upperBound);
 				}
 				typeSettings.setLowerBound(lowerBound);
 				typeSettings.setUpperBound(upperBound);
@@ -105,7 +106,7 @@ public class TypeSettingsCalculator {
 		ITypeBinding binding = type.resolveBinding();
 		if (binding.isArray()) {
 			if (binding.getDimensions() > 1) {
-				myDiagnostics.reportError("Multidimentional arrays are not supported", type);
+				myDiagnostics.reportError(type, MULTIDIM_ARRAYS_ARE_NOT_SUPPORTED);
 			}
 			return new TypeSettings(true, true, true, 0, -1, true, true, IUnwrapStrategy.UNWRAP_ARRAY);
 		}
@@ -119,7 +120,7 @@ public class TypeSettingsCalculator {
 		
 		ITypeBinding[] typeArguments = binding.getTypeArguments();
 		if (typeArguments.length == 0) {
-			myDiagnostics.reportWarning("Raw collection type will be wrapped into a simple EDatatType", type);
+			myDiagnostics.reportWarning(type, RAW_COLLECTION_TYPE_WILL_BE_WRAPPED);
 			return TypeSettings.DEFAULT.getWorkingCopy();
 		}
 
@@ -142,13 +143,13 @@ public class TypeSettingsCalculator {
 			} else {
 				upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
 				if (lowerBound > upperBound) {
-					myDiagnostics.reportError("Lower bound " + lowerBound + " is greater than upper bound " + upperBound, type);
+					myDiagnostics.reportErrorFormatted(type, LOWERBOUND_GREATER_THAN_UPPERBOUND, lowerBound, upperBound);
 				}
 			}
 			typeSettings.setLowerBound(lowerBound);
 			typeSettings.setUpperBound(upperBound);
 		} catch (NumberFormatException e) {
-			myDiagnostics.reportError("Wrong number format. " + e.getMessage(), type);
+			myDiagnostics.reportErrorFormatted(type, WRONG_NUMBER_FORMAT, e.getMessage());
 		}
 	}
 }

@@ -17,8 +17,8 @@ import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
 import org.abreslav.java2ecore.transformation.deferred.IDeferredActions;
-import org.abreslav.java2ecore.transformation.deferred.SetOppositeAction;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import org.abreslav.java2ecore.transformation.impl.deferred.SetOppositeAction;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EDataType;
@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class MemberBuilder extends ASTVisitor {
 	private final EClass myEClass;
@@ -66,7 +67,7 @@ public class MemberBuilder extends ASTVisitor {
 
 	@Override
 	public boolean visit(EnumDeclaration node) {
-		myDiagnostics.reportError("Nested enums are not allowed", node);
+		myDiagnostics.reportError(node, NESTED_TYPES_ARE_NOT_SUPPORTED_BY_ECORE);
 		return false;
 	}
 	
@@ -75,12 +76,12 @@ public class MemberBuilder extends ASTVisitor {
 		@SuppressWarnings("unchecked")
 		List<VariableDeclarationFragment> fragments = (List<VariableDeclarationFragment>) node.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
 		for (VariableDeclarationFragment fragment : fragments.subList(1, fragments.size())) {
-			myDiagnostics.reportError("Only one feature per declaration is allowed", fragment);
+			myDiagnostics.reportError(fragment, ONLY_ONE_FEATURE_PER_DECLARATION);
 		}
 		
 		VariableDeclarationFragment fragment = fragments.get(0);
 		if (fragment.getExtraDimensions() > 0) {
-			myDiagnostics.reportError("Specify array dimensions at the field type", fragment);
+			myDiagnostics.reportError(fragment, SPECIFY_DIMENSIONS_AT_THE_TYPE);
 		}
 
 		ETypedElement temporaryTypedElement = new MyTypedElement();
@@ -207,10 +208,10 @@ public class MemberBuilder extends ASTVisitor {
 		AnnotationView annotation = annotatedView.getAnnotation(DefaultValueLiteral.class);
 		if (annotation != null) {
 			if (noDefaultValue) {
-				myDiagnostics.reportError("This conflicts with @NoDefaultValue", annotation.getAnnotation());
+				myDiagnostics.reportError(annotation.getAnnotation(), CONFLICT_WITH_NO_DEFAULT_VALUE);
 			} else if (initializer != null 
 					&& false == initializer instanceof NullLiteral) {
-				myDiagnostics.reportError("Default value is specified by an initializer", annotation.getAnnotation());
+				myDiagnostics.reportError(annotation.getAnnotation(), DEFAULT_VALUE_IS_SPECIFIED_BY_AN_INITIALIZER);
 			} else {
 				feature.setDefaultValueLiteral((String) annotation.getDefaultAttribute());
 				return;
@@ -221,7 +222,7 @@ public class MemberBuilder extends ASTVisitor {
 			if (constant != null) {
 				feature.setDefaultValue(constant);
 			} else if (false == initializer instanceof NullLiteral) {
-				myDiagnostics.reportError("Non-constant values are not allowed", initializer);
+				myDiagnostics.reportError(initializer, NON_CONSTANT_VALUES_ARE_NOT_ALLOWED);
 			}
 		}
 	}

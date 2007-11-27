@@ -10,7 +10,9 @@ import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
+import org.abreslav.java2ecore.transformation.diagnostics.IDiagnosticMessage;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class AnnotationValidator {
 
@@ -27,20 +29,21 @@ public class AnnotationValidator {
 	}
 	
 	public static void checkEAttributeAnnotations(AnnotatedView annotatedView, IDiagnostics diagnostics) {
-		doCheckAnnotations(annotatedView, diagnostics, ourAnnotationsForbiddenForEAttributes, "This annotation is not allowed for attributes");
+		doCheckAnnotations(annotatedView, diagnostics, ourAnnotationsForbiddenForEAttributes, NOT_ALLOWED_FOR_ATTRIBUTES);
 	}
 
 	public static void checkEReferenceAnnotations(AnnotatedView annotatedView, IDiagnostics diagnostics) {
-		doCheckAnnotations(annotatedView, diagnostics, ourAnnotationsForbiddenForEReferences, "This annotation is not allowed for references");
+		doCheckAnnotations(annotatedView, diagnostics, ourAnnotationsForbiddenForEReferences, NOT_ALLOWED_FOR_REFERENCES);
 	}
 
 	private static void doCheckAnnotations(AnnotatedView annotatedView,
 			IDiagnostics diagnostics,
-			Set<Class<? extends Annotation>> forbiddenAnnotations, String message) {
+			Set<Class<? extends Annotation>> forbiddenAnnotations, 
+			IDiagnosticMessage message) {
 		for (Class<? extends Annotation> annotationClass : forbiddenAnnotations) {
 			AnnotationView annotation = annotatedView.getAnnotation(annotationClass);
 			if (annotation != null) {
-				diagnostics.reportError(message, annotation.getAnnotation());
+				diagnostics.reportError(annotation.getAnnotation(), message);
 			}
 		}
 	}
