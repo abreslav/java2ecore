@@ -1,25 +1,24 @@
 package org.abreslav.java2ecore.transformation.diagnostics;
 
-import java.util.Collections;
-import java.util.Iterator;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class NullDiagnostics implements IDiagnostics {
 
-	public boolean hasErrors() {
-		return false;
-	}
-
-	public Iterator<Diagnostic> iterator() {
-		return Collections.<Diagnostic>emptyList().iterator();
-	}
-
-	public void reportError(String message, ASTNode node) {
+	public void reportWarning(ASTNode node, IDiagnosticMessage message) {
 		
 	}
 
-	public void reportWarning(String message, ASTNode node) {
+	public void reportError(ASTNode node, IDiagnosticMessage message) {
+		
+	}
+
+	public void reportErrorFormatted(ASTNode node, IDiagnosticMessage message,
+			Object... args) {
+		
+	}
+
+	public void reportWarningFormatted(ASTNode node,
+			IDiagnosticMessage message, Object... args) {
 		
 	}
 

@@ -31,6 +31,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class CompilationUnitToECoreTransformation {
 
@@ -41,7 +42,7 @@ public class CompilationUnitToECoreTransformation {
 		List<AbstractTypeDeclaration> types = (List<AbstractTypeDeclaration>) unitAST.getStructuralProperty(CompilationUnit.TYPES_PROPERTY);
 
 		if (types.isEmpty()) {
-			diagnostics.reportError("No package class found", unitAST);
+			diagnostics.reportError(unitAST, NO_PACKAGE_CLASS);
 			return null;
 		}
 
@@ -49,7 +50,7 @@ public class CompilationUnitToECoreTransformation {
 		if (types.size() > 1) {
 			List<AbstractTypeDeclaration> otherTypes = types.subList(1, types.size());
 			for (AbstractTypeDeclaration abstractTypeDeclaration : otherTypes) {
-				diagnostics.reportError("All the types must be contained in a package. Only one top-level package might be declared in a compilation unit.", abstractTypeDeclaration);
+				diagnostics.reportError(abstractTypeDeclaration, ONE_TOPLEVEL_CLASS_PER_PACKAGE);
 			}
 		}
 		
@@ -59,11 +60,11 @@ public class CompilationUnitToECoreTransformation {
 		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(firstType);
 		if (annotatedView.isAnnotationPresent(org.abreslav.java2ecore.annotations.EPackage.class)) {
 			if (annotatedView.isAnnotationPresent(NonModel.class)) {
-				diagnostics.reportError("Root package type cannot be non-model", annotatedView.getAnnotation(NonModel.class).getAnnotation());
+				diagnostics.reportError(annotatedView.getAnnotation(NonModel.class).getAnnotation(), ROOT_PACKAGE_TYPE_CANNOT_BE_NON_MODEL);
 			}
 			firstType.accept(new DeclarationCollector(firstType.resolveBinding(), declarationStorage, diagnostics));
 		} else {
-			diagnostics.reportError("This type must declare @EPackage annotation", firstType.getName());
+			diagnostics.reportError(firstType.getName(), TOP_LEVEL_TYPE_MUST_BE_EPACKAGE);
 			return null;
 		}
 
