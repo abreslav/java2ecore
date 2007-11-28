@@ -52,5 +52,12 @@
             value="true">
       </persistent>
    </extension>
+   <extension
+         point="org.eclipse.jdt.core.classpathVariableInitializer">
+      <classpathVariableInitializer
+            class="org.abreslav.java2ecore.transformation.VariableResolver"
+            variable="Java2Ecore">
+      </classpathVariableInitializer>
+   </extension>
 
 </plugin>
