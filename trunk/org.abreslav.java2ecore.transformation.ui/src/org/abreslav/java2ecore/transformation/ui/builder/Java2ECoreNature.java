@@ -1,10 +1,16 @@
 package org.abreslav.java2ecore.transformation.ui.builder;
 
+import org.abreslav.java2ecore.transformation.VariableResolver;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 
 public class Java2ECoreNature implements IProjectNature {
 
@@ -38,6 +44,20 @@ public class Java2ECoreNature implements IProjectNature {
 		desc.setBuildSpec(newCommands);
 		
 		project.setDescription(desc, null);
+		
+		IJavaProject javaProject = JavaCore.create(project);
+		IClasspathEntry[] classpath = javaProject.getRawClasspath();
+		IPath path = Path.fromPortableString(VariableResolver.VARIABLE);
+		for (IClasspathEntry classpathEntry : classpath) {
+			if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_VARIABLE
+					&& path.equals(classpathEntry.getPath())) {
+				return;
+			}
+		}
+		IClasspathEntry[] newClasspath = new IClasspathEntry[classpath.length + 1];
+		System.arraycopy(classpath, 0, newClasspath, 0, classpath.length);
+		newClasspath[classpath.length] = JavaCore.newVariableEntry(path, path, null);
+		javaProject.setRawClasspath(newClasspath, null);
 	}
 
 	/*
