@@ -33,14 +33,8 @@ permissions and limitations under the License.
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
+      <import plugin="org.eclipse.core.variables"/>
    </requires>
-
-   <plugin
-         id="org.abreslav.java2ecore"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
 
    <plugin
          id="org.abreslav.java2ecore.transformation"
