@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="WINDOWS-1251" standalone="no"?>
+<jardesc>
+    <jar path="C:/Eclipse Workspaces/workspace/org.abreslav.java2ecore.transformation/lib/java2ecore.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/org.abreslav.java2ecore/export.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=org.abreslav.java2ecore/src"/>
+    </selectedElements>
+</jardesc>
