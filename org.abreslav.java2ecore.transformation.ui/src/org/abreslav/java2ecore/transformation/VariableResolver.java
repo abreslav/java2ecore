@@ -13,6 +13,8 @@ import org.eclipse.jdt.core.JavaModelException;
 
 public class VariableResolver extends ClasspathVariableInitializer {
 
+	public static final String VARIABLE = "Java2Ecore";
+	
 	@Override
 	public void initialize(String variable) {
 		try {
