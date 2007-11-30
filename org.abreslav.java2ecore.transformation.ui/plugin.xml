@@ -3,7 +3,7 @@
 <plugin>
    <extension
          id="builder"
-         name="Java2ECore Project Builder"
+         name="Java2Ecore Project Builder"
          point="org.eclipse.core.resources.builders">
       <builder
             hasNature="true">
@@ -14,7 +14,7 @@
    </extension>
    <extension
          id="nature"
-         name="Java2ECore Project Nature"
+         name="Java2Ecore Project Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -35,15 +35,15 @@
          <action
                class="org.abreslav.java2ecore.transformation.ui.builder.ToggleNatureAction"
                enablesFor="+"
-               id="Test.addRemoveNatureAction"
-               label="Toggle Java2ECore Nature"
+               id="org.abreslav.java2ecore.transformation.ui.addRemoveNatureAction"
+               label="Toggle Java2Ecore Nature"
                menubarPath="additions">
          </action>
       </objectContribution>
    </extension>
    <extension
          id="j2EcoreProblem"
-         name="Java2ECore Transformation Problem"
+         name="Java2Ecore Transformation Problem"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
