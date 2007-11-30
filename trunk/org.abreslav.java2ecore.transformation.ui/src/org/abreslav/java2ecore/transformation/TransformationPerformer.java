@@ -7,6 +7,7 @@ import java.util.Collections;
 
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnosticMessage;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import org.abreslav.java2ecore.transformation.ui.builder.Java2ECoreBuilder;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
@@ -21,8 +22,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class TransformationPerformer {
-	private static final String MARKER_TYPE = "org.abreslav.java2ecore.transformation.ui.j2EcoreProblem";
-
 	@SuppressWarnings("serial")
 	private static class ExceptionWrapper extends RuntimeException {
 		public ExceptionWrapper(CoreException cause) {
@@ -32,7 +31,7 @@ public class TransformationPerformer {
 	
 	public static void performTransformation(final ICompilationUnit compilationUnit)
 			throws CoreException, IOException {
-		compilationUnit.getResource().deleteMarkers(MARKER_TYPE, false,
+		compilationUnit.getResource().deleteMarkers(Java2ECoreBuilder.MARKER_TYPE, false,
 				IResource.DEPTH_ZERO);
 		final boolean[] hasErrors = new boolean[1];
 		IDiagnostics diagnostics = new IDiagnostics() {
@@ -91,7 +90,7 @@ public class TransformationPerformer {
 	private static void createMarker(ICompilationUnit compilationUnit,
 			int severity, String message, ASTNode node) {
 		try {
-			IMarker marker = compilationUnit.getResource().createMarker(MARKER_TYPE);
+			IMarker marker = compilationUnit.getResource().createMarker(Java2ECoreBuilder.MARKER_TYPE);
 			marker.setAttribute(IMarker.SEVERITY, severity);
 			marker.setAttribute(IMarker.MESSAGE, message);
 			marker.setAttribute(IMarker.CHAR_START, node.getStartPosition());

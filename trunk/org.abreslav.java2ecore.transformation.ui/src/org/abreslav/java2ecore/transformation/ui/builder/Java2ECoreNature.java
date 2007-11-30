@@ -1,31 +1,39 @@
 package org.abreslav.java2ecore.transformation.ui.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
+
 import org.abreslav.java2ecore.transformation.VariableResolver;
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Shell;
 
 public class Java2ECoreNature implements IProjectNature {
 
+	public static final String PLUGIN_ID = "org.abreslav.java2ecore.transformation.ui";
 	/**
 	 * ID of this project nature
 	 */
-	public static final String NATURE_ID = "org.abreslav.java2ecore.transformation.ui.nature";
+	public static final String NATURE_ID = PLUGIN_ID + ".nature";
 
 	private IProject project;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#configure()
-	 */
 	public void configure() throws CoreException {
 		IProjectDescription desc = project.getDescription();
 		ICommand[] commands = desc.getBuildSpec();
@@ -44,8 +52,49 @@ public class Java2ECoreNature implements IProjectNature {
 		desc.setBuildSpec(newCommands);
 		
 		project.setDescription(desc, null);
-		
+
 		IJavaProject javaProject = JavaCore.create(project);
+		List<IStatus> errors = new ArrayList<IStatus>();
+		try {
+			createClasspathEntryForOurSourceFolder(javaProject);
+		} catch (CoreException e) {
+			reportError(e, "Error while adding a source folder");
+			errors.add(e.getStatus());
+		}
+		try {
+			createClasspathEntryForOurJar(javaProject);
+		} catch (CoreException e) {
+			reportError(e, "Error while adding java2ecore.jar to classpath");
+			errors.add(e.getStatus());
+		}
+		if (!errors.isEmpty()) {
+			MultiStatus multiStatus = new MultiStatus(
+					PLUGIN_ID, 0, 
+					errors.toArray(new IStatus[errors.size()]), 
+					"Errors occurred while configuring the project",
+					null);
+			throw new CoreException(multiStatus);
+		}
+	}
+
+	private void reportError(CoreException e, String message) {
+		Shell shell = new Shell();
+		MessageDialog.openError(shell, message, e.getMessage());
+	}
+
+	private void createClasspathEntryForOurSourceFolder(IJavaProject javaProject) throws CoreException {
+		IFolder ourSourceFolder = project.getFolder(Java2ECoreBuilder.SOURCE_FOLDER_NAME);
+		if (!ourSourceFolder.exists()) {
+			ourSourceFolder.create(true, false, null);
+		}
+		IJavaElement javaSourceFolder = JavaCore.create(ourSourceFolder);
+		if (javaSourceFolder == null) {
+			IClasspathEntry sourceEntry = JavaCore.newSourceEntry(ourSourceFolder.getFullPath());
+			extendClasspath(javaProject, sourceEntry);
+		}
+	}
+
+	private void createClasspathEntryForOurJar(IJavaProject javaProject) throws JavaModelException {
 		IClasspathEntry[] classpath = javaProject.getRawClasspath();
 		IPath path = Path.fromPortableString(VariableResolver.VARIABLE);
 		for (IClasspathEntry classpathEntry : classpath) {
@@ -54,17 +103,29 @@ public class Java2ECoreNature implements IProjectNature {
 				return;
 			}
 		}
-		IClasspathEntry[] newClasspath = new IClasspathEntry[classpath.length + 1];
-		System.arraycopy(classpath, 0, newClasspath, 0, classpath.length);
-		newClasspath[classpath.length] = JavaCore.newVariableEntry(path, path, null);
-		javaProject.setRawClasspath(newClasspath, null);
+		IClasspathEntry variableEntry = JavaCore.newVariableEntry(path, path, null);
+		extendClasspath(javaProject, variableEntry);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
-	 */
+	private void extendClasspath(IJavaProject javaProject, IClasspathEntry newEntry)
+			throws JavaModelException {
+		List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(Arrays.asList(javaProject.getRawClasspath()));
+		ListIterator<IClasspathEntry> it = classpath.listIterator();
+		// Add new entry after all the entries of that kind
+		if (it.hasNext()) {
+			IClasspathEntry entry;
+			do {
+				entry = it.next();
+			} while (it.hasNext() && (entry.getEntryKind() != newEntry.getEntryKind()));
+			while (it.hasNext() && (entry.getEntryKind() == newEntry.getEntryKind())) {
+				entry = it.next();
+			}
+			it.previous();
+		}
+		it.add(newEntry);
+		javaProject.setRawClasspath(classpath.toArray(new IClasspathEntry[classpath.size()]), null);
+	}
+
 	public void deconfigure() throws CoreException {
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();
@@ -80,20 +141,10 @@ public class Java2ECoreNature implements IProjectNature {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#getProject()
-	 */
 	public IProject getProject() {
 		return project;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
-	 */
 	public void setProject(IProject project) {
 		this.project = project;
 	}

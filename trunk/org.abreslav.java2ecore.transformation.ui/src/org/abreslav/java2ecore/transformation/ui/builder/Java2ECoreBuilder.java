@@ -22,8 +22,11 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 
 public class Java2ECoreBuilder extends IncrementalProjectBuilder {
+	public static final String SOURCE_FOLDER_NAME = "ecores";
+	public static final String MARKER_TYPE = Java2ECoreNature.PLUGIN_ID + ".j2EcoreProblem";
 
 	class DeltaVisitor implements IResourceDeltaVisitor {
+
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
 			IJavaElement element = JavaCore.create(resource);
@@ -32,7 +35,7 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 			}
 			if (element instanceof IPackageFragmentRoot) {
 				IPackageFragmentRoot srcFolder = (IPackageFragmentRoot) element;
-				return "ecores".equals(srcFolder.getElementName());
+				return SOURCE_FOLDER_NAME.equals(srcFolder.getElementName());
 			}
 			if (element instanceof ICompilationUnit) {
 				ICompilationUnit compilationUnit = (ICompilationUnit) element;
@@ -62,7 +65,7 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 			}
 			if (element instanceof IPackageFragmentRoot) {
 				IPackageFragmentRoot srcFolder = (IPackageFragmentRoot) element;
-				return "ecores".equals(srcFolder.getElementName());
+				return SOURCE_FOLDER_NAME.equals(srcFolder.getElementName());
 			}
 			if (element instanceof ICompilationUnit) {
 				ICompilationUnit compilationUnit = (ICompilationUnit) element;
