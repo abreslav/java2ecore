@@ -3,7 +3,7 @@
 <plugin>
    <extension
          id="builder"
-         name="Java2Ecore Project Builder"
+         name="Java2Ecore Builder"
          point="org.eclipse.core.resources.builders">
       <builder
             hasNature="true">
@@ -14,7 +14,7 @@
    </extension>
    <extension
          id="nature"
-         name="Java2Ecore Project Nature"
+         name="Java2Ecore Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
