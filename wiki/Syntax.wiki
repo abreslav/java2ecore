@@ -1,5 +1,7 @@
 #summary Description of Java2Ecore syntax
 
+Note: all the following is about version 0.1. Current version is 0.2 and a description for it is being created.
+
 = File structure =
 When you describe some Ecore model in a `*`.java file you define classes on the same level:
 one of them might be public (I think, it will be a package-specifying class) and others are package-private. All these classes will be handled by Java2Ecore.
