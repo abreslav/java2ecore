@@ -37,11 +37,13 @@ class Library {
 
 class Writer {
 	String name;
+	@Opposite("author")
 	List<Book> books;
 }
 
 class Book {
 	String title;
+	@Bounds(1)
 	Writer author;
 	int pages = 100;
 	BookCategory category;
