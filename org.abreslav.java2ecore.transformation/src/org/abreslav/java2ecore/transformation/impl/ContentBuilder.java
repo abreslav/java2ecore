@@ -47,6 +47,7 @@ public class ContentBuilder {
 
 	public void buildEPackage(TypeDeclaration type, EPackage ePackage) {
 		AnnotatedView view = ASTViewFactory.INSTANCE.createAnnotatedView(type);
+		AnnotationValidator.checkEPackageAnnotations(view, myDiagnostics);
 		ePackage.setName(type.getName().getIdentifier());
 		AnnotationView annotation = view.getAnnotation(org.abreslav.java2ecore.annotations.EPackage.class);
 		ePackage.setNsPrefix((String) annotation.getAttribute("nsPrefix"));
@@ -61,9 +62,8 @@ public class ContentBuilder {
 	public void buildEEnum(final EnumDeclaration type, final EEnum eEnum) {
 		setUpEClassifier(type, eEnum);
 
-		if (eEnum == null) {
-			throw new IllegalStateException("An enum is present but not collected");
-		}
+		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(type);
+		AnnotationValidator.checkEEnumAnnotations(annotatedView, myDiagnostics);
 		
 		@SuppressWarnings("unchecked")
 		List<Type> superInterfaces = (List<Type>) type.getStructuralProperty(EnumDeclaration.SUPER_INTERFACE_TYPES_PROPERTY);
@@ -105,6 +105,8 @@ public class ContentBuilder {
 		setUpEClassifier(type, eDataType);
 		
 		AnnotatedView view = ASTViewFactory.INSTANCE.createAnnotatedView(type);
+		AnnotationValidator.checkEDataTypeAnnotations(view, myDiagnostics);
+
 		AnnotationView eDataTypeAnnotation = view.getAnnotation(org.abreslav.java2ecore.annotations.types.EDataType.class);
 		eDataType.setInstanceTypeName((String) eDataTypeAnnotation.getDefaultAttribute());
 		myTypeResolver.createTypeParameters(eDataType, type.resolveBinding());
@@ -114,6 +116,7 @@ public class ContentBuilder {
 		setUpEClassifier(type, eClass);
 
 		AnnotatedView view = ASTViewFactory.INSTANCE.createAnnotatedView(type);
+		AnnotationValidator.checkEClassAnnotations(view, myDiagnostics);
 		AnnotationView instanceTypeName = view.getAnnotation(InstanceTypeName.class);
 		if (instanceTypeName != null) {
 			eClass.setInstanceTypeName((String) instanceTypeName.getDefaultAttribute());
