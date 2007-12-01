@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
 public @interface Bounds {
 	/**
-	 * Corresponds to lowerBound and upperBound attributes.
+	 * Corresponds to <code>lowerBound</code> and <code>upperBound</code> attributes.
 	 * 
 	 * @see Bounds
 	 */
