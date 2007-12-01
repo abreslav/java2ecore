@@ -113,8 +113,10 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 	private void perform(ICompilationUnit compilationUnit) throws CoreException {
 		try {
 			IMarker[] markers = compilationUnit.getResource().findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_ONE);
-			if (markers.length > 0) {
-				return;
+			for (IMarker marker : markers) {
+				if (marker.getAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO) == IMarker.SEVERITY_ERROR) {
+					return;
+				}
 			}
 			TransformationPerformer.performTransformation(compilationUnit);
 		} catch (IOException e) {
