@@ -1,4 +1,4 @@
-package errors.forbidden_annotations;
+package errors.forbidden_annotations.features;
 import org.abreslav.java2ecore.annotations.EPackage;
 import org.abreslav.java2ecore.annotations.sfeatures.ID;
 

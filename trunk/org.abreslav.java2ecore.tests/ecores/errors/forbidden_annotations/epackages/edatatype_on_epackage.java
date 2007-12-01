@@ -1,17 +1,15 @@
-package errors.instance_type_name;
+package errors.forbidden_annotations.epackages;
 import org.abreslav.java2ecore.annotations.EPackage;
 import org.abreslav.java2ecore.annotations.types.EDataType;
-import org.abreslav.java2ecore.annotations.types.InstanceTypeName;
 
 @EPackage( 
 		nsPrefix="sdf",
 		nsURI="..."
 )
-public class instance_type_name_on_enum {
+public class edatatype_on_epackage {
 	
-	@InstanceTypeName("a.b.C")
+	@EPackage(nsURI="", nsPrefix="")
 	@EDataType("a.b.C")
 	class A {
 	}
-	
 }
