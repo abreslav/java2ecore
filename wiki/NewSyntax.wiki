@@ -2,33 +2,46 @@
 
 Note: all the following is about version 0.1. Current version is 0.2 and a description for it is being created.
 
-= File structure =
-When you describe some Ecore model in a `*`.java file you define classes on the same level:
-one of them might be public (I think, it will be a package-specifying class) and others are package-private. All these classes will be handled by Java2Ecore.
-
 = EPackage specification =
-The first thing to do when defining a Ecore model is to create EPackage (and not to forget  to set up nsPrefix and nsURI attributes). In Java2Ecore this is done as follows:
+When you describe some Ecore model in a `*`.java file you define a top-level class to specify a root EPackage of the model, EPackages's contents (classifiers and subpackages) are denoted by nested Java types.
+
+Use {{{@EPackage}}} annotation to denote a class that describes EPackage and set up nsPrefix and nsURI attributes.
 {{{
 @EPackage(
     nsPrefix="samples",   
     nsURI="http:///example.com/samples"
 )  
 public class samples {
+    @EPackage(
+        nsPrefix="subpackage",
+        nsURI="http:///example.com/samples/subpackage"
+    )
+    class subpackage {
+        // subpackage contents
+    }
+
+    // other root package contents
 }
 }}}
-Such a class is called a _package specification class_. EPackage will have the same name as it's specification class and nsPrefix and nsURI are specified by an annotation @EPackage.
+EPackage will have the same name as this class.
 
 = Classifiers =
 Java2Ecore supports all three types of classifiers:
  * _EClass_ which is represented by Java {{{class}}} or {{{interface}}} (see below)
 {{{
-interface MyInterface {
-}
-class First {
-}
-class Sample extends First implements MyInterface { // both extends and implements are supported
-}
-abstract class Abstract { // abstract modifier sets up EClass' abstract attribute
+@EPackage(
+    nsPrefix="samples",   
+    nsURI="http:///example.com/samples"
+)  
+public class samples {
+    interface MyInterface {
+    }
+    class First {
+    }
+    class Sample extends First implements MyInterface { // both extends and implements are supported
+    }
+    abstract class Abstract { // abstract modifier sets up EClass' abstract attribute
+    }
 }
 }}}
  * _EDataType_ which is represented by Java {{{class}}} with {{{@EDataType}}} annotation or just created automatically (see below)
