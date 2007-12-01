@@ -18,6 +18,14 @@ public class bounds_annotation {
 
 	class A {
 	abstract class _{ 
+		@Bounds()  
+		int xdefaultBounds;		
+		
+		int xdef;
+		
+		@Bounds(1) 
+		int xone;
+		
 		@Bounds({1, 5})
 		int x;		
 		
@@ -39,6 +47,9 @@ public class bounds_annotation {
 		MList<Integer, _1, _5> mlist;
 		@Bounds({1, 5})
 		MSet<Integer, _1, _5> mset;
+
+		@Bounds(1)
+		MSet<Integer, _1, _1> msetOneBound;
 		
 		@Bounds({1, -1})
 		abstract A a();
