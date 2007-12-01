@@ -1,5 +1,13 @@
 package org.abreslav.java2ecore.transformation.impl;
 
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.LOWERBOUND_CANNOT_BE_INFINITE;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.LOWERBOUND_GREATER_THAN_UPPERBOUND;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.MULTIDIM_ARRAYS_ARE_NOT_SUPPORTED;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.RAW_COLLECTION_TYPE_WILL_BE_WRAPPED;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.WRONG_BOUNDS_ARRAY_CONTENT;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.WRONG_NUMBER_FORMAT;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +26,9 @@ import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.eclipse.emf.ecore.ETypedElement;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Type;
-import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class TypeSettingsCalculator {
 	
@@ -54,10 +62,70 @@ public class TypeSettingsCalculator {
 
 	public ITypeSettings calculateTypeSettings(Type type,
 			AnnotatedView annotatedView) {
+		IOverridableTypeSettings typeSettings = getTypeSettingsImpliedByJavaType(type);
+
+		calculateUniqueAndOrdered(annotatedView, typeSettings);
+		calculateBounds(annotatedView, typeSettings);
+		return typeSettings;
+	}
+
+	private void calculateBounds(AnnotatedView annotatedView,
+			IOverridableTypeSettings typeSettings) {
+		AnnotationView bounds = annotatedView.getAnnotation(Bounds.class);
+		if (bounds != null) {
+			int lowerBound;
+			int upperBound;
+			Object boundsAttribute = bounds.getDefaultAttribute();
+			if (boundsAttribute instanceof Integer) {
+				Integer value = (Integer) boundsAttribute;
+				lowerBound = value;
+				upperBound = value;
+			} else {
+				Object[] boundsValue = (Object[]) boundsAttribute;
+				if (boundsValue.length != 2) {
+					myDiagnostics.reportError(bounds.getAnnotation(), WRONG_BOUNDS_ARRAY_CONTENT);
+					return;
+				} else {
+					lowerBound = (Integer) boundsValue[0];
+					upperBound = (Integer) boundsValue[1];
+					checkBoundsCorrespondence(bounds.getAnnotation(), lowerBound, upperBound);
+				}
+			}
+			checkOverridablility(typeSettings, bounds, lowerBound,
+					upperBound);
+			checkLowerBound(bounds, lowerBound);
+			typeSettings.setLowerBound(lowerBound);
+			typeSettings.setUpperBound(upperBound);
+		}
+	}
+
+	private void checkBoundsCorrespondence(ASTNode node,
+			int lowerBound, int upperBound) {
+		if (lowerBound > upperBound && upperBound > 0) {
+			myDiagnostics.reportErrorFormatted(node, LOWERBOUND_GREATER_THAN_UPPERBOUND, lowerBound, upperBound);
+		}
+	}
+
+	private void checkLowerBound(AnnotationView bounds, int lowerBound) {
+		if (lowerBound < 0) {
+			myDiagnostics.reportError(bounds.getAnnotation(), LOWERBOUND_CANNOT_BE_INFINITE);
+		}
+	}
+
+	private void checkOverridablility(IOverridableTypeSettings typeSettings,
+			AnnotationView bounds, int lowerBound, int upperBound) {
+		if ((lowerBound != typeSettings.getLowerBound() 
+				|| upperBound != typeSettings.getUpperBound()) 
+				&& !typeSettings.isBoundsOverridable()) {
+			myDiagnostics.reportErrorFormatted(bounds.getAnnotation(), ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE, "Bounds");
+		}
+	}
+
+	private void calculateUniqueAndOrdered(AnnotatedView annotatedView,
+			IOverridableTypeSettings typeSettings) {
 		AnnotationView unique = annotatedView.getAnnotation(Unique.class);
 		AnnotationView ordered = annotatedView.getAnnotation(Ordered.class);
 		
-		IOverridableTypeSettings typeSettings = getTypeSettingsImpliedByJavaType(type);
 		if (unique != null && !typeSettings.isUniqueOverridable()) {
 			if (!unique.getDefaultAttribute().equals(typeSettings.isUnique())) {
 				myDiagnostics.reportErrorFormatted(unique.getAnnotation(), ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE, "eUnique");
@@ -75,31 +143,6 @@ public class TypeSettingsCalculator {
 		if (ordered != null) {
 			typeSettings.setOrdered((Boolean) ordered.getDefaultAttribute());
 		}
-		
-		AnnotationView bounds = annotatedView.getAnnotation(Bounds.class);
-		if (bounds != null) {
-			Object[] boundsValue = (Object[]) bounds.getDefaultAttribute();
-			if (boundsValue.length != 2) {
-				myDiagnostics.reportError(bounds.getAnnotation(), WRONG_BOUNDS_ARRAY_CONTENT);
-			} else {
-				int lowerBound = (Integer) boundsValue[0];
-				int upperBound = (Integer) boundsValue[1];
-				if ((lowerBound != typeSettings.getLowerBound() 
-						|| upperBound != typeSettings.getUpperBound()) 
-						&& !typeSettings.isBoundsOverridable()) {
-					myDiagnostics.reportErrorFormatted(bounds.getAnnotation(), ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE, "Bounds");
-				}
-				if (lowerBound < 0) {
-					myDiagnostics.reportError(bounds.getAnnotation(), LOWERBOUND_CANNOT_BE_INFINITE);
-				}
-				if (lowerBound > upperBound && upperBound > 0) {
-					myDiagnostics.reportErrorFormatted(bounds.getAnnotation(), LOWERBOUND_GREATER_THAN_UPPERBOUND, lowerBound, upperBound);
-				}
-				typeSettings.setLowerBound(lowerBound);
-				typeSettings.setUpperBound(upperBound);
-			}
-		}
-		return typeSettings;
 	}
 
 	private IOverridableTypeSettings getTypeSettingsImpliedByJavaType(Type type) {
@@ -142,9 +185,7 @@ public class TypeSettingsCalculator {
 				upperBound = ETypedElement.UNSPECIFIED_MULTIPLICITY;
 			} else {
 				upperBound = Integer.valueOf(typeArguments[2].getName().substring(1));
-				if (lowerBound > upperBound) {
-					myDiagnostics.reportErrorFormatted(type, LOWERBOUND_GREATER_THAN_UPPERBOUND, lowerBound, upperBound);
-				}
+				checkBoundsCorrespondence(type, lowerBound, upperBound);
 			}
 			typeSettings.setLowerBound(lowerBound);
 			typeSettings.setUpperBound(upperBound);
