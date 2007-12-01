@@ -1,4 +1,4 @@
-package errors.eypedelement;
+package errors.eypedelement.bounds;
 import org.abreslav.java2ecore.annotations.EPackage;
 import org.abreslav.java2ecore.annotations.sfeatures.Bounds;
 
@@ -6,9 +6,9 @@ import org.abreslav.java2ecore.annotations.sfeatures.Bounds;
 		nsPrefix="sdf",
 		nsURI="a"
 )
-public class bounds_negative_lower_bound {
+public class bounds_with_less_values {
 	class A {
-		@Bounds({-1, 1})    
+		@Bounds({1})
 		int a;
 	}
 }

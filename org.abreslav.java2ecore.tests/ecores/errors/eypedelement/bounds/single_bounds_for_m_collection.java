@@ -1,4 +1,4 @@
-package errors.eypedelement;
+package errors.eypedelement.bounds;
 import org.abreslav.java2ecore.annotations.EPackage;
 import org.abreslav.java2ecore.annotations.sfeatures.Bounds;
 import org.abreslav.java2ecore.multiplicities.MList;
@@ -9,9 +9,9 @@ import org.abreslav.java2ecore.multiplicities._1;
 		nsPrefix="sdf",
 		nsURI="a"
 )
-public class bounds_for_m_collection {
+public class single_bounds_for_m_collection {
 	class A {
-		@Bounds({1, 10})
+		@Bounds(1)
 		MList<Integer, _0, _1> a;
 	}
 }
