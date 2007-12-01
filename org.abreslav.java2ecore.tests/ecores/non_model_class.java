@@ -23,4 +23,4 @@ public class non_model_class {
 	}
 		
 	    
-}  
+}   
