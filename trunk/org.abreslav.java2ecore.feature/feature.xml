@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.abreslav.java2ecore.feature"
-      label="Java2Ecore Feature"
+      label="Java2Ecore"
       version="0.2"
       provider-name="Andrey Breslav">
 
