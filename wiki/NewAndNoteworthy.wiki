@@ -6,7 +6,7 @@
   * Full support for structural features' properties
   * Diagnostics improved (more errors reported)
   * Some bugs fixed
- * UI features ===
+ * UI features
   * !JavaDoc descriptions for annotations provided directly in the editor
   * Update site
   * Builder supports clean
