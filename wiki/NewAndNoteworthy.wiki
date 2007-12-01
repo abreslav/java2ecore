@@ -3,9 +3,28 @@
 = Version 0.2 beta =
 Core:
  * Support for nested packages
+ * Full support for structural features' properties
  * Diagnostics improved (more errors reported)
 UI:
- * JavaDoc descriptions for annotations provided directly in the editor
+ * !JavaDoc descriptions for annotations provided directly in the editor
  * Update site
  * Builder supports clean
  * Nature automatically adds necessary resources
+
+= Version 0.1 alpha =
+Core:
+ * Main Ecore classifiers 
+  * EPackage
+  * EClass  
+  * EDataType  
+  * EEnum
+  * EReference
+  * EAttribute
+  * EOperation
+  * EParameter
+ * Generics
+UI:
+ * Java Editor
+  * Code completion
+  * Error reporting
+ * Builder
