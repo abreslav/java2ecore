@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="instance_type_name" nsURI="a" nsPrefix="a">
+  <eClassifiers xsi:type="ecore:EDataType" name="A" instanceClassName="a.b.C"/>
+  <eClassifiers xsi:type="ecore:EClass" name="B" instanceClassName="c.d.E"/>
+</ecore:EPackage>
