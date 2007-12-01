@@ -1,4 +1,4 @@
-#summary New and noteworthy
+#summary History of changes
 
 = Version 0.2 beta =
  * Core features
