@@ -22,6 +22,8 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class TransformationPerformer {
+	public static final String MODEL_FOLDER_NAME = "model";
+
 	@SuppressWarnings("serial")
 	private static class ExceptionWrapper extends RuntimeException {
 		public ExceptionWrapper(CoreException cause) {
@@ -66,7 +68,7 @@ public class TransformationPerformer {
 						.createURI(fileName));
 				res.getContents().add(ePackage);
 	
-				IFolder folder = project.getFolder("model");
+				IFolder folder = project.getFolder(MODEL_FOLDER_NAME);
 				if (!folder.exists()) {
 					folder.create(true, true, null);
 				}

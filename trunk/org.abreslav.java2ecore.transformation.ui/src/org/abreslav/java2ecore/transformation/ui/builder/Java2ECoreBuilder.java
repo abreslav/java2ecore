@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.abreslav.java2ecore.transformation.TransformationPerformer;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -119,6 +121,22 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 			throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
 		} catch (Throwable e) {
 			e.printStackTrace();
+		}
+	}
+	
+	@Override
+	protected void clean(final IProgressMonitor monitor) throws CoreException {
+		IFolder modelFolder = getProject().getFolder(TransformationPerformer.MODEL_FOLDER_NAME);
+		if (modelFolder.exists()) {
+			modelFolder.accept(new IResourceVisitor() {
+				public boolean visit(IResource resource) throws CoreException {
+					if (resource instanceof IContainer) {
+						return true;
+					}
+					resource.delete(true, monitor);
+					return false;
+				}
+			});
 		}
 	}
 }
