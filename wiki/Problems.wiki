@@ -5,8 +5,7 @@
 
 = Not yet implemented =
  * Ecore annotations
- * Nested packages
- * Import of existing Ecore models (Ecore itself, for example)
+ * Import of existing Ecore models
  * Ecore2Java transformations
 
 = Problems and known issues =
@@ -26,9 +25,6 @@ class _<T> { // Define the same type parameters as enclosing type does
 }
 }
 }}}
- * No opportunity to place two models (`*`.java files) containing classes with same names in the same package (two Java classes with same names cannot appear in one package)
-  * _Solution_ (not implemented): allow to declare model types inside package type
-
 
 = Unsupported things =
  * Generic exceptions are not supported in Java, so !Java2Ecore does not support them
