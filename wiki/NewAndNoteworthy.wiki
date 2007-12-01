@@ -1,0 +1,11 @@
+#summary New and noteworthy
+
+= Version 0.2 beta =
+Core:
+ * Support for nested packages
+ * Diagnostics improved (more errors reported)
+UI:
+ * JavaDoc descriptions for annotations provided directly in the editor
+ * Update site
+ * Builder supports clean
+ * Nature automatically adds necessary resources
