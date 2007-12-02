@@ -167,15 +167,16 @@ class A {
 == Other attributes of structural features ==
 
 === Attributes mapped from Java modifiers ===
- * {{{final}}} makes changeable false
- * {{{transient}}} makes transient true
- * {{{volatile}}} makes volatile true
+ * {{{final}}} makes _changeable_ to {{{false}}}
+ * {{{transient}}} makes _transient_ to {{{true}}}
+ * {{{volatile}}} makes _volatile_ to {{{true}}}
 
 === Default value ===
-You can specify default value by initializing a field with a *constant*:
+You can specify default value by initializing a field with a *constant* or an enum literal:
 {{{
 class A {
-    String s = "some"; // defaultValueLiteral = "some"
+    String s = "some"; // defaultValue = "some"
+    E e = E.LITERAL; // defaultValue = E.LITERAL
 }
 }}}
 
