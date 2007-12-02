@@ -36,5 +36,10 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="xannundef" changeable="false">
       <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="e" eType="//E" defaultValueLiteral="A"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="eA" eType="//E" defaultValueLiteral="A"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="E">
+    <eLiterals name="A" literal="A"/>
   </eClassifiers>
 </ecore:EPackage>
