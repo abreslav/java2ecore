@@ -15,7 +15,7 @@ import org.abreslav.java2ecore.multiplicities._5;
 		nsURI="http://sdfsad.com"
 )
 public class bounds_annotation {    
-
+   
 	class A {
 	abstract class _{ 
 		@Bounds()  

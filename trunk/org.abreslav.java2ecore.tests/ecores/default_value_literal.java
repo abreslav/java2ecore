@@ -10,7 +10,7 @@ public class default_value_literal {
 
 	class A {
 	abstract class _{
-		A aa = null;
+		A aa = null; 
 
 		@DefaultValueLiteral("null")
 		A a = null;
@@ -30,7 +30,16 @@ public class default_value_literal {
 
 		@NoDefaultValue 
 		final int xannundef = 0;
+		
+		@DefaultValueLiteral("A")
+		E e;
+
+		E eA = E.A;
 	}
+	}
+	
+	enum E {
+		A;
 	}
 		 
 	    
