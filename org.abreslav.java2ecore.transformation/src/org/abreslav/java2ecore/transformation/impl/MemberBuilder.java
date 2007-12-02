@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
@@ -44,6 +45,8 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.IVariableBinding;
+
 import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class MemberBuilder extends ASTVisitor {
@@ -221,9 +224,23 @@ public class MemberBuilder extends ASTVisitor {
 			Object constant = initializer.resolveConstantExpressionValue();
 			if (constant != null) {
 				feature.setDefaultValue(constant);
-			} else if (false == initializer instanceof NullLiteral) {
-				myDiagnostics.reportError(initializer, NON_CONSTANT_VALUES_ARE_NOT_ALLOWED);
-			}
+				return;
+			} 
+			if (initializer instanceof Name) {
+				Name name = (Name) initializer;
+				IBinding binding = name.resolveBinding();
+				if (binding instanceof IVariableBinding) {
+					IVariableBinding variableBinding = (IVariableBinding) binding;
+					if (variableBinding.isEnumConstant()) {
+						feature.setDefaultValueLiteral(variableBinding.getName());
+						return;
+					}
+				}
+			} 
+			if (initializer instanceof NullLiteral) {
+				return;
+			} 
+			myDiagnostics.reportError(initializer, NON_CONSTANT_VALUES_ARE_NOT_ALLOWED);
 		}
 	}
 
