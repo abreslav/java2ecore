@@ -24,7 +24,7 @@ public interface samples {
 EPackage will have the same name as this class.
 
 = Classifiers =
-Java2Ecore supports all three types of Ecore classifiers:
+!Java2Ecore supports all three types of Ecore classifiers:
  * _EClass_ which is represented by Java {{{class}}} or {{{interface}}} (see below)
 {{{
 @EPackage(
@@ -249,15 +249,13 @@ class A {
 }
 }}}
 
-== Other attributes of structural features ==
-
-=== Attributes mapped from Java modifiers ===
+== Attributes mapped from Java modifiers ==
  * {{{final}}} sets _changeable_ to {{{false}}}
  * {{{transient}}} sets _transient_ to {{{true}}}
  * {{{volatile}}} sets _volatile_ to {{{true}}}
  * All the modifiers which do not have analogs in Ecore are ignored
 
-=== Default value ===
+== Default values ==
 You can specify default value by initializing a field with a *constant* or an *enum literal*:
 {{{
 class A {
@@ -283,7 +281,7 @@ Sometimes you have to specify a non-trivial value for {{{defaultValueLiteral}}} 
 MyClass a;
 }}}
 
-=== Opposite references ===
+== Opposite references ==
 
 You can use {{{@Opposite}}} annotation to denote an opposite reference for the defined reference.
 {{{
@@ -321,7 +319,8 @@ class Writer {
 }
 }}}
 
-=== Other attributes ===
+== Other attributes of structural features ==
+
 Other attributes are set by annotations:
  * {{{@Containment}}}
   * Denotes a containment reference
