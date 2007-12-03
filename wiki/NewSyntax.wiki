@@ -1,6 +1,6 @@
 #summary Description of Java2Ecore syntax
 
-= Java2Ecore Syntax =
+= !Java2Ecore Syntax =
 !Java2Ecore uses Java syntax to express Ecore constructs. If some construct is not defined in Java we use annotations. All the annotations mentioned below can be found in {{{org.abreslav.java2ecore.annotations}}} package and it's subpackages.
 
 = EPackage specification =
