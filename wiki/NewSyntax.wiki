@@ -242,13 +242,20 @@ class Writer {
 
 === Other attributes ===
 Other attributes are set by annotations:
- * @Containment
- * @Derived
- * @ID
- * @Ordered
- * @ResolveProxies
- * @Unique
+ * {{{@Containment}}}
+  * Denotes a containment reference
+ * {{{@Derived}}}
+  * Denotes a derived feature
+ * {{{@ID}}}
+  * Denotes an ID-attribute
+ * {{{@Ordered[(booleanValue)]}}}
+  * Sets _ordered_ attribute of a feature to {{{booleanValue}}}
+ * {{{@ResolveProxies[(booleanValue)]}}}
+  * Sets _resolveProxies_ attribute of a feature to {{{booleanValue}}}
+ * {{{@Unique[(booleanValue)]}}}
+  * Sets _unique_ attribute of a feature to {{{booleanValue}}}
  * @Unsettable
+  * Denotes an unsettable reference
  
 = Operations =
 
