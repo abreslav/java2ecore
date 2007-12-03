@@ -281,9 +281,9 @@ abstract class Abstract { // abstract modifier sets up EClass' abstract attribut
 }}}
 
 But here we face a problem of multiple inheritance for classes being supported by Ecore and not supported by Java.
-!Java2Ecore provides a workaround which we call an _interface form of class_...
+!Java2Ecore provides a workaround which we call an _interface form of class_ (see below)...
 
-== Interfaces with fiels ==
+== Interfaces with fields ==
 
 In Java you cannot declare non-final fields in interfaces. But {{{final}}} sets  _changeable_ to {{{false}}}. A final field also has to be initialized which will set up _defaultValue_ unless you specify {{{@NoDefaultValue}}} annotation. And Ecore supports any structural features in interfaces.
 
@@ -298,7 +298,7 @@ class _{
 }}}
 In this example we created an EClass having {{{interface}}} attribute set to {{{true}}} and having one integer attribute and one reference of type {{{I}}}.
 
-== Multiple inheritance for classes ==
+== Multiple inheritance for classes: interface form of class ==
 
 There's no multiple inheritance for classes in Java. But there is one for interfaces.
 
