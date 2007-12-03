@@ -129,7 +129,9 @@ These classes are analogous to Java collections but they allow to specify lower 
 
 Possible values are
  * {{{Infinity}}} - for infinite upper bound (-1)
+  * Defined in {{{org.abreslav.java2ecore.multiplicities}}} package
  * {{{Unspecified}}} - for unspecified upper bound (-2)
+  * Defined in {{{org.abreslav.java2ecore.multiplicities}}} package
  * {{{_NUM}}} where {{{NUM}}} is a non-negative integer
 {{{
 class A {
@@ -167,12 +169,12 @@ class A {
 == Other attributes of structural features ==
 
 === Attributes mapped from Java modifiers ===
- * {{{final}}} makes _changeable_ to {{{false}}}
- * {{{transient}}} makes _transient_ to {{{true}}}
- * {{{volatile}}} makes _volatile_ to {{{true}}}
+ * {{{final}}} sets _changeable_ to {{{false}}}
+ * {{{transient}}} sets _transient_ to {{{true}}}
+ * {{{volatile}}} sets _volatile_ to {{{true}}}
 
 === Default value ===
-You can specify default value by initializing a field with a *constant* or an enum literal:
+You can specify default value by initializing a field with a *constant* or an *enum literal*:
 {{{
 class A {
     String s = "some"; // defaultValue = "some"
@@ -180,9 +182,11 @@ class A {
 }
 }}}
 
-If the field is {{{final}}} Java forces you to initialize it. If in this case you want to leave {{{defaultValue}}} unset, you can use two opportunities: 
+If the field is {{{final}}} Java forces you to initialize it. In this case if you want to leave {{{defaultValue}}} unset, you can use one of the two opportunities: 
  * assign {{{null}}} if it is allowed:
-   {{{final String s = null; // no default value}}}
+{{{
+final String s = null; // no default value
+}}}
  * if {{{null}}} is not allowed you can supply {{{@NoDefaultValue}}} annotation:
 {{{
 @NoDefaultValue
