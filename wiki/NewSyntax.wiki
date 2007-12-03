@@ -348,7 +348,9 @@ class A {
 }}}
 Method body is always ignored.
 
-To avoid writing stub code for methods returning values you can use abstract methods and to avoid making your class necessary abstract you can use _interface form of class_ (see next section).
+All the multiplicity-related things mentioned above apply for operations' return values and parameter types.
+
+To avoid writing stub code for methods returning values you can use abstract methods and to avoid making your class necessary abstract you can use _interface form of class_ (see above).
 
 = Generics =
 
