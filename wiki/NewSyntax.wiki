@@ -1,5 +1,8 @@
 #summary Description of Java2Ecore syntax
 
+= Java2Ecore Syntax =
+!Java2Ecore uses Java syntax to express Ecore constructs. If some construct is not defined in Java we use annotations. All the annotations mentioned below can be found in {{{org.abreslav.java2ecore.annotations}}} package and it's subpackages.
+
 = EPackage specification =
 When you describe some Ecore model in a `*`.java file you define a top-level interface (or class) to specify a root EPackage of the model, EPackages's contents (classifiers and subpackages) are denoted by nested Java types.
 
@@ -141,6 +144,16 @@ Otherwise !Java2Ecore creates a new EDataType with {{{instanceClassName}}} attri
 
 The only exception is for unknown supertypes: such a type has to be EClass, not EDataType.
 So, !Java2Ecore reports an error in this case.
+
+== Non-Model classifiers ==
+
+Eventually you may need to define some Java type which you want !Java2Ecore to ignore (not to create a corresponding Ecore classifier). You can obtain this by supplying {{{@NonModel}}} annotation:
+{{{
+@NonModel
+class AuxilaryType {
+
+}
+}}}
 
 = Structural features =
 
