@@ -199,17 +199,26 @@ Sometimes you have to specify a non-trivial value for {{{defaultValueLiteral}}} 
 MyClass a;
 }}}
 
+=== Opposite references ===
+
+You can use {{{@Opposite}}} annotation to denote an opposite reference for the defined reference.
+{{{
+class Book {
+    @Opposite("books")
+    Writer writer;
+}
+class Writer {
+    Set<Book> books;
+    // ...
+}
+}}}
+In this example references {{{writer}}} and {{{books}}} are opposite to each other. All the opposites in !Java2Ecore are bidirectional ({{{a}}} cannot be an opposite to {{{b}}} unless {{{b}}} is opposite to {{{a}}}).
+
 === Other attributes ===
 Other attributes are set by annotations:
- * @Bounds
-   * mentioned above
  * @Containment
- * @DefaultValueLiteral
-  * used when the type does not allow to initialize a field with an appropriate literal
  * @Derived
  * @ID
- * @Opposite
-  * value() attribute specifies the name of the opposite feature
  * @Ordered
  * @ResolveProxies
  * @Unique
