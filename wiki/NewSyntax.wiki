@@ -214,6 +214,32 @@ class Writer {
 }}}
 In this example references {{{writer}}} and {{{books}}} are opposite to each other. All the opposites in !Java2Ecore are bidirectional ({{{a}}} cannot be an opposite to {{{b}}} unless {{{b}}} is opposite to {{{a}}}).
 
+The following teo examples are absolutely equivalent to each other and to the first example:
+{{{
+class Book {
+    @Opposite("books")
+    Writer writer;
+}
+class Writer {
+    @Opposite("writer")
+    Set<Book> books;
+    // ...
+}
+}}}
+
+means the same as
+
+{{{
+class Book {
+    Writer writer;
+}
+class Writer {
+    @Opposite("writer")
+    Set<Book> books;
+    // ...
+}
+}}}
+
 === Other attributes ===
 Other attributes are set by annotations:
  * @Containment
