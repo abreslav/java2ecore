@@ -121,12 +121,11 @@ class A {
 There are some auxiliary types defined in {{{org.abreslav.java2ecore.multiplicities}}} package.
 
 Main three of them are:
- * {{{
-MCollection<E, L extends ILowerBound, U extends IUpperBound>}}}
- * {{{MSet<E, L extends ILowerBound, U extends IUpperBound>}}}
- * {{{MList<E, L extends ILowerBound, U extends IUpperBound>}}}
+ * MCollection<E, L extends ILowerBound, U extends IUpperBound>
+ * MSet<E, L extends ILowerBound, U extends IUpperBound>
+ * MList<E, L extends ILowerBound, U extends IUpperBound>
 
-These classes are analogous to Java collections but they allow to specify lower and upper bounds in their {{{L}}} and {{{U}}} parameters.
+These classes are analogous to Java collections but they allow to specify lower and upper bounds in their *L* and *U* parameters.
 
 Possible values are
  * {{{Infinity}}} - for infinite upper bound (-1)
@@ -137,8 +136,8 @@ class A {
     MList<String, _1, _5> strings; // 1..5
 }
 }}}
-  * {{{_0}}} cannot be specified as an upper bound and upper bound cannot be less than lower bound
-  * Types {{{_0}}} through {{{_12}}} are defined in {{{org.abreslav.java2ecore.multiplicities}}}
+  * *`_`0* cannot be specified as an upper bound and upper bound cannot be less than lower bound
+  * Types *`_`0* through *`_`12* are defined in {{{org.abreslav.java2ecore.multiplicities}}}
   * If you need higher values you can create your own:
 {{{
 @NonModel // this annotation is described below
