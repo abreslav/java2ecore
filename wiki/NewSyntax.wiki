@@ -322,7 +322,7 @@ In this sample we created three *classes*: A, B and C, where C is a descendant o
 
 You still can specify {{{abstract}}} attribute along with {{{@EClass}}} annotation to make your class abstract:
 {{{
-abstract @Class interface A {
+abstract @EClass interface A {
 class _{
    Object o;
 }
@@ -350,12 +350,12 @@ Almost nothing to say: generics are fully supported :)...
  * Generic classes, interfaces and data types
   * even those created automatically for unknown types
  * Type parameters for methods
- * Upper and lower bounds (T extends Some, ? super T)
- * Several bounds on the same variable (T extends A & B)
+ * Upper and lower bounds (<T extends Some>, <? super T>)
+ * Several bounds on the same variable (<T extends A & B>)
  * Wildcards
-  * with no bound (?)
-  * with upper bound (? extends T)
-  * with lower bound (? super T)
+  * with no bound (<?>)
+  * with upper bound (<? extends T>)
+  * with lower bound (<? super T>)
 
 Did you ever know that Java itself supports all these things? :)
 
