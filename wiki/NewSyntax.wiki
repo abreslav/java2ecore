@@ -209,7 +209,6 @@ class Book {
 }
 class Writer {
     Set<Book> books;
-    // ...
 }
 }}}
 In this example references {{{writer}}} and {{{books}}} are opposite to each other. All the opposites in !Java2Ecore are bidirectional ({{{a}}} cannot be an opposite to {{{b}}} unless {{{b}}} is opposite to {{{a}}}).
@@ -223,7 +222,6 @@ class Book {
 class Writer {
     @Opposite("writer")
     Set<Book> books;
-    // ...
 }
 }}}
 
@@ -236,7 +234,6 @@ class Book {
 class Writer {
     @Opposite("writer")
     Set<Book> books;
-    // ...
 }
 }}}
 
@@ -248,12 +245,12 @@ Other attributes are set by annotations:
   * Denotes a derived feature
  * {{{@ID}}}
   * Denotes an ID-attribute
- * {{{@Ordered[(booleanValue)]}}}
-  * Sets _ordered_ attribute of a feature to {{{booleanValue}}}
- * {{{@ResolveProxies[(booleanValue)]}}}
-  * Sets _resolveProxies_ attribute of a feature to {{{booleanValue}}}
- * {{{@Unique[(booleanValue)]}}}
-  * Sets _unique_ attribute of a feature to {{{booleanValue}}}
+ * {{{@Ordered(boolean value() default true)}}}
+  * Sets _ordered_ attribute of a feature to {{{value()}}}
+ * {{{@ResolveProxiesboolean value() default true}}}
+  * Sets _resolveProxies_ attribute of a feature to {{{value()}}}
+ * {{{@Uniqueboolean value() default true}}}
+  * Sets _unique_ attribute of a feature to {{{value()}}}
  * @Unsettable
   * Denotes an unsettable reference
  
