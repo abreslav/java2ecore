@@ -121,7 +121,8 @@ class A {
 There are some auxiliary types defined in {{{org.abreslav.java2ecore.multiplicities}}} package.
 
 Main three of them are:
- * {{{MCollection<E, L extends ILowerBound, U extends IUpperBound>}}}
+ * {{{
+MCollection<E, L extends ILowerBound, U extends IUpperBound>}}}
  * {{{MSet<E, L extends ILowerBound, U extends IUpperBound>}}}
  * {{{MList<E, L extends ILowerBound, U extends IUpperBound>}}}
 
