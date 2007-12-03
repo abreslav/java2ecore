@@ -56,12 +56,91 @@ enum Enum {
 }
 }}}
 
-== Ecore types ==
+== Setting instance type (instance class) ==
 
-Ecore defines a number of EDataTypes for general purposes: {{{EInt}}}, {{{EJavaObject}}} and so on.
-To use those types in your model just use their Java analogs: {{{int}}} and {{{Object}}} for given example.
+To set _instanceTypeName_ attribute of EClass, supply {{{@InstanceTypeName}}} annotation:
+{{{
+@InstanceTypeName("java.util.Comparator<Integer>")
+class IntComparator {
+}
+}}}
 
-To use Ecore EClasses like {{{EPackage}}} or {{{EStructuralFeature}}} refer to them by Java type, for example {{{org.eclipse.emf.ecore.EReference}}} is mapped to an EClass from {{{Ecore}}} EPackage.
+== Inheritance ==
+
+As it is mentioned above Java-style inheritance (both {{{extends}}} and {{{implements}}}) is fully supported.
+{{{
+interface MyInterface {
+}
+class First {
+}
+class Sample extends First implements MyInterface { // both extends and implements are supported
+}
+abstract class Abstract { // abstract modifier sets up EClass' abstract attribute
+}
+}}}
+
+But here we face a problem of multiple inheritance for classes being supported by Ecore and not supported by Java.
+!Java2Ecore provides a workaround which we call an _interface form of class_ (see below)...
+
+=== Interfaces with fields ===
+
+In Java you cannot declare non-final fields in interfaces. But {{{final}}} sets  _changeable_ to {{{false}}}. A final field also has to be initialized which will set up _defaultValue_ unless you specify {{{@NoDefaultValue}}} annotation. And Ecore supports any structural features in interfaces.
+
+So we provide the following: each interface (or class, to be consistent) can declare one _inner class_ (it's name does not matter), which holds all the parent's contents:
+{{{
+interface I {
+class _{
+    int x;
+    I other;
+}
+}
+}}}
+In this example we created an EClass having {{{interface}}} attribute set to {{{true}}} and having one integer attribute and one reference of type {{{I}}}.
+
+=== Multiple inheritance for classes: interface form of class ===
+
+There's no multiple inheritance for classes in Java. But there is one for interfaces.
+
+To provide multiple inheritance for Ecore EClasses you can define them as Java interfaces supplying a {{{@EClass}}} annotation which will tell Java2Ecore not to set {{{interface}}} attribute to true.
+{{{
+@EClass interface A {
+class _{
+   int x;
+}
+}
+@EClass interface B {
+class _{
+   A a;
+}
+}
+@EClass interface C extends A, B {
+}
+}}}
+
+In this sample we created three *classes*: A, B and C, where C is a descendant of both A and B.
+
+You still can specify {{{abstract}}} attribute along with {{{@EClass}}} annotation to make your class abstract:
+{{{
+abstract @EClass interface A {
+class _{
+   Object o;
+}
+}
+}}}
+
+== Handling unknown types ==
+When you define a type in your EPackage and then use it, there's no doubt about what happens then.
+
+But what if you use some Java type not being declared in your package?
+
+=== Handling Ecore types ===
+If this is a class from Ecore itself (e.g. {{{EStructuralFeature}}}) the corresponding EClass is chosen.
+
+=== The case of an unknown type ===
+Otherwise !Java2Ecore creates a new EDataType with {{{instanceClassName}}} attribute set to fully-qualified name of unknown class.
+
+The only exception is for unknown supertypes: such a type has to be EClass, not EDataType.
+So, !Java2Ecore reports an error in this case.
 
 = Structural features =
 
@@ -77,6 +156,12 @@ ERerferences are distinguished from EAttributes by type: if the type is EClass t
 Above example is transformed to the following:
 
 http://content.screencast.com/media/f65373b7-9f45-481e-ab41-a17993595cfc_2d2ecdec-33f4-4541-acd2-9ed52d228863_static_0_0_image.png
+
+
+== Primitive types ==
+
+Ecore defines a number of EDataTypes for general purposes: {{{EInt}}}, {{{EJavaObject}}} and so on.
+To use those types in your model just use their Java analogs: {{{int}}} and {{{Object}}} for given example.
 
 == Multiplicities ==
 
@@ -265,84 +350,6 @@ class A {
 Method body is always ignored.
 
 To avoid writing stub code for methods returning values you can use abstract methods and to avoid making your class necessary abstract you can use _interface form of class_ (see next section).
-
-= Inheritance =
-
-As it is mentioned above Java-style inheritance (both {{{extends}}} and {{{implements}}}) is fully supported.
-{{{
-interface MyInterface {
-}
-class First {
-}
-class Sample extends First implements MyInterface { // both extends and implements are supported
-}
-abstract class Abstract { // abstract modifier sets up EClass' abstract attribute
-}
-}}}
-
-But here we face a problem of multiple inheritance for classes being supported by Ecore and not supported by Java.
-!Java2Ecore provides a workaround which we call an _interface form of class_ (see below)...
-
-== Interfaces with fields ==
-
-In Java you cannot declare non-final fields in interfaces. But {{{final}}} sets  _changeable_ to {{{false}}}. A final field also has to be initialized which will set up _defaultValue_ unless you specify {{{@NoDefaultValue}}} annotation. And Ecore supports any structural features in interfaces.
-
-So we provide the following: each interface (or class, to be consistent) can declare one _inner class_ (it's name does not matter), which holds all the parent's contents:
-{{{
-interface I {
-class _{
-    int x;
-    I other;
-}
-}
-}}}
-In this example we created an EClass having {{{interface}}} attribute set to {{{true}}} and having one integer attribute and one reference of type {{{I}}}.
-
-== Multiple inheritance for classes: interface form of class ==
-
-There's no multiple inheritance for classes in Java. But there is one for interfaces.
-
-To provide multiple inheritance for Ecore EClasses you can define them as Java interfaces supplying a {{{@EClass}}} annotation which will tell Java2Ecore not to set {{{interface}}} attribute to true.
-{{{
-@EClass interface A {
-class _{
-   int x;
-}
-}
-@EClass interface B {
-class _{
-   A a;
-}
-}
-@EClass interface C extends A, B {
-}
-}}}
-
-In this sample we created three *classes*: A, B and C, where C is a descendant of both A and B.
-
-You still can specify {{{abstract}}} attribute along with {{{@EClass}}} annotation to make your class abstract:
-{{{
-abstract @EClass interface A {
-class _{
-   Object o;
-}
-}
-}}}
-
-= Handling unknown types =
-
-When you define a type in your EPackage and then use it, there's no doubt about what happens then.
-
-But what if you use some Java type not being declared in your package?
-
-=== Handling Ecore types ===
-If this is a class from Ecore itself (e.g. {{{EStructuralFeature}}}) the corresponding EClass is chosen.
-
-=== The case of an unknown type ===
-Otherwise !Java2Ecore creates a new EDataType with {{{instanceClassName}}} attribute set to fully-qualified name of unknown class.
-
-The only exception is for unknown supertypes: such a type has to be EClass, not EDataType.
-So, !Java2Ecore reports an error in this case.
 
 = Generics =
 
