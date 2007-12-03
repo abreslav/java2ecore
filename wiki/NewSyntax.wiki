@@ -1,17 +1,15 @@
 #summary Description of Java2Ecore syntax
 
-Note: all the following is about version 0.1. Current version is 0.2 and a description for it is being created.
-
 = EPackage specification =
-When you describe some Ecore model in a `*`.java file you define a top-level class to specify a root EPackage of the model, EPackages's contents (classifiers and subpackages) are denoted by nested Java types.
+When you describe some Ecore model in a `*`.java file you define a top-level interface (or class) to specify a root EPackage of the model, EPackages's contents (classifiers and subpackages) are denoted by nested Java types.
 
-Use {{{@EPackage}}} annotation to denote a class that describes EPackage and set up nsPrefix and nsURI attributes.
+Use {{{@EPackage}}} annotation to denote a type that describes EPackage and set up nsPrefix and nsURI attributes.
 {{{
 @EPackage(
     nsPrefix="samples",   
     nsURI="http:///example.com/samples"
 )  
-public class samples {
+public interface samples {
     @EPackage(
         nsPrefix="subpackage",
         nsURI="http:///example.com/samples/subpackage"
@@ -33,7 +31,7 @@ Java2Ecore supports all three types of Ecore classifiers:
     nsPrefix="samples",   
     nsURI="http:///example.com/samples"
 )  
-public class samples {
+public interface samples {
     interface MyInterface {
     }
     class First {
@@ -172,6 +170,7 @@ class A {
  * {{{final}}} sets _changeable_ to {{{false}}}
  * {{{transient}}} sets _transient_ to {{{true}}}
  * {{{volatile}}} sets _volatile_ to {{{true}}}
+ * All the modifiers which do not have analogs in Ecore are ignored
 
 === Default value ===
 You can specify default value by initializing a field with a *constant* or an *enum literal*:
@@ -247,9 +246,9 @@ Other attributes are set by annotations:
   * Denotes an ID-attribute
  * {{{@Ordered(boolean value() default true)}}}
   * Sets _ordered_ attribute of a feature to {{{value()}}}
- * {{{@ResolveProxiesboolean value() default true}}}
+ * {{{@ResolveProxies(boolean value() default true)}}}
   * Sets _resolveProxies_ attribute of a feature to {{{value()}}}
- * {{{@Uniqueboolean value() default true}}}
+ * {{{@Unique(boolean value() default true)}}}
   * Sets _unique_ attribute of a feature to {{{value()}}}
  * @Unsettable
   * Denotes an unsettable reference
@@ -282,15 +281,13 @@ abstract class Abstract { // abstract modifier sets up EClass' abstract attribut
 }}}
 
 But here we face a problem of multiple inheritance for classes being supported by Ecore and not supported by Java.
-Java2Ecore provides a workaround which we call an _interface form of class_...
+!Java2Ecore provides a workaround which we call an _interface form of class_...
 
-== Interface form of class ==
+== Interfaces with fiels ==
 
-There's no multiple inheritance for classes in Java. But there is one for interfaces.
+In Java you cannot declare non-final fields in interfaces. But {{{final}}} sets  _changeable_ to {{{false}}}. A final field also has to be initialized which will set up _defaultValue_ unless you specify {{{@NoDefaultValue}}} annotation. And Ecore supports any structural features in interfaces.
 
-On the other hand you cannot declare non-final fields in interfaces in Java and final field has to be initialized which will set up defaultValueLiteral and is impossible for most types. And Ecore supports any structural features in interfaces.
-
-So we provide the following: each interface (or class, to be consistent) can declare one inner-class, which holds all the parent's contents:
+So we provide the following: each interface (or class, to be consistent) can declare one _inner class_ (it's name does not matter), which holds all the parent's contents:
 {{{
 interface I {
 class _{
@@ -299,29 +296,31 @@ class _{
 }
 }
 }}}
-In this example we created an EClass having {{{interface}}} attribute set to true and having one integer attribute and one reference of type {{{I}}}.
+In this example we created an EClass having {{{interface}}} attribute set to {{{true}}} and having one integer attribute and one reference of type {{{I}}}.
 
 == Multiple inheritance for classes ==
 
-To provide multiple inheritance for classes you can define them as Java interfaces supplying a {{{@Class}}} annotation which will tell Java2Ecore not to set {{{interface}}} attribute to true.
+There's no multiple inheritance for classes in Java. But there is one for interfaces.
+
+To provide multiple inheritance for Ecore EClasses you can define them as Java interfaces supplying a {{{@EClass}}} annotation which will tell Java2Ecore not to set {{{interface}}} attribute to true.
 {{{
-@Class interface A {
+@EClass interface A {
 class _{
    int x;
 }
 }
-@Class interface B {
+@EClass interface B {
 class _{
    A a;
 }
 }
-@Class interface C extends A, B {
+@EClass interface C extends A, B {
 }
 }}}
 
-In this sample we created three _classes_, A, B and C, and C is a descendant of both A and B.
+In this sample we created three *classes*: A, B and C, where C is a descendant of both A and B.
 
-You still can specify {{{abstract}}} attribute along with {{{@Class}}} annotation to make your class abstract:
+You still can specify {{{abstract}}} attribute along with {{{@EClass}}} annotation to make your class abstract:
 {{{
 abstract @Class interface A {
 class _{
@@ -335,10 +334,15 @@ class _{
 When you define a type in your EPackage and then use it, there's no doubt about what happens then.
 
 But what if you use some Java type not being declared in your package?
-By default Java2Ecore creates a new EDataType with {{{instanceClassName}}} attribute set to fully-qualified name of unknown class.
+
+=== Handling Ecore types ===
+If this is a class from Ecore itself (e.g. {{{EStructuralFeature}}}) the corresponding EClass is chosen.
+
+=== The case of an unknown type ===
+Otherwise !Java2Ecore creates a new EDataType with {{{instanceClassName}}} attribute set to fully-qualified name of unknown class.
 
 The only exception is for unknown supertypes: such a type has to be EClass, not EDataType.
-So, Java2Ecore creates EClass for such types assigning {{{instanceClassName}}} the same way.
+So, !Java2Ecore reports an error in this case.
 
 = Generics =
 
