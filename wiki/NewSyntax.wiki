@@ -52,9 +52,9 @@ class Point {}
  * _EEnum_ which is represented by Java {{{enum}}}
 {{{
 enum Enum {
-  A,
-  B,
-  C;
+    A,
+    B,
+    C;
 }
 }}}
 
@@ -74,7 +74,7 @@ class A {
     A y;
 }
 }}}
-ERerferences are distinguished from EAttributes by type: if the type is EClass then the feature will be a reference otherwise (see _Handling unknown types_ section) it will be an attribute.
+ERerferences are distinguished from EAttributes by type: if the type is EClass then the feature will be a reference, otherwise (see _Handling unknown types_ section) it will be an attribute.
 
 Above example is transformed to the following:
 
@@ -85,7 +85,7 @@ http://content.screencast.com/media/f65373b7-9f45-481e-ab41-a17993595cfc_2d2ecde
 There are several ways to denote feature's multiplicity:
  * Stay satisfied by default multiplicity: 0..1
  * Use Java array type
- * Use Java collections ({{{java.util.Collection}}} and it's descendants
+ * Use Java collections ({{{java.util.Collection}}} and it's descendants)
  * Use MCollections (from {{{org.abreslav.java2ecore.multiplicities}}} package)
  * Use {{{@Bounds}}} annotation
 
@@ -118,12 +118,12 @@ class A {
 {{{@Unique}}} might be used for Collections and Lists (but not for Sets).
 
 === MCollections ===
-There are some auxiliary classes defined in {{{org.abreslav.java2ecore.multiplicities}}} multiplicities package.
+There are some auxiliary types defined in {{{org.abreslav.java2ecore.multiplicities}}} package.
 
 Main three of them are:
- * MCollection<E, L extends ILowerBound, U extends IUpperBound>
- * MSet<E, L extends ILowerBound, U extends IUpperBound>
- * MList<E, L extends ILowerBound, U extends IUpperBound>
+ * {{{MCollection<E, L extends ILowerBound, U extends IUpperBound>}}}
+ * {{{MSet<E, L extends ILowerBound, U extends IUpperBound>}}}
+ * {{{MList<E, L extends ILowerBound, U extends IUpperBound>}}}
 
 These classes are analogous to Java collections but they allow to specify lower and upper bounds in their {{{L}}} and {{{U}}} parameters.
 
