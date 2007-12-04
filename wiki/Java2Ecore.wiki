@@ -11,7 +11,7 @@ The main idea is that you can simply define some classes in Java and they will b
    * type checking
    * code completion
    * outline
-   * on-line !JavaDoc
+   * on-line !JavaDoc for !Java2Ecore annotations
    * and so on...
   * *Full support for generics* - actually at first this was the main goal. All the generic-related things supported both in Java and EMF are supported by !Java2Ecore.
   * *Clear syntax* - most constructs are expressed in very natural manner. 
