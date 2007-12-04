@@ -61,7 +61,7 @@ If you like it even a little bit, please, proceed to [Syntax] page. :)
 
 = Disadvantages =
 
-  * Java2Ecore uses *JDT DOM* and thus can hardly work out of Eclipse
+  * !Java2Ecore uses *JDT DOM* and thus can hardly work out of Eclipse
   * Some Ecore notions cannot be expressed in Java (see [Problems Unsupported features])
 
 = See also =
