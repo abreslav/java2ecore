@@ -1,7 +1,7 @@
 #summary Description of Java2Ecore syntax
 
 = !Java2Ecore Syntax =
-!Java2Ecore uses Java syntax to express Ecore constructs. If some construct is not defined in Java we use annotations. All the annotations mentioned below can be found in {{{org.abreslav.java2ecore.annotations}}} package and it's subpackages.
+!Java2Ecore uses Java syntax to express Ecore constructs. If some construct is not defined in Java we use annotations. All the annotations mentioned below can be found in [http://java2ecore.googlecode.com/svn/trunk/org.abreslav.java2ecore.docs/index.html org.abreslav.java2ecore.annotations] package and it's subpackages.
 
 = EPackage specification =
 When you describe some Ecore model in a `*`.java file you define a top-level interface (or class) to specify a root EPackage of the model, EPackages's contents (classifiers and subpackages) are denoted by nested Java types.
@@ -182,7 +182,7 @@ There are several ways to denote feature's multiplicity:
  * Stay satisfied by default multiplicity: 0..1
  * Use Java array type
  * Use Java collections ({{{java.util.Collection}}} and it's descendants)
- * Use MCollections (from {{{org.abreslav.java2ecore.multiplicities}}} package)
+ * Use MCollections (from [http://java2ecore.googlecode.com/svn/trunk/org.abreslav.java2ecore.docs/index.html org.abreslav.java2ecore.multiplicities] package)
  * Use {{{@Bounds}}} annotation
 
 === Java arrays ===
