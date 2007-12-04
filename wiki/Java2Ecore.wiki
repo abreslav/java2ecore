@@ -13,7 +13,8 @@ The main idea is that you can simply define some classes in Java and they will b
    * outline
    * on-line !JavaDoc for !Java2Ecore annotations
    * and so on...
-  * *Full support for generics* - actually at first this was the main goal. All the generic-related things supported both in Java and EMF are supported by !Java2Ecore.
+  * *Full support for generics* - actually at first this was the main goal. 
+   *All the generic-related things supported both in Java and EMF are supported by !Java2Ecore.
   * *Clear syntax* - most constructs are expressed in very natural manner. 
    * Unfortunately, there are some [Problems exceptions].
 See [NewAndNoteworthy New and noteworthy] for more details.
@@ -27,32 +28,33 @@ http://help.eclipse.org/help32/topic/org.eclipse.emf.doc/tutorials/clibmod/image
 	nsPrefix = "library", 
 	nsURI = "http:///example.com/library"
 )
-public class library {}
+public interface library {
 
-class Library {
-	String name;
-	List<Writer> writers;
-	List<Book> books;
-}
+	class Library {
+		String name;
+		List<Writer> writers;
+		List<Book> books;
+	}
 
-class Writer {
-	String name;
-	@Opposite("author")
-	List<Book> books;
-}
+	class Writer {
+		String name;
+		@Opposite("author")
+		List<Book> books;
+	}
 
-class Book {
-	String title;
-	@Bounds(1)
-	Writer author;
-	int pages = 100;
-	BookCategory category;
-}
+	class Book {
+		String title;
+		@Bounds(1)
+		Writer author;
+		int pages;
+		BookCategory category = BookCategory.Mystery;
+	}
 
-enum BookCategory {
-	Mystery,
-	ScienceFiction,
-	Biography
+	enum BookCategory {
+		Mystery,
+		ScienceFiction,
+		Biography
+	}
 }
 }}}
 If you like it even a little bit, please, proceed to [Syntax] page. :)
