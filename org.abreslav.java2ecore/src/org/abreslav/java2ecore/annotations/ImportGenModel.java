@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE})
 public @interface ImportGenModel {
-	String value();
+	String[] value();
 }
