@@ -1,12 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Java2ECore Transformation Plug-in
-Bundle-SymbolicName: org.abreslav.java2ecore.transformation
+Bundle-SymbolicName: org.abreslav.java2ecore.transformation;singleton:=true
 Bundle-Version: 1.0.0
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core,
- org.eclipse.emf.ecore
+ org.eclipse.emf.ecore,
+ org.eclipse.emf.codegen.ecore;visibility:=reexport
 Export-Package: org.abreslav.java2ecore.transformation,
- org.abreslav.java2ecore.transformation.diagnostics
+ org.abreslav.java2ecore.transformation.diagnostics,
+ org.abreslav.java2ecore.transformation.imports.genmodel
 Bundle-ClassPath: lib/java2ecore.jar,
  .

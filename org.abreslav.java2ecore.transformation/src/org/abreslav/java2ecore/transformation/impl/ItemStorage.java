@@ -1,8 +1,5 @@
 package org.abreslav.java2ecore.transformation.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.abreslav.java2ecore.transformation.IItemStorage;
 import org.abreslav.java2ecore.transformation.declarations.EClassDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EDataTypeDeclaration;
@@ -11,7 +8,6 @@ import org.abreslav.java2ecore.transformation.declarations.EPackageDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.IDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationStorage;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationVisitor;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -21,23 +17,27 @@ import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class ItemStorage implements IItemStorage {
-	private final Map<String, EClass> myEClasses = new HashMap<String, EClass>();
-	private final Map<String, EDataType> myEDataTypes = new HashMap<String, EDataType>();
-	private final Map<String, EEnum> myEEnums = new HashMap<String, EEnum>();
-	private final Map<String, EPackage> myEPackages = new HashMap<String, EPackage>();
+	private final ItemStorageWithStringKeys myImpl;
 	
-	public ItemStorage(IDeclarationStorage declarationStorage) {
-		EList<EClassifier> classifiers = EcorePackage.eINSTANCE.getEClassifiers();
-		for (EClassifier classifier : classifiers) {
+	public ItemStorage(ItemStorageWithStringKeys impl, IDeclarationStorage declarationStorage) {
+		myImpl = impl;
+		importEcorePackageContents();
+		importDeclarations(declarationStorage);
+	}
+
+	private void importEcorePackageContents() {
+		for (EClassifier classifier : EcorePackage.eINSTANCE.getEClassifiers()) {
 			if (classifier.getInstanceClassName() != null) {
 				if (classifier instanceof EDataType) {
-					myEDataTypes.put(classifier.getInstanceClassName(), (EDataType) classifier);
+					myImpl.addEDataType(classifier.getInstanceClassName(), (EDataType) classifier);
 				} else if (classifier instanceof EClass) {
-					myEClasses.put(classifier.getInstanceClassName(), (EClass) classifier);
+					myImpl.addEClass(classifier.getInstanceClassName(), (EClass) classifier);
 				}
 			}
 		}
+	}
 
+	private void importDeclarations(IDeclarationStorage declarationStorage) {
 		for (final IDeclaration declaration : declarationStorage.getDeclarations()) {
 			declaration.accept(new IDeclarationVisitor(){
 				public void visit(EClassDeclaration declaration) {
@@ -60,35 +60,35 @@ public class ItemStorage implements IItemStorage {
 	}
 	
 	public void addEClass(ITypeBinding type, EClass class1) {
-		myEClasses.put(type.getErasure().getQualifiedName(), class1);
+		myImpl.addEClass(type.getErasure().getQualifiedName(), class1);
 	}
-
+	
 	public void addEDataType(ITypeBinding type, EDataType dataType) {
-		myEDataTypes.put(type.getErasure().getQualifiedName(), dataType);
+		myImpl.addEDataType(type.getErasure().getQualifiedName(), dataType);
 	}
 
 	public void addEEnum(ITypeBinding type, EEnum enum1) {
-		myEEnums.put(type.getErasure().getQualifiedName(), enum1);
+		myImpl.addEEnum(type.getErasure().getQualifiedName(), enum1);
 	}
 
 	public void addEPackage(ITypeBinding type, EPackage package1) {
-		myEPackages.put(type.getErasure().getQualifiedName(), package1);
+		myImpl.addEPackage(type.getErasure().getQualifiedName(), package1);
 	}
 
 	public EClass getEClass(ITypeBinding type) {
-		return myEClasses.get(type.getErasure().getQualifiedName());
+		return myImpl.getEClass(type.getErasure().getQualifiedName());
 	}
 
 	public EDataType getEDataType(ITypeBinding type) {
-		return myEDataTypes.get(type.getErasure().getQualifiedName());
+		return myImpl.getEDataType(type.getErasure().getQualifiedName());
 	}
 
 	public EEnum getEEnum(ITypeBinding type) {
-		return myEEnums.get(type.getErasure().getQualifiedName());
+		return myImpl.getEEnum(type.getErasure().getQualifiedName());
 	}
 
 	public EPackage getEPackage(ITypeBinding type) {
-		return myEPackages.get(type.getErasure().getQualifiedName());
+		return myImpl.getEPackage(type.getErasure().getQualifiedName());
 	}
 
 }
