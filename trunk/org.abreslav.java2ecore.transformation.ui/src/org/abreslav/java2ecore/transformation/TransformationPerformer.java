@@ -58,10 +58,10 @@ public class TransformationPerformer {
 			}
 		};
 		try {
-			EPackage ePackage = CompilationUnitToECoreTransformation.transform(
-					compilationUnit, diagnostics);
-
 			IProject project = compilationUnit.getJavaProject().getProject();
+			EPackage ePackage = CompilationUnitToECoreTransformation.transform(
+					compilationUnit, new GenModelLoader(project), diagnostics);
+
 			if (!hasErrors[0]) {
 				String fileName = ePackage.getName() + ".ecore";
 				Resource res = new XMIResourceFactoryImpl().createResource(URI
