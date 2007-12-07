@@ -8,7 +8,7 @@ public class manypackages {
 	@EPackage(
 			nsPrefix="a",
 			nsURI="a"
-	)  
+	)   
 	interface a { 
 		class A {}
 		@EPackage(

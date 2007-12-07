@@ -101,8 +101,13 @@
     <eLiterals name="B" value="1" literal="B"/>
     <eLiterals name="C" value="2" literal="C"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EDataType" name="Exception" instanceClassName="java.lang.Exception"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="RuntimeException" instanceClassName="java.lang.RuntimeException"/>
+  <eClassifiers xsi:type="ecore:EDataType" name="IOException" instanceClassName="java.io.IOException"/>
   <eClassifiers xsi:type="ecore:EClass" name="D" abstract="true">
-    <eOperations name="a" eExceptions="//Exception //RuntimeException //IOException"/>
+    <eOperations name="a" eExceptions="//Exception //RuntimeException //IOException">
+      <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
+    </eOperations>
     <eOperations name="t" eExceptions="//Exception">
       <eGenericType eClassifier="//MyIntf">
         <eTypeArguments eTypeParameter="//D/t/T">
@@ -125,6 +130,9 @@
         </eGenericType>
       </eParameters>
     </eOperations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EDataType" name="Comparable" instanceTypeName="java.util.Comparable&lt;T>">
+    <eTypeParameters name="T"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="B">
     <eTypeParameters name="T">
@@ -154,17 +162,11 @@
   <eClassifiers xsi:type="ecore:EDataType" name="X" instanceClassName="javax.swing.JComponent">
     <eTypeParameters name="T"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EDataType" name="Exception" instanceClassName="java.lang.Exception"/>
-  <eClassifiers xsi:type="ecore:EDataType" name="RuntimeException" instanceClassName="java.lang.RuntimeException"/>
-  <eClassifiers xsi:type="ecore:EDataType" name="IOException" instanceClassName="java.io.IOException"/>
-  <eClassifiers xsi:type="ecore:EDataType" name="Comparable" instanceClassName="java.lang.Comparable">
-    <eTypeParameters name="T"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EDataType" name="Reader" instanceClassName="java.io.Reader"/>
   <eSubpackages name="newpack" nsURI="dsfs" nsPrefix="sdfsd">
     <eClassifiers xsi:type="ecore:EClass" name="A"/>
     <eClassifiers xsi:type="ecore:EClass" name="B" eSuperTypes="//C">
-      <eStructuralFeatures xsi:type="ecore:EAttribute" name="r" eType="//Reader"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="r" eType="//newpack/Reader"/>
     </eClassifiers>
+    <eClassifiers xsi:type="ecore:EDataType" name="Reader" instanceClassName="java.io.Reader"/>
   </eSubpackages>
 </ecore:EPackage>

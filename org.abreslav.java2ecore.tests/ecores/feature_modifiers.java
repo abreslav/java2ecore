@@ -6,7 +6,7 @@ import org.abreslav.java2ecore.annotations.EPackage;
 )
 public class feature_modifiers {    
 
-	class A {
+	class A { 
 	abstract class _{
 		final int x = 0;
 		transient int y;
