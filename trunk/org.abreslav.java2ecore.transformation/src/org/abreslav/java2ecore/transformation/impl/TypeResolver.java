@@ -1,7 +1,6 @@
 package org.abreslav.java2ecore.transformation.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,23 +14,28 @@ import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeParameter;
+import org.eclipse.jdt.core.dom.WildcardType;
 
 public class TypeResolver implements ITypeResolver {
 	private IItemStorage myItemStorage;
-	private Collection<? super EClassifier> myWrappedEClassifiers;
+	private IUnknownTypeHandler myUnknownTypeHandler;
 	
 	public TypeResolver(IItemStorage itemStorage,
-			Collection<? super EClassifier> wrappedEClassifiers) {
+			IUnknownTypeHandler unknownTypeHandler) {
 		myItemStorage = itemStorage;
-		myWrappedEClassifiers = wrappedEClassifiers;
+		myUnknownTypeHandler = unknownTypeHandler;
 	}
 
-	public EClass getEClass(ITypeBinding type) {
+	private EClass getEClass(ITypeBinding type) {
 		return myItemStorage.getEClass(type);
 	}
 
-	public EDataType getEDataType(ITypeBinding type) {
+	private EDataType getEDataType(ITypeBinding type) {
 		EDataType eDataType = myItemStorage.getEDataType(type);
 		if (eDataType != null) {
 			return eDataType;
@@ -39,7 +43,7 @@ public class TypeResolver implements ITypeResolver {
 		return getEEnum(type);
 	}
 
-	public EEnum getEEnum(ITypeBinding type) {
+	private EEnum getEEnum(ITypeBinding type) {
 		return myItemStorage.getEEnum(type);
 	}
 	
@@ -47,13 +51,14 @@ public class TypeResolver implements ITypeResolver {
 		return myItemStorage.getEPackage(type);
 	}
 
-	public EGenericType resolveEGenericType(ITypeBinding binding, boolean forceEClass, TypeParameterIndex typeParameterIndex) {
+	public EGenericType resolveEGenericType(Type type, boolean forceEClass, TypeParameterIndex typeParameterIndex) {
 		EGenericType eGenericType = EcoreFactory.eINSTANCE.createEGenericType(); 
 		
+		ITypeBinding binding = type.resolveBinding();
 		if (binding.isTypeVariable()) {
 			eGenericType.setETypeParameter(typeParameterIndex.getETypeParameter(binding.getName()));
-		} if (binding.isWildcardType()) { 
-			ITypeBinding bound = binding.getBound();
+		} if (type.isWildcardType()) { 
+			Type bound = ((WildcardType) type).getBound();
 			if (bound != null) {
 				EGenericType eBound = resolveEGenericType(bound, false, typeParameterIndex);
 				if (binding.isUpperbound()) {
@@ -63,61 +68,46 @@ public class TypeResolver implements ITypeResolver {
 				}
 			}
 		} else {
-			processActualType(binding.getTypeDeclaration(), eGenericType, forceEClass);
-			if (eGenericType.getEClassifier() == null) {
-				return null;
+			EClassifier actualType = resolveEClassifier(binding, type, forceEClass);
+			if (actualType == null) {
+				return eGenericType;
 			}
+			
+			eGenericType.setEClassifier(actualType);
 		}
 		
-		ITypeBinding[] typeArguments = binding.getTypeArguments();
-		for (ITypeBinding typeArgument : typeArguments) {
-			eGenericType.getETypeArguments().add(resolveEGenericType(typeArgument, false, typeParameterIndex));
+		if (type.isParameterizedType()) {
+			@SuppressWarnings("unchecked")
+			List<Type> typeArguments = (List<Type>) type.getStructuralProperty(ParameterizedType.TYPE_ARGUMENTS_PROPERTY);
+			for (Type typeArgument : typeArguments) {
+				eGenericType.getETypeArguments().add(resolveEGenericType(typeArgument, false, typeParameterIndex));
+			}
 		}
 		
 		return eGenericType;
 	}
 
-	private void processActualType(ITypeBinding binding,
-			EGenericType eGenericType, boolean forceEClass) {
-		EClass eClass = getEClass(binding);
-		if (forceEClass && eClass == null) {
-//			eClass = wrapUnknownClass(binding);
-			return;
-		}
-		if (eClass != null) {
-			eGenericType.setEClassifier(eClass);
-		} else {
-			EDataType eDataType = resolveEDataType(binding);
-			if (eDataType != null) {
-				eGenericType.setEClassifier(eDataType);
-			}
-		}
-	}
-
 	public TypeParameterIndex createTypeParameters(EClassifier eClassifier,
-			ITypeBinding binding) {
+			List<TypeParameter> typeParameters) {
 		TypeParameterIndex typeParameterIndex = new TypeParameterIndex(null);
-		if (binding.isGenericType()) {
-			ITypeBinding[] typeParameters = binding.getTypeParameters();
-			eClassifier.getETypeParameters().addAll(createETypeParameters(
-					typeParameterIndex, Arrays.asList(typeParameters)));
-		}
+		eClassifier.getETypeParameters().addAll(createETypeParameters(typeParameterIndex, typeParameters));
 		return typeParameterIndex;
 	}
 
 	public Collection<ETypeParameter> createETypeParameters(
 			TypeParameterIndex typeParameterIndex,
-			List<ITypeBinding> typeParameters) {
+			List<TypeParameter> typeParameters) {
 		Collection<ETypeParameter> eTypeParameters = new ArrayList<ETypeParameter>();
-		for (ITypeBinding typeParameter : typeParameters) {
+		for (TypeParameter typeParameter : typeParameters) {
 			ETypeParameter eTypeParameter = EcoreFactory.eINSTANCE.createETypeParameter();
-			eTypeParameter.setName(typeParameter.getName());
+			eTypeParameter.setName(typeParameter.getName().getIdentifier());
 			typeParameterIndex.registerTypeParameter(eTypeParameter);
 			
-			ITypeBinding[] typeBounds = typeParameter.getTypeBounds();
-			for (ITypeBinding typeBound : typeBounds) {
+			@SuppressWarnings("unchecked")
+			List<Type> typeBounds = typeParameter.typeBounds();
+			for (Type typeBound : typeBounds) {
 				// TODO: Strange hack :)
-				if (Object.class.getName().equals(typeBound.getQualifiedName())) {
+				if (Object.class.getName().equals(typeBound.resolveBinding().getQualifiedName())) {
 					continue;
 				}
 				EGenericType eTypeBound = resolveEGenericType(typeBound, false, typeParameterIndex);
@@ -128,22 +118,43 @@ public class TypeResolver implements ITypeResolver {
 		return eTypeParameters;
 	}
 
-	private EDataType resolveEDataType(ITypeBinding type) {
-		EDataType eDataType = getEDataType(type);
-		if (void.class.getCanonicalName().equals(type.getQualifiedName())) {
+	public EClassifier resolveEClassifier(ITypeBinding binding, ASTNode node, boolean forceEClass) {
+		if (void.class.getCanonicalName().equals(binding.getQualifiedName())) {
 			return null;
 		}
+		EClass eClass = getEClass(binding);
+		if (forceEClass && eClass == null) {
+			myUnknownTypeHandler.handleUnknownClass(binding.getName(), node);
+			return null;
+		}
+		if (eClass != null) {
+			return eClass;
+		}
+		EDataType eDataType = getEDataType(binding);
 		if (eDataType == null) {
-			eDataType = EcoreFactory.eINSTANCE.createEDataType();
-			eDataType.setName(type.getErasure().getName());
-			String qualifiedName = type.getErasure().getQualifiedName();
-			eDataType.setInstanceTypeName(qualifiedName);
-
-			createTypeParameters(eDataType, type.getTypeDeclaration());
-			
-			myItemStorage.addEDataType(type, eDataType);
-			myWrappedEClassifiers.add(eDataType);
+			myUnknownTypeHandler.handleUnknownType(binding.getName(), node);
 		}
 		return eDataType;
 	}
+
+//	private EDataType resolveEDataType(Type type) {
+//		ITypeBinding typeBinding = type.resolveBinding();
+//		EDataType eDataType = getEDataType(typeBinding);
+//		if (eDataType == null) {
+//			eDataType = EcoreFactory.eINSTANCE.createEDataType();
+//			eDataType.setName(typeBinding.getErasure().getName());
+//			String qualifiedName = typeBinding.getErasure().getQualifiedName();
+//			eDataType.setInstanceTypeName(qualifiedName);
+//
+//			if (type.isParameterizedType()) {
+//				@SuppressWarnings("unchecked")
+//				List<Type> typeArguments = (List<Type>) type.getStructuralProperty(ParameterizedType.TYPE_ARGUMENTS_PROPERTY);
+//				createTypeParameters(eDataType, typeArguments);
+//			}
+//			
+//			myItemStorage.addEDataType(typeBinding, eDataType);
+//			myUnknownTypeHandler.handleUnknownType(type, eDataType);
+//		}
+//		return eDataType;
+//	}
 }

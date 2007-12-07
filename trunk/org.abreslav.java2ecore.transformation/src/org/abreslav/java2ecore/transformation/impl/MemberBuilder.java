@@ -1,6 +1,12 @@
 package org.abreslav.java2ecore.transformation.impl;
 
-import java.util.ArrayList;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.CONFLICT_WITH_NO_DEFAULT_VALUE;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.DEFAULT_VALUE_IS_SPECIFIED_BY_AN_INITIALIZER;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.NESTED_TYPES_ARE_NOT_SUPPORTED_BY_ECORE;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.NON_CONSTANT_VALUES_ARE_NOT_ALLOWED;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.ONLY_ONE_FEATURE_PER_DECLARATION;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.SPECIFY_DIMENSIONS_AT_THE_TYPE;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -21,6 +27,7 @@ import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.abreslav.java2ecore.transformation.impl.deferred.SetOppositeAction;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EOperation;
@@ -37,6 +44,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
@@ -45,9 +53,6 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-
-import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class MemberBuilder extends ASTVisitor {
 	private final EClass myEClass;
@@ -93,7 +98,7 @@ public class MemberBuilder extends ASTVisitor {
 		AnnotatedView annotatedView = ASTViewFactory.INSTANCE.createAnnotatedView(node);
 		EGenericType eGenericType = temporaryTypedElement.getEGenericType();
 		
-		EStructuralFeature feature = createFeature(annotatedView, eGenericType);;
+		EStructuralFeature feature = createFeature(annotatedView, eGenericType);
 		
 		feature.setEGenericType(temporaryTypedElement.getEGenericType());
 		feature.setLowerBound(temporaryTypedElement.getLowerBound());
@@ -125,11 +130,7 @@ public class MemberBuilder extends ASTVisitor {
 		
 		@SuppressWarnings("unchecked")
 		List<TypeParameter> typeParameters = (List<TypeParameter>) node.getStructuralProperty(MethodDeclaration.TYPE_PARAMETERS_PROPERTY);
-		List<ITypeBinding> parameterTypeBindings = new ArrayList<ITypeBinding>();
-		for (TypeParameter typeParameter : typeParameters) {
-			parameterTypeBindings.add(typeParameter.resolveBinding());
-		}
-		Collection<ETypeParameter> eTypeParameters = myTypeResolver.createETypeParameters(typeParameterIndex, parameterTypeBindings);
+		Collection<ETypeParameter> eTypeParameters = myTypeResolver.createETypeParameters(typeParameterIndex, typeParameters);
 		eOperation.getETypeParameters().addAll(eTypeParameters);
 		
 		setUpTypedElement(eOperation, node.getReturnType2(), node, typeParameterIndex);
@@ -149,8 +150,10 @@ public class MemberBuilder extends ASTVisitor {
 		List<Name> exceptionClassNames = (List<Name>) node.getStructuralProperty(MethodDeclaration.THROWN_EXCEPTIONS_PROPERTY);
 		for (Name name : exceptionClassNames) {
 			ITypeBinding exceptionType = name.resolveTypeBinding();
-			EGenericType genericExceptionType = myTypeResolver.resolveEGenericType(exceptionType, false, typeParameterIndex);
-			eOperation.getEGenericExceptions().add(genericExceptionType);
+			EClassifier exception = myTypeResolver.resolveEClassifier(exceptionType, name, false);
+			if (exception != null) {
+				eOperation.getEExceptions().add(exception);
+			}
 		}
 		
 		myEClass.getEOperations().add(eOperation);		
@@ -199,9 +202,8 @@ public class MemberBuilder extends ASTVisitor {
 		eTypedElement.setUnique(typeSettings.isUnique());
 		eTypedElement.setOrdered(typeSettings.isOrdered());
 		
-		ITypeBinding typeBinding = type.resolveBinding();
-		typeBinding = typeSettings.getUnwrapStrategy().unwrap(typeBinding);
-		EGenericType eGenericType = myTypeResolver.resolveEGenericType(typeBinding, false, typeParameterIndex);
+		type = typeSettings.getUnwrapStrategy().unwrap(type);
+		EGenericType eGenericType = myTypeResolver.resolveEGenericType(type, false, typeParameterIndex);
 		eTypedElement.setEGenericType(eGenericType);
 	}
 	

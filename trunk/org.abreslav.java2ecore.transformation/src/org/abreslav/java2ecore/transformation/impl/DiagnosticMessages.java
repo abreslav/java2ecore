@@ -10,7 +10,6 @@ public enum DiagnosticMessages implements IDiagnosticMessage {
 	ENUMS_DO_NOT_IMPLEMENT_INTERFACES("Ecore enums do not implement interfaces"),
 	NOTHING_BUT_LITERALS_ALLOWED_IN_ENUMS("Nothing but literals is allowed in enums"),
 	NO_CONTENT_ALLOWED_FOR_EDATATYPES("No content is allowed for EDataTypes"),
-	ONLY_ECLASS_MIGHT_BE_A_SUPERTYPE("Only EClass might be a supertype"),
 	NESTED_TYPES_ARE_NOT_SUPPORTED_BY_ECORE("Nested types are not supported by Ecore"),
 	ONLY_ONE_BODY_CLASS_IS_ALLOWED("Only one body class is allowed"),
 	ALL_THE_FEATURES_MUST_BE_SPECIFIED_IN_A_BODY_CLASS("If a body class is present, all the features must be specified in this type"),
@@ -30,6 +29,8 @@ public enum DiagnosticMessages implements IDiagnosticMessage {
 	ONE_TOPLEVEL_CLASS_PER_PACKAGE("All the types must be contained in a package. Only one top-level package might be declared in a compilation unit"),
 	ROOT_PACKAGE_TYPE_CANNOT_BE_NON_MODEL("Root package type cannot be non-model"),
 	TOP_LEVEL_TYPE_MUST_BE_EPACKAGE("This type must declare @EPackage annotation"),
+	UNKNOWN_CLASS("Type %s is not known as model class"),
+	UNKNOWN_TYPE("Type %s is not known as a model type"), 
 	;
 	
 	private final String myTemplate;

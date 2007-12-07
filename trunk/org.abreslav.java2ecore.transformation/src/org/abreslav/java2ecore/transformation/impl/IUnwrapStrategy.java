@@ -3,26 +3,28 @@
  */
 package org.abreslav.java2ecore.transformation.impl;
 
-import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.ArrayType;
+import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.Type;
 
 interface IUnwrapStrategy {
-	ITypeBinding unwrap(ITypeBinding binding);
+	Type unwrap(Type type);
 	
 	IUnwrapStrategy NO_UNWRAP = new IUnwrapStrategy() {
-		public ITypeBinding unwrap(ITypeBinding binding) {
-			return binding;
+		public Type unwrap(Type type) {
+			return type;
 		}
 	};
 	
 	IUnwrapStrategy UNWRAP_ARRAY = new IUnwrapStrategy() {
-		public ITypeBinding unwrap(ITypeBinding binding) {
-			return binding.getElementType();
+		public Type unwrap(Type type) {
+			return ((ArrayType) type).getElementType();
 		}
 	};
 	
 	IUnwrapStrategy UNWRAP_GENERIC = new IUnwrapStrategy() {
-		public ITypeBinding unwrap(ITypeBinding binding) {
-			return binding.getTypeArguments()[0];
+		public Type unwrap(Type type) {
+			return (Type) ((ParameterizedType) type).typeArguments().get(0);
 		}
 	};
 }

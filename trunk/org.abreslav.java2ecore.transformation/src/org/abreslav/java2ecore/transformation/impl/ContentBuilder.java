@@ -30,6 +30,8 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.TypeParameter;
+
 import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.*;
 
 public class ContentBuilder {
@@ -109,7 +111,10 @@ public class ContentBuilder {
 
 		AnnotationView eDataTypeAnnotation = view.getAnnotation(org.abreslav.java2ecore.annotations.types.EDataType.class);
 		eDataType.setInstanceTypeName((String) eDataTypeAnnotation.getDefaultAttribute());
-		myTypeResolver.createTypeParameters(eDataType, type.resolveBinding());
+
+		@SuppressWarnings("unchecked")
+		List<TypeParameter> typeParameters = (List<TypeParameter>) type.getStructuralProperty(TypeDeclaration.TYPE_PARAMETERS_PROPERTY);
+		myTypeResolver.createTypeParameters(eDataType, typeParameters);
 	}
 	
 	public void buildEClass(TypeDeclaration type, EClass eClass) {
@@ -130,19 +135,16 @@ public class ContentBuilder {
 		} else {
 			eClass.setInterface(false);
 		}
-		
-		ITypeBinding binding = type.resolveBinding();
+
+		@SuppressWarnings("unchecked")
+		List<TypeParameter> typeParameters = (List<TypeParameter>) type.getStructuralProperty(TypeDeclaration.TYPE_PARAMETERS_PROPERTY);
 		TypeParameterIndex typeParameterIndex = myTypeResolver.createTypeParameters(
-				eClass, binding);
+				eClass, typeParameters);
 		
 		List<Type> supertypes = getSupertypes(type);
 		for (Type supertype : supertypes) {
-			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(supertype.resolveBinding(), true, typeParameterIndex);
-			if (eSuperClass != null) {
-				eClass.getEGenericSuperTypes().add(eSuperClass);
-			} else {
-				myDiagnostics.reportError(supertype, ONLY_ECLASS_MIGHT_BE_A_SUPERTYPE);
-			}
+			EGenericType eSuperClass = myTypeResolver.resolveEGenericType(supertype, true, typeParameterIndex);
+			eClass.getEGenericSuperTypes().add(eSuperClass);
 		}
 		
 		TypeDeclaration[] types = type.getTypes();
