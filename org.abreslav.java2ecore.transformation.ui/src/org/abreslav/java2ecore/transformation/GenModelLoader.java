@@ -8,6 +8,7 @@ import org.abreslav.java2ecore.transformation.imports.genmodel.ModelLoadingExcep
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.common.util.URI;
@@ -26,7 +27,7 @@ public class GenModelLoader implements IGenModelLoader {
 		myRoot = root;
 	}
 
-	public ResourceSet createResourceSet() {
+	public ResourceSet createResourceSet(final IContainer root) {
 		ResourceSetImpl resourceSetImpl = new ResourceSetImpl();
 		resourceSetImpl.setURIResourceMap(new HashMap<URI, Resource>());
 		ResourceSet resourceSet = resourceSetImpl;
@@ -38,7 +39,7 @@ public class GenModelLoader implements IGenModelLoader {
 			public URI normalize(URI uri) {
 				String scheme = uri.scheme();
 				if (scheme == null) {
-					IFile file = myRoot.getFile(Path.fromPortableString(uri.toFileString()));
+					IFile file = root.getFile(Path.fromPortableString(uri.toFileString()));
 					java.net.URI locationURI = file.getLocationURI();
 					URI fileURI = URI.createFileURI(locationURI.getPath().toString());
 					return fileURI;
@@ -49,13 +50,21 @@ public class GenModelLoader implements IGenModelLoader {
 		return resourceSet;
 	}
 
-	public GenModel loadGenModel(String path) throws ModelLoadingException {
-		IFile file = myRoot.getFile(Path.fromPortableString(path));
+	public GenModel loadGenModel(String locator) throws ModelLoadingException {
+		IPath path = Path.fromPortableString(locator);
+		IFile file;
+		if (path.getDevice() != null) {
+			throw new ModelLoadingException("Only paths in the workspace are supported");
+		} else if (path.isAbsolute()) {
+			file = myRoot.getWorkspace().getRoot().getFile(path);
+		} else {
+			file = myRoot.getFile(path);
+		}
 		if (!file.exists()) {
 			throw new ModelLoadingException("GenModel file does not exist");
 		}
-		ResourceSet resourceSet = createResourceSet();
-		Resource resource = resourceSet.createResource(URI.createURI(path));
+		ResourceSet resourceSet = createResourceSet(file.getParent());
+		Resource resource = resourceSet.createResource(URI.createURI(locator));
 		try {
 			resource.load(file.getContents(), null);
 		} catch (IOException e) {
