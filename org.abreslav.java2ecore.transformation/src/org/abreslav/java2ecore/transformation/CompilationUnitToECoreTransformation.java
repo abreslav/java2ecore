@@ -5,9 +5,9 @@ import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.NO_
 import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.ONE_TOPLEVEL_CLASS_PER_PACKAGE;
 import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.ROOT_PACKAGE_TYPE_CANNOT_BE_NON_MODEL;
 import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.TOP_LEVEL_TYPE_MUST_BE_EPACKAGE;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.UNKNOWN_TYPE;
+import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.UNKNOWN_CLASS;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.abreslav.java2ecore.annotations.ImportGenModel;
@@ -28,6 +28,7 @@ import org.abreslav.java2ecore.transformation.deferred.IDeferredActions;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.abreslav.java2ecore.transformation.impl.ContentBuilder;
 import org.abreslav.java2ecore.transformation.impl.DeclarationCollector;
+import org.abreslav.java2ecore.transformation.impl.IUnknownTypeHandler;
 import org.abreslav.java2ecore.transformation.impl.ItemStorage;
 import org.abreslav.java2ecore.transformation.impl.ItemStorageWithStringKeys;
 import org.abreslav.java2ecore.transformation.impl.TypeResolver;
@@ -35,18 +36,18 @@ import org.abreslav.java2ecore.transformation.imports.genmodel.GenModelImportRes
 import org.abreslav.java2ecore.transformation.imports.genmodel.IGenModelLoader;
 import org.abreslav.java2ecore.transformation.imports.genmodel.ModelLoadingException;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
-import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public class CompilationUnitToECoreTransformation {
 
-	public static EPackage transform(ICompilationUnit compilationUnit, IGenModelLoader genModelLoader, IDiagnostics diagnostics) throws JavaModelException {
+	public static EPackage transform(ICompilationUnit compilationUnit, IGenModelLoader genModelLoader, final IDiagnostics diagnostics) throws JavaModelException {
 		CompilationUnit unitAST = createAST(compilationUnit);
 		
 		@SuppressWarnings("unchecked")
@@ -80,19 +81,24 @@ public class CompilationUnitToECoreTransformation {
 			return null;
 		}
 
-		Collection<EClassifier> unknownTypes = new ArrayList<EClassifier>();
 		ItemStorageWithStringKeys storageWithStringKeys = new ItemStorageWithStringKeys();
 		
 		processGenModelImports(genModelLoader, diagnostics, annotatedView,
 				storageWithStringKeys);
 		
-		IItemStorage itemStorage = new ItemStorage(storageWithStringKeys,declarationStorage);
+		IItemStorage itemStorage = new ItemStorage(storageWithStringKeys, declarationStorage);
+		IUnknownTypeHandler unknownTypes = new IUnknownTypeHandler() {
+			public void handleUnknownType(String typeName, ASTNode node) {
+				diagnostics.reportErrorFormatted(node, UNKNOWN_TYPE, typeName);
+			}
+
+			public void handleUnknownClass(String typeName, ASTNode node) {
+				diagnostics.reportErrorFormatted(node, UNKNOWN_CLASS, typeName);
+			}
+		};
 		ITypeResolver typeResolver = new TypeResolver(itemStorage, unknownTypes);
 		rootEPackage = buildCollectedItems(diagnostics, typeResolver, declarationStorage);
 
-		if (rootEPackage != null) {
-			rootEPackage.getEClassifiers().addAll(unknownTypes);
-		}
 		return rootEPackage;
 	}
 

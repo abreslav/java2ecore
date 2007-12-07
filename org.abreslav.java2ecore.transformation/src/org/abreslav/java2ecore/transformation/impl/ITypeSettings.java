@@ -1,6 +1,6 @@
 package org.abreslav.java2ecore.transformation.impl;
 
-interface ITypeSettings {
+interface ITypeSettings { 
 
 	int getLowerBound();
 
