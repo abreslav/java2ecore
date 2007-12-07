@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="import_genmodel" nsURI="http://sdfsad.com" nsPrefix="some">
+  <eClassifiers xsi:type="ecore:EClass" name="X">
+    <eSuperTypes href="another_model.ecore#//SampleInterface"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="l">
+      <eType xsi:type="ecore:EClass" href="imported_model.ecore#//Library"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="e" defaultValueLiteral="B">
+      <eType xsi:type="ecore:EEnum" href="imported_model.ecore#//E"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="s">
+      <eType xsi:type="ecore:EClass" href="another_model.ecore#//SampleClass"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ee">
+      <eType xsi:type="ecore:EEnum" href="another_model.ecore#//SampleEnum"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+</ecore:EPackage>
