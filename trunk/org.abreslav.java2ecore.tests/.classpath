@@ -3,9 +3,10 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="ecores"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Eclipse-Extensions/eclipse/plugins/org.eclipse.emf.ecore_2.3.1.v200709252135.jar"/>
-	<classpathentry kind="lib" path="C:/Eclipse-Extensions/eclipse/plugins/org.eclipse.emf.common_2.3.0.v200709252135.jar"/>
-	<classpathentry kind="lib" path="C:/Eclipse-Extensions/eclipse/plugins/org.eclipse.emf_2.3.0.v200709252135.jar"/>
-	<classpathentry kind="var" path="Java2Ecore"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="var" path="Java2Ecore" sourcepath="Java2Ecore"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.emf_2.3.0.v200709252135.jar"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.emf.common_2.3.0.v200709252135.jar"/>
+	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.emf.ecore_2.3.1.v200709252135.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
