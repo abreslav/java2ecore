@@ -10,7 +10,7 @@ import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
 )
 public class feature_annotations {    
 
-	class A {
+	class A { 
 	abstract class _{
 		int adef;
 		A fdef;

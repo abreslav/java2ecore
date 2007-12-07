@@ -14,7 +14,7 @@ import org.abreslav.java2ecore.multiplicities._5;
 		nsPrefix="some",   
 		nsURI="http://sdfsad.com"
 )
-public class bounds_annotation {    
+public class bounds_annotation {     
     
 	class A {
 	abstract class _{ 
@@ -30,10 +30,10 @@ public class bounds_annotation {
 		int x;		
 		
 		@Bounds({1, 5})
-		int[] xx;		
+		int[] xx;	 	
 		
 		@Bounds({1, 5})
-		List<Integer> xxlist;		
+		List<Integer> xxlist;	  	
 		
 		@Bounds({1, 5})
 		Set<Integer> xxset;		
@@ -54,7 +54,7 @@ public class bounds_annotation {
 		@Bounds({1, -1})
 		abstract A a();
 		
-		@Bounds({1, 5})
+		@Bounds({1, 5}) 
 		abstract int a(
 				@Bounds({1, 5})
 				float a,

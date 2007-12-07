@@ -1,3 +1,4 @@
+package errors;
 import java.io.Reader;
 
 import org.abreslav.java2ecore.annotations.EPackage;

@@ -12,7 +12,7 @@ import org.abreslav.java2ecore.multiplicities._0;
 		nsURI="http://sdfsad.com"
 )
 public class non_model_class {    
-
+ 
 	@NonModel
 	interface _239 extends IUpperBound, ILowerBound {
 	}

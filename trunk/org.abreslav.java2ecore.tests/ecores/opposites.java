@@ -12,7 +12,7 @@ public class opposites {
 		@Opposite("a") 
 		List<B> b;
 	} 
-	
+	 
 	class B {
 		A a; 
 		C c;

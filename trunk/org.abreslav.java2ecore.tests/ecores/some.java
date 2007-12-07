@@ -1,7 +1,5 @@
 
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
@@ -57,14 +55,29 @@ public class some {
 	    
 	enum Enum {     
 		A, B, C;  
-	}     
+	}      
 	   
+	@EDataType("java.lang.Exception")
+	class Exception extends Throwable {		
+	}
+	
+	@EDataType("java.lang.RuntimeException")
+	class RuntimeException extends Throwable {		
+	}
+	
+	@EDataType("java.io.IOException")
+	class IOException extends Throwable {		
+	}
+	
 	abstract @EClass interface D {
 		void a() throws Exception, RuntimeException, IOException;
 		<T, F extends C & D> MyIntf<T, T> t(Q<? super F> t) throws Exception;
 	}
-
-	 
+ 
+	@EDataType("java.util.Comparable<T>")
+	interface Comparable<T> {
+	}
+	
 	@EClass interface B<T extends MyIntf<T, ? extends T>> extends D, C, A<T> {
 	class _<T extends MyIntf<T, ? extends T>> {
 		Comparable<T> my;
@@ -88,6 +101,10 @@ public class some {
 			Reader r;
 		}
 		
+		@EDataType("java.io.Reader")
+		class Reader {
+			
+		}
 		
 	}
 	    

@@ -8,7 +8,7 @@ import org.abreslav.java2ecore.annotations.sfeatures.NoDefaultValue;
 )
 public class default_value_literal {    
 
-	class A {
+	class A { 
 	abstract class _{
 		A aa = null; 
 
