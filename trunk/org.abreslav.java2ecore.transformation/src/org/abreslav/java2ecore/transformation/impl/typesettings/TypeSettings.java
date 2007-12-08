@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typesettings;
 
 class TypeSettings implements IOverridableTypeSettings {
 	public static final int BOUNDS_SPECIFIED_BY_TYPE = -3;

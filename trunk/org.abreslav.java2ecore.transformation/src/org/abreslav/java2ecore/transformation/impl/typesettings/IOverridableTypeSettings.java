@@ -1,4 +1,4 @@
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typesettings;
 
 interface IOverridableTypeSettings extends ITypeSettings {
 

@@ -18,13 +18,17 @@ import org.abreslav.java2ecore.annotations.sfeatures.NoDefaultValue;
 import org.abreslav.java2ecore.annotations.sfeatures.Opposite;
 import org.abreslav.java2ecore.annotations.sfeatures.ResolveProxies;
 import org.abreslav.java2ecore.annotations.sfeatures.Unsettable;
-import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
 import org.abreslav.java2ecore.transformation.deferred.IDeferredActions;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
 import org.abreslav.java2ecore.transformation.impl.deferred.SetOppositeAction;
+import org.abreslav.java2ecore.transformation.impl.typeresolver.ITypeResolver;
+import org.abreslav.java2ecore.transformation.impl.typeresolver.TypeParameterIndex;
+import org.abreslav.java2ecore.transformation.impl.typesettings.ITypeSettings;
+import org.abreslav.java2ecore.transformation.impl.typesettings.MyTypedElement;
+import org.abreslav.java2ecore.transformation.impl.typesettings.TypeSettingsCalculator;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -203,7 +207,7 @@ public class MemberBuilder extends ASTVisitor {
 		eTypedElement.setUnique(typeSettings.isUnique());
 		eTypedElement.setOrdered(typeSettings.isOrdered());
 		
-		type = typeSettings.getUnwrapStrategy().unwrap(type);
+		type = typeSettings.getUnwrapStrategy().unwrap(type); 
 		EGenericType eGenericType = myTypeResolver.resolveEGenericType(type, false, typeParameterIndex);
 		if (eGenericType.getEClassifier() != null) {
 			eTypedElement.setEGenericType(eGenericType);

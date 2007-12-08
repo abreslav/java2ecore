@@ -2,7 +2,7 @@ package org.abreslav.java2ecore.transformation.imports.genmodel;
 
 import java.util.List;
 
-import org.abreslav.java2ecore.transformation.impl.ItemStorageWithStringKeys;
+import org.abreslav.java2ecore.transformation.impl.typeresolver.ItemStorageWithStringKeys;
 import org.eclipse.emf.codegen.ecore.genmodel.GenClass;
 import org.eclipse.emf.codegen.ecore.genmodel.GenEnum;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;

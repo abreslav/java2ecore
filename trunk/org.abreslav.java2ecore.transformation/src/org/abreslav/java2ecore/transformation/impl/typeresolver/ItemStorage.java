@@ -1,6 +1,5 @@
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typeresolver;
 
-import org.abreslav.java2ecore.transformation.IItemStorage;
 import org.abreslav.java2ecore.transformation.declarations.EClassDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EDataTypeDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.EEnumDeclaration;

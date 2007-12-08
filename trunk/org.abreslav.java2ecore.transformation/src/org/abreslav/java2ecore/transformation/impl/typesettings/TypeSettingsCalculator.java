@@ -1,4 +1,4 @@
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typesettings;
 
 import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.ATTRIBUTE_SPECIFIED_BY_FEATURE_TYPE;
 import static org.abreslav.java2ecore.transformation.impl.DiagnosticMessages.LOWERBOUND_CANNOT_BE_INFINITE;

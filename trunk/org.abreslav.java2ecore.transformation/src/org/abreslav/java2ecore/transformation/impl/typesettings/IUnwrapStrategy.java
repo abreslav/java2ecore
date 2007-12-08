@@ -1,13 +1,13 @@
 /**
  * 
  */
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typesettings;
 
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.Type;
 
-interface IUnwrapStrategy {
+public interface IUnwrapStrategy {
 	Type unwrap(Type type);
 	
 	IUnwrapStrategy NO_UNWRAP = new IUnwrapStrategy() {

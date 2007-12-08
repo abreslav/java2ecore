@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.abreslav.java2ecore.annotations.types.InstanceTypeName;
-import org.abreslav.java2ecore.transformation.ITypeResolver;
 import org.abreslav.java2ecore.transformation.astview.ASTViewFactory;
 import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
 import org.abreslav.java2ecore.transformation.deferred.IDeferredActions;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import org.abreslav.java2ecore.transformation.impl.typeresolver.ITypeResolver;
+import org.abreslav.java2ecore.transformation.impl.typeresolver.TypeParameterIndex;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;

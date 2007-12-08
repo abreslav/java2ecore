@@ -19,6 +19,7 @@ import org.abreslav.java2ecore.transformation.astview.AnnotatedView;
 import org.abreslav.java2ecore.transformation.astview.AnnotationView;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnosticMessage;
 import org.abreslav.java2ecore.transformation.diagnostics.IDiagnostics;
+import org.abreslav.java2ecore.transformation.utils.SetFactory;
 
 @SuppressWarnings("unchecked")
 public class AnnotationValidator {
