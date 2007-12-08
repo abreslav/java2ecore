@@ -121,6 +121,8 @@ public class Java2ECoreBuilder extends IncrementalProjectBuilder {
 			TransformationPerformer.performTransformation(compilationUnit);
 		} catch (IOException e) {
 			throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, e.getMessage(), e));
+		} catch (RuntimeException e) {
+			throw new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, IStatus.OK, "Exception in builder while processing " + compilationUnit.getElementName(), e));
 		}
 	}
 	
