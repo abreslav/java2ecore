@@ -8,10 +8,10 @@ import org.abreslav.java2ecore.annotations.EPackage;
 		nsURI="..."
 )
 public class unknown_superclass {
-	class A {
-		Reader r;
-	}
-	
+	class A { 
+		Reader r; 
+	} 
+	  
 	abstract class B extends Reader {
 		
 	}

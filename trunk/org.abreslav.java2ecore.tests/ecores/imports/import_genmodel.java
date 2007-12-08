@@ -28,5 +28,4 @@ public class import_genmodel {
 		SampleEnum ee;
 	}
 	}
-	    
 }  

@@ -105,9 +105,7 @@
   <eClassifiers xsi:type="ecore:EDataType" name="RuntimeException" instanceClassName="java.lang.RuntimeException"/>
   <eClassifiers xsi:type="ecore:EDataType" name="IOException" instanceClassName="java.io.IOException"/>
   <eClassifiers xsi:type="ecore:EClass" name="D" abstract="true">
-    <eOperations name="a" eExceptions="//Exception //RuntimeException //IOException">
-      <eType xsi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EJavaObject"/>
-    </eOperations>
+    <eOperations name="a" eExceptions="//Exception //RuntimeException //IOException"/>
     <eOperations name="t" eExceptions="//Exception">
       <eGenericType eClassifier="//MyIntf">
         <eTypeArguments eTypeParameter="//D/t/T">

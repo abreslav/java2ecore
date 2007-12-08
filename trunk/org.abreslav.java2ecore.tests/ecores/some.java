@@ -21,7 +21,7 @@ import org.abreslav.java2ecore.multiplicities._4;
 public class some {    
 	interface I {}  
 
-	@NonModel
+	@NonModel 
 	interface _239 extends IUpperBound, ILowerBound {
 		
 	}

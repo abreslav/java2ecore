@@ -17,7 +17,7 @@ import org.abreslav.java2ecore.multiplicities._5;
 public class bounds_annotation {     
     
 	class A {
-	abstract class _{ 
+	abstract class _{  
 		@Bounds()  
 		int xdefaultBounds;		
 		
