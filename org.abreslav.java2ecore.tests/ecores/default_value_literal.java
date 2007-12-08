@@ -7,7 +7,7 @@ import org.abreslav.java2ecore.annotations.sfeatures.NoDefaultValue;
 		nsURI="http://sdfsad.com"
 )
 public class default_value_literal {    
-
+ 
 	class A { 
 	abstract class _{
 		A aa = null; 
