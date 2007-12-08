@@ -162,7 +162,8 @@ public class MemberBuilder extends ASTVisitor {
 
 	private EStructuralFeature createFeature(AnnotatedView annotations,
 			EGenericType eGenericType) {
-		if (eGenericType.getEClassifier() instanceof EDataType) {
+		if ((eGenericType == null) 
+				|| (eGenericType.getEClassifier() instanceof EDataType)) {
 			AnnotationValidator.checkEAttributeAnnotations(annotations, myDiagnostics);
 			boolean isId = annotations.isAnnotationPresent(ID.class);
 			EAttribute result = EcoreFactory.eINSTANCE.createEAttribute();
@@ -204,7 +205,9 @@ public class MemberBuilder extends ASTVisitor {
 		
 		type = typeSettings.getUnwrapStrategy().unwrap(type);
 		EGenericType eGenericType = myTypeResolver.resolveEGenericType(type, false, typeParameterIndex);
-		eTypedElement.setEGenericType(eGenericType);
+		if (eGenericType.getEClassifier() != null) {
+			eTypedElement.setEGenericType(eGenericType);
+		}
 	}
 	
 	private void setDefaultValue(EStructuralFeature feature,

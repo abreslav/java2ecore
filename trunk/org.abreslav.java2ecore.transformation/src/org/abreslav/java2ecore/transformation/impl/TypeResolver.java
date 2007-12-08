@@ -95,26 +95,37 @@ public class TypeResolver implements ITypeResolver {
 	}
 
 	public Collection<ETypeParameter> createETypeParameters(
-			TypeParameterIndex typeParameterIndex,
+			final TypeParameterIndex typeParameterIndex,
 			List<TypeParameter> typeParameters) {
+		List<Runnable> deferredCommands = new ArrayList<Runnable>();
 		Collection<ETypeParameter> eTypeParameters = new ArrayList<ETypeParameter>();
-		for (TypeParameter typeParameter : typeParameters) {
-			ETypeParameter eTypeParameter = EcoreFactory.eINSTANCE.createETypeParameter();
+		for (final TypeParameter typeParameter : typeParameters) {
+			final ETypeParameter eTypeParameter = EcoreFactory.eINSTANCE.createETypeParameter();
 			eTypeParameter.setName(typeParameter.getName().getIdentifier());
 			typeParameterIndex.registerTypeParameter(eTypeParameter);
-			
-			@SuppressWarnings("unchecked")
-			List<Type> typeBounds = typeParameter.typeBounds();
-			for (Type typeBound : typeBounds) {
-				// TODO: Strange hack :)
-				if (Object.class.getName().equals(typeBound.resolveBinding().getQualifiedName())) {
-					continue;
+
+			deferredCommands.add(new Runnable() {
+				public void run() {
+					@SuppressWarnings("unchecked")
+					List<Type> typeBounds = typeParameter.typeBounds();
+					for (Type typeBound : typeBounds) {
+						// TODO: Strange hack :)
+						if (Object.class.getName().equals(typeBound.resolveBinding().getQualifiedName())) {
+							continue;
+						}
+						EGenericType eTypeBound = resolveEGenericType(typeBound, false, typeParameterIndex);
+						eTypeParameter.getEBounds().add(eTypeBound);
+					}
 				}
-				EGenericType eTypeBound = resolveEGenericType(typeBound, false, typeParameterIndex);
-				eTypeParameter.getEBounds().add(eTypeBound);
-			}
+			});
+			
 			eTypeParameters.add(eTypeParameter);
 		}
+		
+		for (Runnable runnable : deferredCommands) {
+			runnable.run();
+		}
+		
 		return eTypeParameters;
 	}
 
