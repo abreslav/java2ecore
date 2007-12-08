@@ -33,6 +33,7 @@ import org.abreslav.java2ecore.transformation.impl.typeresolver.IItemStorage;
 import org.abreslav.java2ecore.transformation.impl.typeresolver.ITypeResolver;
 import org.abreslav.java2ecore.transformation.impl.typeresolver.ItemStorage;
 import org.abreslav.java2ecore.transformation.impl.typeresolver.ItemStorageWithStringKeys;
+import org.abreslav.java2ecore.transformation.impl.typeresolver.RegisteredClasses;
 import org.abreslav.java2ecore.transformation.impl.typeresolver.TypeResolver;
 import org.abreslav.java2ecore.transformation.imports.genmodel.GenModelImportResolver;
 import org.abreslav.java2ecore.transformation.imports.genmodel.IGenModelLoader;
@@ -83,7 +84,7 @@ public class CompilationUnitToECoreTransformation {
 			return null;
 		}
 
-		ItemStorageWithStringKeys storageWithStringKeys = new ItemStorageWithStringKeys();
+		ItemStorageWithStringKeys storageWithStringKeys = new ItemStorageWithStringKeys(RegisteredClasses.INSTANCE);
 		
 		processGenModelImports(genModelLoader, diagnostics, annotatedView,
 				storageWithStringKeys);

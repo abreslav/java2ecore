@@ -8,11 +8,9 @@ import org.abreslav.java2ecore.transformation.declarations.IDeclaration;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationStorage;
 import org.abreslav.java2ecore.transformation.declarations.IDeclarationVisitor;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 public class ItemStorage implements IItemStorage {
@@ -20,20 +18,7 @@ public class ItemStorage implements IItemStorage {
 	
 	public ItemStorage(ItemStorageWithStringKeys impl, IDeclarationStorage declarationStorage) {
 		myImpl = impl;
-		importEcorePackageContents();
 		importDeclarations(declarationStorage);
-	}
-
-	private void importEcorePackageContents() {
-		for (EClassifier classifier : EcorePackage.eINSTANCE.getEClassifiers()) {
-			if (classifier.getInstanceClassName() != null) {
-				if (classifier instanceof EDataType) {
-					myImpl.addEDataType(classifier.getInstanceClassName(), (EDataType) classifier);
-				} else if (classifier instanceof EClass) {
-					myImpl.addEClass(classifier.getInstanceClassName(), (EClass) classifier);
-				}
-			}
-		}
 	}
 
 	private void importDeclarations(IDeclarationStorage declarationStorage) {

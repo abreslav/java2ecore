@@ -8,11 +8,21 @@ import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnum;
 import org.eclipse.emf.ecore.EPackage;
 
-public class ItemStorageWithStringKeys {
+public class ItemStorageWithStringKeys implements IItemStorageWithStringKeys {
 	private final Map<String, EClass> myEClasses = new HashMap<String, EClass>();
 	private final Map<String, EDataType> myEDataTypes = new HashMap<String, EDataType>();
 	private final Map<String, EEnum> myEEnums = new HashMap<String, EEnum>();
 	private final Map<String, EPackage> myEPackages = new HashMap<String, EPackage>();
+
+	private final IItemStorageWithStringKeys myParent;
+	
+	public ItemStorageWithStringKeys() {
+		this(NullStorage.INSTANCE);
+	}
+	
+	public ItemStorageWithStringKeys(IItemStorageWithStringKeys parent) {
+		myParent = parent;
+	}
 
 	public void addEClass(String type, EClass class1) {
 		myEClasses.put(type, class1);
@@ -31,19 +41,35 @@ public class ItemStorageWithStringKeys {
 	}
 
 	public EClass getEClass(String type) {
-		return myEClasses.get(type);
+		EClass result = myEClasses.get(type);
+		if (result == null) {
+			result = myParent.getEClass(type);
+		}
+		return result;
 	}
 
 	public EDataType getEDataType(String type) {
-		return myEDataTypes.get(type);
+		EDataType result = myEDataTypes.get(type);
+		if (result == null) {
+			result = myParent.getEDataType(type);
+		}
+		return result;
 	}
 
 	public EEnum getEEnum(String type) {
-		return myEEnums.get(type);
+		EEnum result = myEEnums.get(type);
+		if (result == null) {
+			result = myParent.getEEnum(type);
+		}
+		return result;
 	}
 
 	public EPackage getEPackage(String type) {
-		return myEPackages.get(type);
+		EPackage result = myEPackages.get(type);
+		if (result == null) {
+			result = myParent.getEPackage(type);
+		}
+		return result;
 	}
 
 }
