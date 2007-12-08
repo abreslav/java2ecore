@@ -1,4 +1,4 @@
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typesettings;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
@@ -14,7 +14,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.ETypedElement;
 import org.eclipse.emf.ecore.resource.Resource;
 
-/*package*/ class MyTypedElement implements ETypedElement {
+public class MyTypedElement implements ETypedElement {
 
 	private EGenericType myGenericType;
 	private int myLowerBound;

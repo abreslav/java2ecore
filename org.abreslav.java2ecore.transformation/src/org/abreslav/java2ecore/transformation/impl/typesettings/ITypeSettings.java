@@ -1,6 +1,6 @@
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typesettings;
 
-interface ITypeSettings { 
+public interface ITypeSettings { 
 
 	int getLowerBound();
 

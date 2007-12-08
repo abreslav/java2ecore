@@ -1,11 +1,10 @@
-package org.abreslav.java2ecore.transformation.impl;
+package org.abreslav.java2ecore.transformation.impl.typeresolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.abreslav.java2ecore.transformation.IItemStorage;
-import org.abreslav.java2ecore.transformation.ITypeResolver;
+import org.abreslav.java2ecore.transformation.impl.IUnknownTypeHandler;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;

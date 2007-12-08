@@ -1,9 +1,8 @@
-package org.abreslav.java2ecore.transformation;
+package org.abreslav.java2ecore.transformation.impl.typeresolver;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.abreslav.java2ecore.transformation.impl.TypeParameterIndex;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EGenericType;
 import org.eclipse.emf.ecore.EPackage;
