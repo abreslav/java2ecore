@@ -4,7 +4,7 @@
  * Core features
   * Imports
    * Registered packages
-   * GenModels with generated Java code
+   * !GenModels with generated Java code
   * Unknown types are reported as errors
 
 = Version 0.2 beta =
