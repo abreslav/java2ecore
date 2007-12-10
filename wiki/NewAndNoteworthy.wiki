@@ -1,5 +1,12 @@
 #summary History of changes
 
+= Version 0.3 beta =
+ * Core features
+  * Imports
+   * Registered packages
+   * GenModels with generated Java code
+  * Unknown types are reported as errors
+
 = Version 0.2 beta =
  * Core features
   * Support for nested packages
