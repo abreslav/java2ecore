@@ -2,7 +2,7 @@
 <feature
       id="org.abreslav.java2ecore.feature"
       label="Java2Ecore"
-      version="0.2"
+      version="0.3"
       provider-name="Andrey Breslav">
 
    <description url="http://code.google.com/p/java2ecore/">
