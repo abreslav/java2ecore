@@ -84,7 +84,7 @@ public class CompilationUnitToECoreTransformation {
 			return null;
 		}
 
-		ItemStorageWithStringKeys storageWithStringKeys = new ItemStorageWithStringKeys(RegisteredClasses.INSTANCE);
+		ItemStorageWithStringKeys storageWithStringKeys = new ItemStorageWithStringKeys(RegisteredClasses.STORAGE);
 		
 		processGenModelImports(genModelLoader, diagnostics, annotatedView,
 				storageWithStringKeys);

@@ -1,5 +1,6 @@
 package org.abreslav.java2ecore.transformation.impl.typeresolver;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.emf.ecore.EClass;
@@ -10,13 +11,17 @@ import org.eclipse.emf.ecore.EcorePackage;
 
 public class RegisteredClasses {
 
-	public static ItemStorageWithStringKeys INSTANCE = new ItemStorageWithStringKeys();
+	public static ItemStorageWithStringKeys STORAGE = new ItemStorageWithStringKeys();
 	static {
-		importPackageContents(EcorePackage.eINSTANCE, INSTANCE);
-		Set<String> nsURIs = EPackage.Registry.INSTANCE.keySet();
+		importPackageContents(EcorePackage.eINSTANCE, STORAGE);
+		// Some new packages may be added during a walk through
+		// EPackage.Registry.INSTANCE.keySet()
+		// So we have to avoid ConcurrentModificationException
+		// Hack workaround (some packages will be missing)
+		Set<String> nsURIs = new HashSet<String>(EPackage.Registry.INSTANCE.keySet());
 		for (String nsURI : nsURIs) {
 			EPackage ePackage = EPackage.Registry.INSTANCE.getEPackage(nsURI);
-			importPackageContents(ePackage, INSTANCE);
+			importPackageContents(ePackage, STORAGE);
 		}
 	}
 	
