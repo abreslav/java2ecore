@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 
@@ -59,12 +58,15 @@ public class TransformationPerformer {
 		};
 		try {
 			IProject project = compilationUnit.getJavaProject().getProject();
+			GenModelLoader genModelLoader = new GenModelLoader(project);
 			EPackage ePackage = CompilationUnitToECoreTransformation.transform(
-					compilationUnit, new GenModelLoader(project), diagnostics);
+					compilationUnit, genModelLoader, diagnostics);
 
 			if (!hasErrors[0]) {
 				String fileName = ePackage.getName() + ".ecore";
-				Resource res = new XMIResourceFactoryImpl().createResource(URI
+//				Resource res = new XMIResourceFactoryImpl().createResource(URI
+//						.createURI(fileName));
+				Resource res = genModelLoader.getResourceSet().createResource(URI
 						.createURI(fileName));
 				res.getContents().add(ePackage);
 	

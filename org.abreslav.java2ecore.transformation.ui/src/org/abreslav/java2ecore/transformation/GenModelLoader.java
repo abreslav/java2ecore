@@ -21,32 +21,46 @@ import org.eclipse.emf.ecore.resource.impl.URIConverterImpl;
 
 public class GenModelLoader implements IGenModelLoader {
 
+	private final class RelativeURIConverter extends URIConverterImpl {
+		private IContainer myRoot;
+
+		private RelativeURIConverter() {
+		}
+		
+		public void setRoot(IContainer root) {
+			myRoot = root;
+		}
+
+		@Override
+		public URI normalize(URI uri) {
+			String scheme = uri.scheme();
+			if (scheme == null) {
+				IFile file = myRoot.getFile(Path.fromPortableString(uri.toFileString()));
+				java.net.URI locationURI = file.getLocationURI();
+				URI fileURI = URI.createFileURI(locationURI.getPath().toString());
+				return fileURI;
+			}
+			return super.normalize(uri);
+		}
+	}
+
 	private final IContainer myRoot;
+	private ResourceSet myResourceSet;
+	private RelativeURIConverter myURIConverter;
 	
 	public GenModelLoader(IContainer root) {
 		myRoot = root;
+		myURIConverter = new RelativeURIConverter();
+		myResourceSet = createResourceSet(myURIConverter);
 	}
 
-	public ResourceSet createResourceSet(final IContainer root) {
+	private ResourceSet createResourceSet(RelativeURIConverter relativeURIConverter) {
 		ResourceSetImpl resourceSetImpl = new ResourceSetImpl();
 		resourceSetImpl.setURIResourceMap(new HashMap<URI, Resource>());
 		ResourceSet resourceSet = resourceSetImpl;
 		resourceSet.setPackageRegistry(EPackage.Registry.INSTANCE);
 		resourceSet.setResourceFactoryRegistry(Resource.Factory.Registry.INSTANCE);
-		
-		resourceSet.setURIConverter(new URIConverterImpl() {
-			@Override
-			public URI normalize(URI uri) {
-				String scheme = uri.scheme();
-				if (scheme == null) {
-					IFile file = root.getFile(Path.fromPortableString(uri.toFileString()));
-					java.net.URI locationURI = file.getLocationURI();
-					URI fileURI = URI.createFileURI(locationURI.getPath().toString());
-					return fileURI;
-				}
-				return super.normalize(uri);
-			}
-		});
+		resourceSet.setURIConverter(relativeURIConverter);
 		return resourceSet;
 	}
 
@@ -63,8 +77,8 @@ public class GenModelLoader implements IGenModelLoader {
 		if (!file.exists()) {
 			throw new ModelLoadingException("GenModel file does not exist");
 		}
-		ResourceSet resourceSet = createResourceSet(file.getParent());
-		Resource resource = resourceSet.createResource(URI.createURI(locator));
+		myURIConverter.setRoot(file.getParent());
+		Resource resource = myResourceSet.createResource(URI.createURI(locator));
 		try {
 			resource.load(file.getContents(), null);
 		} catch (IOException e) {
@@ -72,6 +86,7 @@ public class GenModelLoader implements IGenModelLoader {
 		} catch (CoreException e) {
 			throw new ModelLoadingException(e);
 		}
+		System.out.println(resource.getURI());
 		if (resource.getContents().size() < 0) {
 			throw new ModelLoadingException("GenModel file does not contain a model");
 		}
@@ -82,4 +97,7 @@ public class GenModelLoader implements IGenModelLoader {
 		return (GenModel) object;
 	}
 
+	public ResourceSet getResourceSet() {
+		return myResourceSet;
+	}
 }
